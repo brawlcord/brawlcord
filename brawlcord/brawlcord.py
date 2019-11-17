@@ -342,6 +342,8 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         embed.add_field(name="Brawler", 
                 value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}")
         embed.add_field(name="Game Mode", value=gamemode)
+
+        await ctx.send(embed=embed)
     
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
