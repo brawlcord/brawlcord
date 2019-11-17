@@ -332,7 +332,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}")
 
         tokens = await self.get_player_stat(user, 'tokens')
-        embed.add_field(name="Tokens", value=f"{emojis['tokens']} {tokens}")
+        embed.add_field(name="Tokens", value=f"{emojis['token']} {tokens}")
 
         selected = await self.get_player_stat(user, 'selected', is_iter=True)
         brawler = selected['brawler']
@@ -438,7 +438,6 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         # brawler trophies
         selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
         brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=selected_brawler)
-        print(brawler_data)
         trophies = brawler_data['trophies']
 
         reward_trophies = self.trophies_to_reward_mapping(
@@ -455,11 +454,6 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         await self.update_player_stat(user, 'xp', xp)
         await self.update_player_stat(user, 'brawlers', trophies,
                                       substat=selected_brawler, sub_index='trophies')
-
-        # test (3 lines)
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=selected_brawler)
-        trophies = brawler_data['trophies']
-        print(trophies)
 
         user_avatar = user.avatar_url
 
