@@ -1,0 +1,13 @@
+{
+    "author" : "snowsee",
+    "install_msg" : "Thank you for trying out the Rush Wars cog.",
+    "name" : "BrawlCord",
+    "short" : "A simplified version of the game Brawl Stars, developed by Supercell.",
+    "description" : "Play the game Brawl Stars (by Supercell) on Discord.",
+	"tags": [
+		"rpg",
+        "supercell",
+        "brawlstars",
+        "games"
+	]
+}

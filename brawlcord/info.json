@@ -1,0 +1,18 @@
+{
+	"author": "snowsee",
+	"description": "An RPG for Discord.",
+    "install_msg" : "Thank you for trying out the Brawl Stars cog, based on the game developed by Supercell.",
+    "min_python_version": [3, 6, 0],
+    "permissions" : [
+		"add_reactions",
+		"manage_messages"
+	],
+	"short": "A simplified version of Brawl Stars for Discord.",
+	"tags": [
+		"rpg",
+        "supercell",
+        "brawlstars",
+        "games"
+	],
+	"type": "COG"
+}
