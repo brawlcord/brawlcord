@@ -1,0 +1,2497 @@
+{
+    "1": {
+        "ProgressStart": 0,
+        "Progress": 40,
+        "TokensRewardCount": 20
+    },
+    "2": {
+        "ProgressStart": 40,
+        "Progress": 50,
+        "TokensRewardCount": 20
+    },
+    "3": {
+        "ProgressStart": 90,
+        "Progress": 60,
+        "TokensRewardCount": 20
+    },
+    "4": {
+        "ProgressStart": 150,
+        "Progress": 70,
+        "TokensRewardCount": 20
+    },
+    "5": {
+        "ProgressStart": 220,
+        "Progress": 80,
+        "TokensRewardCount": 20
+    },
+    "6": {
+        "ProgressStart": 300,
+        "Progress": 90,
+        "TokensRewardCount": 20
+    },
+    "7": {
+        "ProgressStart": 390,
+        "Progress": 100,
+        "TokensRewardCount": 20
+    },
+    "8": {
+        "ProgressStart": 490,
+        "Progress": 110,
+        "TokensRewardCount": 20
+    },
+    "9": {
+        "ProgressStart": 600,
+        "Progress": 120,
+        "TokensRewardCount": 20
+    },
+    "10": {
+        "ProgressStart": 720,
+        "Progress": 130,
+        "TokensRewardCount": 20
+    },
+    "11": {
+        "ProgressStart": 850,
+        "Progress": 140,
+        "TokensRewardCount": 20
+    },
+    "12": {
+        "ProgressStart": 990,
+        "Progress": 150,
+        "TokensRewardCount": 20
+    },
+    "13": {
+        "ProgressStart": 1140,
+        "Progress": 160,
+        "TokensRewardCount": 20
+    },
+    "14": {
+        "ProgressStart": 1300,
+        "Progress": 170,
+        "TokensRewardCount": 20
+    },
+    "15": {
+        "ProgressStart": 1470,
+        "Progress": 180,
+        "TokensRewardCount": 20
+    },
+    "16": {
+        "ProgressStart": 1650,
+        "Progress": 190,
+        "TokensRewardCount": 20
+    },
+    "17": {
+        "ProgressStart": 1840,
+        "Progress": 200,
+        "TokensRewardCount": 20
+    },
+    "18": {
+        "ProgressStart": 2040,
+        "Progress": 210,
+        "TokensRewardCount": 20
+    },
+    "19": {
+        "ProgressStart": 2250,
+        "Progress": 220,
+        "TokensRewardCount": 20
+    },
+    "20": {
+        "ProgressStart": 2470,
+        "Progress": 230,
+        "TokensRewardCount": 20
+    },
+    "21": {
+        "ProgressStart": 2700,
+        "Progress": 240,
+        "TokensRewardCount": 20
+    },
+    "22": {
+        "ProgressStart": 2940,
+        "Progress": 250,
+        "TokensRewardCount": 20
+    },
+    "23": {
+        "ProgressStart": 3190,
+        "Progress": 260,
+        "TokensRewardCount": 20
+    },
+    "24": {
+        "ProgressStart": 3450,
+        "Progress": 270,
+        "TokensRewardCount": 20
+    },
+    "25": {
+        "ProgressStart": 3720,
+        "Progress": 280,
+        "TokensRewardCount": 20
+    },
+    "26": {
+        "ProgressStart": 4000,
+        "Progress": 290,
+        "TokensRewardCount": 20
+    },
+    "27": {
+        "ProgressStart": 4290,
+        "Progress": 300,
+        "TokensRewardCount": 20
+    },
+    "28": {
+        "ProgressStart": 4590,
+        "Progress": 310,
+        "TokensRewardCount": 20
+    },
+    "29": {
+        "ProgressStart": 4900,
+        "Progress": 320,
+        "TokensRewardCount": 20
+    },
+    "30": {
+        "ProgressStart": 5220,
+        "Progress": 330,
+        "TokensRewardCount": 20
+    },
+    "31": {
+        "ProgressStart": 5550,
+        "Progress": 340,
+        "TokensRewardCount": 20
+    },
+    "32": {
+        "ProgressStart": 5890,
+        "Progress": 350,
+        "TokensRewardCount": 20
+    },
+    "33": {
+        "ProgressStart": 6240,
+        "Progress": 360,
+        "TokensRewardCount": 20
+    },
+    "34": {
+        "ProgressStart": 6600,
+        "Progress": 370,
+        "TokensRewardCount": 20
+    },
+    "35": {
+        "ProgressStart": 6970,
+        "Progress": 380,
+        "TokensRewardCount": 20
+    },
+    "36": {
+        "ProgressStart": 7350,
+        "Progress": 390,
+        "TokensRewardCount": 20
+    },
+    "37": {
+        "ProgressStart": 7740,
+        "Progress": 400,
+        "TokensRewardCount": 20
+    },
+    "38": {
+        "ProgressStart": 8140,
+        "Progress": 410,
+        "TokensRewardCount": 20
+    },
+    "39": {
+        "ProgressStart": 8550,
+        "Progress": 420,
+        "TokensRewardCount": 20
+    },
+    "40": {
+        "ProgressStart": 8970,
+        "Progress": 430,
+        "TokensRewardCount": 20
+    },
+    "41": {
+        "ProgressStart": 9400,
+        "Progress": 440,
+        "TokensRewardCount": 20
+    },
+    "42": {
+        "ProgressStart": 9840,
+        "Progress": 450,
+        "TokensRewardCount": 20
+    },
+    "43": {
+        "ProgressStart": 10290,
+        "Progress": 460,
+        "TokensRewardCount": 20
+    },
+    "44": {
+        "ProgressStart": 10750,
+        "Progress": 470,
+        "TokensRewardCount": 20
+    },
+    "45": {
+        "ProgressStart": 11220,
+        "Progress": 480,
+        "TokensRewardCount": 20
+    },
+    "46": {
+        "ProgressStart": 11700,
+        "Progress": 490,
+        "TokensRewardCount": 20
+    },
+    "47": {
+        "ProgressStart": 12190,
+        "Progress": 500,
+        "TokensRewardCount": 20
+    },
+    "48": {
+        "ProgressStart": 12690,
+        "Progress": 510,
+        "TokensRewardCount": 20
+    },
+    "49": {
+        "ProgressStart": 13200,
+        "Progress": 520,
+        "TokensRewardCount": 20
+    },
+    "50": {
+        "ProgressStart": 13720,
+        "Progress": 530,
+        "TokensRewardCount": 20
+    },
+    "51": {
+        "ProgressStart": 14250,
+        "Progress": 540,
+        "TokensRewardCount": 20
+    },
+    "52": {
+        "ProgressStart": 14790,
+        "Progress": 550,
+        "TokensRewardCount": 20
+    },
+    "53": {
+        "ProgressStart": 15340,
+        "Progress": 560,
+        "TokensRewardCount": 20
+    },
+    "54": {
+        "ProgressStart": 15900,
+        "Progress": 570,
+        "TokensRewardCount": 20
+    },
+    "55": {
+        "ProgressStart": 16470,
+        "Progress": 580,
+        "TokensRewardCount": 20
+    },
+    "56": {
+        "ProgressStart": 17050,
+        "Progress": 590,
+        "TokensRewardCount": 20
+    },
+    "57": {
+        "ProgressStart": 17640,
+        "Progress": 600,
+        "TokensRewardCount": 20
+    },
+    "58": {
+        "ProgressStart": 18240,
+        "Progress": 610,
+        "TokensRewardCount": 20
+    },
+    "59": {
+        "ProgressStart": 18850,
+        "Progress": 620,
+        "TokensRewardCount": 20
+    },
+    "60": {
+        "ProgressStart": 19470,
+        "Progress": 630,
+        "TokensRewardCount": 20
+    },
+    "61": {
+        "ProgressStart": 20100,
+        "Progress": 640,
+        "TokensRewardCount": 20
+    },
+    "62": {
+        "ProgressStart": 20740,
+        "Progress": 650,
+        "TokensRewardCount": 20
+    },
+    "63": {
+        "ProgressStart": 21390,
+        "Progress": 660,
+        "TokensRewardCount": 20
+    },
+    "64": {
+        "ProgressStart": 22050,
+        "Progress": 670,
+        "TokensRewardCount": 20
+    },
+    "65": {
+        "ProgressStart": 22720,
+        "Progress": 680,
+        "TokensRewardCount": 20
+    },
+    "66": {
+        "ProgressStart": 23400,
+        "Progress": 690,
+        "TokensRewardCount": 20
+    },
+    "67": {
+        "ProgressStart": 24090,
+        "Progress": 700,
+        "TokensRewardCount": 20
+    },
+    "68": {
+        "ProgressStart": 24790,
+        "Progress": 710,
+        "TokensRewardCount": 20
+    },
+    "69": {
+        "ProgressStart": 25500,
+        "Progress": 720,
+        "TokensRewardCount": 20
+    },
+    "70": {
+        "ProgressStart": 26220,
+        "Progress": 730,
+        "TokensRewardCount": 20
+    },
+    "71": {
+        "ProgressStart": 26950,
+        "Progress": 740,
+        "TokensRewardCount": 20
+    },
+    "72": {
+        "ProgressStart": 27690,
+        "Progress": 750,
+        "TokensRewardCount": 20
+    },
+    "73": {
+        "ProgressStart": 28440,
+        "Progress": 760,
+        "TokensRewardCount": 20
+    },
+    "74": {
+        "ProgressStart": 29200,
+        "Progress": 770,
+        "TokensRewardCount": 20
+    },
+    "75": {
+        "ProgressStart": 29970,
+        "Progress": 780,
+        "TokensRewardCount": 20
+    },
+    "76": {
+        "ProgressStart": 30750,
+        "Progress": 790,
+        "TokensRewardCount": 20
+    },
+    "77": {
+        "ProgressStart": 31540,
+        "Progress": 800,
+        "TokensRewardCount": 20
+    },
+    "78": {
+        "ProgressStart": 32340,
+        "Progress": 810,
+        "TokensRewardCount": 20
+    },
+    "79": {
+        "ProgressStart": 33150,
+        "Progress": 820,
+        "TokensRewardCount": 20
+    },
+    "80": {
+        "ProgressStart": 33970,
+        "Progress": 830,
+        "TokensRewardCount": 20
+    },
+    "81": {
+        "ProgressStart": 34800,
+        "Progress": 840,
+        "TokensRewardCount": 20
+    },
+    "82": {
+        "ProgressStart": 35640,
+        "Progress": 850,
+        "TokensRewardCount": 20
+    },
+    "83": {
+        "ProgressStart": 36490,
+        "Progress": 860,
+        "TokensRewardCount": 20
+    },
+    "84": {
+        "ProgressStart": 37350,
+        "Progress": 870,
+        "TokensRewardCount": 20
+    },
+    "85": {
+        "ProgressStart": 38220,
+        "Progress": 880,
+        "TokensRewardCount": 20
+    },
+    "86": {
+        "ProgressStart": 39100,
+        "Progress": 890,
+        "TokensRewardCount": 20
+    },
+    "87": {
+        "ProgressStart": 39990,
+        "Progress": 900,
+        "TokensRewardCount": 20
+    },
+    "88": {
+        "ProgressStart": 40890,
+        "Progress": 910,
+        "TokensRewardCount": 20
+    },
+    "89": {
+        "ProgressStart": 41800,
+        "Progress": 920,
+        "TokensRewardCount": 20
+    },
+    "90": {
+        "ProgressStart": 42720,
+        "Progress": 930,
+        "TokensRewardCount": 20
+    },
+    "91": {
+        "ProgressStart": 43650,
+        "Progress": 940,
+        "TokensRewardCount": 20
+    },
+    "92": {
+        "ProgressStart": 44590,
+        "Progress": 950,
+        "TokensRewardCount": 20
+    },
+    "93": {
+        "ProgressStart": 45540,
+        "Progress": 960,
+        "TokensRewardCount": 20
+    },
+    "94": {
+        "ProgressStart": 46500,
+        "Progress": 970,
+        "TokensRewardCount": 20
+    },
+    "95": {
+        "ProgressStart": 47470,
+        "Progress": 980,
+        "TokensRewardCount": 20
+    },
+    "96": {
+        "ProgressStart": 48450,
+        "Progress": 990,
+        "TokensRewardCount": 20
+    },
+    "97": {
+        "ProgressStart": 49440,
+        "Progress": 1000,
+        "TokensRewardCount": 20
+    },
+    "98": {
+        "ProgressStart": 50440,
+        "Progress": 1010,
+        "TokensRewardCount": 20
+    },
+    "99": {
+        "ProgressStart": 51450,
+        "Progress": 1020,
+        "TokensRewardCount": 20
+    },
+    "100": {
+        "ProgressStart": 52470,
+        "Progress": 1030,
+        "TokensRewardCount": 20
+    },
+    "101": {
+        "ProgressStart": 53500,
+        "Progress": 1040,
+        "TokensRewardCount": 20
+    },
+    "102": {
+        "ProgressStart": 54540,
+        "Progress": 1050,
+        "TokensRewardCount": 20
+    },
+    "103": {
+        "ProgressStart": 55590,
+        "Progress": 1060,
+        "TokensRewardCount": 20
+    },
+    "104": {
+        "ProgressStart": 56650,
+        "Progress": 1070,
+        "TokensRewardCount": 20
+    },
+    "105": {
+        "ProgressStart": 57720,
+        "Progress": 1080,
+        "TokensRewardCount": 20
+    },
+    "106": {
+        "ProgressStart": 58800,
+        "Progress": 1090,
+        "TokensRewardCount": 20
+    },
+    "107": {
+        "ProgressStart": 59890,
+        "Progress": 1100,
+        "TokensRewardCount": 20
+    },
+    "108": {
+        "ProgressStart": 60990,
+        "Progress": 1110,
+        "TokensRewardCount": 20
+    },
+    "109": {
+        "ProgressStart": 62100,
+        "Progress": 1120,
+        "TokensRewardCount": 20
+    },
+    "110": {
+        "ProgressStart": 63220,
+        "Progress": 1130,
+        "TokensRewardCount": 20
+    },
+    "111": {
+        "ProgressStart": 64350,
+        "Progress": 1140,
+        "TokensRewardCount": 20
+    },
+    "112": {
+        "ProgressStart": 65490,
+        "Progress": 1150,
+        "TokensRewardCount": 20
+    },
+    "113": {
+        "ProgressStart": 66640,
+        "Progress": 1160,
+        "TokensRewardCount": 20
+    },
+    "114": {
+        "ProgressStart": 67800,
+        "Progress": 1170,
+        "TokensRewardCount": 20
+    },
+    "115": {
+        "ProgressStart": 68970,
+        "Progress": 1180,
+        "TokensRewardCount": 20
+    },
+    "116": {
+        "ProgressStart": 70150,
+        "Progress": 1190,
+        "TokensRewardCount": 20
+    },
+    "117": {
+        "ProgressStart": 71340,
+        "Progress": 1200,
+        "TokensRewardCount": 20
+    },
+    "118": {
+        "ProgressStart": 72540,
+        "Progress": 1210,
+        "TokensRewardCount": 20
+    },
+    "119": {
+        "ProgressStart": 73750,
+        "Progress": 1220,
+        "TokensRewardCount": 20
+    },
+    "120": {
+        "ProgressStart": 74970,
+        "Progress": 1230,
+        "TokensRewardCount": 20
+    },
+    "121": {
+        "ProgressStart": 76200,
+        "Progress": 1240,
+        "TokensRewardCount": 20
+    },
+    "122": {
+        "ProgressStart": 77440,
+        "Progress": 1250,
+        "TokensRewardCount": 20
+    },
+    "123": {
+        "ProgressStart": 78690,
+        "Progress": 1260,
+        "TokensRewardCount": 20
+    },
+    "124": {
+        "ProgressStart": 79950,
+        "Progress": 1270,
+        "TokensRewardCount": 20
+    },
+    "125": {
+        "ProgressStart": 81220,
+        "Progress": 1280,
+        "TokensRewardCount": 20
+    },
+    "126": {
+        "ProgressStart": 82500,
+        "Progress": 1290,
+        "TokensRewardCount": 20
+    },
+    "127": {
+        "ProgressStart": 83790,
+        "Progress": 1300,
+        "TokensRewardCount": 20
+    },
+    "128": {
+        "ProgressStart": 85090,
+        "Progress": 1310,
+        "TokensRewardCount": 20
+    },
+    "129": {
+        "ProgressStart": 86400,
+        "Progress": 1320,
+        "TokensRewardCount": 20
+    },
+    "130": {
+        "ProgressStart": 87720,
+        "Progress": 1330,
+        "TokensRewardCount": 20
+    },
+    "131": {
+        "ProgressStart": 89050,
+        "Progress": 1340,
+        "TokensRewardCount": 20
+    },
+    "132": {
+        "ProgressStart": 90390,
+        "Progress": 1350,
+        "TokensRewardCount": 20
+    },
+    "133": {
+        "ProgressStart": 91740,
+        "Progress": 1360,
+        "TokensRewardCount": 20
+    },
+    "134": {
+        "ProgressStart": 93100,
+        "Progress": 1370,
+        "TokensRewardCount": 20
+    },
+    "135": {
+        "ProgressStart": 94470,
+        "Progress": 1380,
+        "TokensRewardCount": 20
+    },
+    "136": {
+        "ProgressStart": 95850,
+        "Progress": 1390,
+        "TokensRewardCount": 20
+    },
+    "137": {
+        "ProgressStart": 97240,
+        "Progress": 1400,
+        "TokensRewardCount": 20
+    },
+    "138": {
+        "ProgressStart": 98640,
+        "Progress": 1410,
+        "TokensRewardCount": 20
+    },
+    "139": {
+        "ProgressStart": 100050,
+        "Progress": 1420,
+        "TokensRewardCount": 20
+    },
+    "140": {
+        "ProgressStart": 101470,
+        "Progress": 1430,
+        "TokensRewardCount": 20
+    },
+    "141": {
+        "ProgressStart": 102900,
+        "Progress": 1440,
+        "TokensRewardCount": 20
+    },
+    "142": {
+        "ProgressStart": 104340,
+        "Progress": 1450,
+        "TokensRewardCount": 20
+    },
+    "143": {
+        "ProgressStart": 105790,
+        "Progress": 1460,
+        "TokensRewardCount": 20
+    },
+    "144": {
+        "ProgressStart": 107250,
+        "Progress": 1470,
+        "TokensRewardCount": 20
+    },
+    "145": {
+        "ProgressStart": 108720,
+        "Progress": 1480,
+        "TokensRewardCount": 20
+    },
+    "146": {
+        "ProgressStart": 110200,
+        "Progress": 1490,
+        "TokensRewardCount": 20
+    },
+    "147": {
+        "ProgressStart": 111690,
+        "Progress": 1500,
+        "TokensRewardCount": 20
+    },
+    "148": {
+        "ProgressStart": 113190,
+        "Progress": 1510,
+        "TokensRewardCount": 20
+    },
+    "149": {
+        "ProgressStart": 114700,
+        "Progress": 1520,
+        "TokensRewardCount": 20
+    },
+    "150": {
+        "ProgressStart": 116220,
+        "Progress": 1530,
+        "TokensRewardCount": 20
+    },
+    "151": {
+        "ProgressStart": 117750,
+        "Progress": 1540,
+        "TokensRewardCount": 20
+    },
+    "152": {
+        "ProgressStart": 119290,
+        "Progress": 1550,
+        "TokensRewardCount": 20
+    },
+    "153": {
+        "ProgressStart": 120840,
+        "Progress": 1560,
+        "TokensRewardCount": 20
+    },
+    "154": {
+        "ProgressStart": 122400,
+        "Progress": 1570,
+        "TokensRewardCount": 20
+    },
+    "155": {
+        "ProgressStart": 123970,
+        "Progress": 1580,
+        "TokensRewardCount": 20
+    },
+    "156": {
+        "ProgressStart": 125550,
+        "Progress": 1590,
+        "TokensRewardCount": 20
+    },
+    "157": {
+        "ProgressStart": 127140,
+        "Progress": 1600,
+        "TokensRewardCount": 20
+    },
+    "158": {
+        "ProgressStart": 128740,
+        "Progress": 1610,
+        "TokensRewardCount": 20
+    },
+    "159": {
+        "ProgressStart": 130350,
+        "Progress": 1620,
+        "TokensRewardCount": 20
+    },
+    "160": {
+        "ProgressStart": 131970,
+        "Progress": 1630,
+        "TokensRewardCount": 20
+    },
+    "161": {
+        "ProgressStart": 133600,
+        "Progress": 1640,
+        "TokensRewardCount": 20
+    },
+    "162": {
+        "ProgressStart": 135240,
+        "Progress": 1650,
+        "TokensRewardCount": 20
+    },
+    "163": {
+        "ProgressStart": 136890,
+        "Progress": 1660,
+        "TokensRewardCount": 20
+    },
+    "164": {
+        "ProgressStart": 138550,
+        "Progress": 1670,
+        "TokensRewardCount": 20
+    },
+    "165": {
+        "ProgressStart": 140220,
+        "Progress": 1680,
+        "TokensRewardCount": 20
+    },
+    "166": {
+        "ProgressStart": 141900,
+        "Progress": 1690,
+        "TokensRewardCount": 20
+    },
+    "167": {
+        "ProgressStart": 143590,
+        "Progress": 1700,
+        "TokensRewardCount": 20
+    },
+    "168": {
+        "ProgressStart": 145290,
+        "Progress": 1710,
+        "TokensRewardCount": 20
+    },
+    "169": {
+        "ProgressStart": 147000,
+        "Progress": 1720,
+        "TokensRewardCount": 20
+    },
+    "170": {
+        "ProgressStart": 148720,
+        "Progress": 1730,
+        "TokensRewardCount": 20
+    },
+    "171": {
+        "ProgressStart": 150450,
+        "Progress": 1740,
+        "TokensRewardCount": 20
+    },
+    "172": {
+        "ProgressStart": 152190,
+        "Progress": 1750,
+        "TokensRewardCount": 20
+    },
+    "173": {
+        "ProgressStart": 153940,
+        "Progress": 1760,
+        "TokensRewardCount": 20
+    },
+    "174": {
+        "ProgressStart": 155700,
+        "Progress": 1770,
+        "TokensRewardCount": 20
+    },
+    "175": {
+        "ProgressStart": 157470,
+        "Progress": 1780,
+        "TokensRewardCount": 20
+    },
+    "176": {
+        "ProgressStart": 159250,
+        "Progress": 1790,
+        "TokensRewardCount": 20
+    },
+    "177": {
+        "ProgressStart": 161040,
+        "Progress": 1800,
+        "TokensRewardCount": 20
+    },
+    "178": {
+        "ProgressStart": 162840,
+        "Progress": 1810,
+        "TokensRewardCount": 20
+    },
+    "179": {
+        "ProgressStart": 164650,
+        "Progress": 1820,
+        "TokensRewardCount": 20
+    },
+    "180": {
+        "ProgressStart": 166470,
+        "Progress": 1830,
+        "TokensRewardCount": 20
+    },
+    "181": {
+        "ProgressStart": 168300,
+        "Progress": 1840,
+        "TokensRewardCount": 20
+    },
+    "182": {
+        "ProgressStart": 170140,
+        "Progress": 1850,
+        "TokensRewardCount": 20
+    },
+    "183": {
+        "ProgressStart": 171990,
+        "Progress": 1860,
+        "TokensRewardCount": 20
+    },
+    "184": {
+        "ProgressStart": 173850,
+        "Progress": 1870,
+        "TokensRewardCount": 20
+    },
+    "185": {
+        "ProgressStart": 175720,
+        "Progress": 1880,
+        "TokensRewardCount": 20
+    },
+    "186": {
+        "ProgressStart": 177600,
+        "Progress": 1890,
+        "TokensRewardCount": 20
+    },
+    "187": {
+        "ProgressStart": 179490,
+        "Progress": 1900,
+        "TokensRewardCount": 20
+    },
+    "188": {
+        "ProgressStart": 181390,
+        "Progress": 1910,
+        "TokensRewardCount": 20
+    },
+    "189": {
+        "ProgressStart": 183300,
+        "Progress": 1920,
+        "TokensRewardCount": 20
+    },
+    "190": {
+        "ProgressStart": 185220,
+        "Progress": 1930,
+        "TokensRewardCount": 20
+    },
+    "191": {
+        "ProgressStart": 187150,
+        "Progress": 1940,
+        "TokensRewardCount": 20
+    },
+    "192": {
+        "ProgressStart": 189090,
+        "Progress": 1950,
+        "TokensRewardCount": 20
+    },
+    "193": {
+        "ProgressStart": 191040,
+        "Progress": 1960,
+        "TokensRewardCount": 20
+    },
+    "194": {
+        "ProgressStart": 193000,
+        "Progress": 1970,
+        "TokensRewardCount": 20
+    },
+    "195": {
+        "ProgressStart": 194970,
+        "Progress": 1980,
+        "TokensRewardCount": 20
+    },
+    "196": {
+        "ProgressStart": 196950,
+        "Progress": 1990,
+        "TokensRewardCount": 20
+    },
+    "197": {
+        "ProgressStart": 198940,
+        "Progress": 2000,
+        "TokensRewardCount": 20
+    },
+    "198": {
+        "ProgressStart": 200940,
+        "Progress": 2010,
+        "TokensRewardCount": 20
+    },
+    "199": {
+        "ProgressStart": 202950,
+        "Progress": 2020,
+        "TokensRewardCount": 20
+    },
+    "200": {
+        "ProgressStart": 204970,
+        "Progress": 2030,
+        "TokensRewardCount": 20
+    },
+    "201": {
+        "ProgressStart": 207000,
+        "Progress": 2040,
+        "TokensRewardCount": 20
+    },
+    "202": {
+        "ProgressStart": 209040,
+        "Progress": 2050,
+        "TokensRewardCount": 20
+    },
+    "203": {
+        "ProgressStart": 211090,
+        "Progress": 2060,
+        "TokensRewardCount": 20
+    },
+    "204": {
+        "ProgressStart": 213150,
+        "Progress": 2070,
+        "TokensRewardCount": 20
+    },
+    "205": {
+        "ProgressStart": 215220,
+        "Progress": 2080,
+        "TokensRewardCount": 20
+    },
+    "206": {
+        "ProgressStart": 217300,
+        "Progress": 2090,
+        "TokensRewardCount": 20
+    },
+    "207": {
+        "ProgressStart": 219390,
+        "Progress": 2100,
+        "TokensRewardCount": 20
+    },
+    "208": {
+        "ProgressStart": 221490,
+        "Progress": 2110,
+        "TokensRewardCount": 20
+    },
+    "209": {
+        "ProgressStart": 223600,
+        "Progress": 2120,
+        "TokensRewardCount": 20
+    },
+    "210": {
+        "ProgressStart": 225720,
+        "Progress": 2130,
+        "TokensRewardCount": 20
+    },
+    "211": {
+        "ProgressStart": 227850,
+        "Progress": 2140,
+        "TokensRewardCount": 20
+    },
+    "212": {
+        "ProgressStart": 229990,
+        "Progress": 2150,
+        "TokensRewardCount": 20
+    },
+    "213": {
+        "ProgressStart": 232140,
+        "Progress": 2160,
+        "TokensRewardCount": 20
+    },
+    "214": {
+        "ProgressStart": 234300,
+        "Progress": 2170,
+        "TokensRewardCount": 20
+    },
+    "215": {
+        "ProgressStart": 236470,
+        "Progress": 2180,
+        "TokensRewardCount": 20
+    },
+    "216": {
+        "ProgressStart": 238650,
+        "Progress": 2190,
+        "TokensRewardCount": 20
+    },
+    "217": {
+        "ProgressStart": 240840,
+        "Progress": 2200,
+        "TokensRewardCount": 20
+    },
+    "218": {
+        "ProgressStart": 243040,
+        "Progress": 2210,
+        "TokensRewardCount": 20
+    },
+    "219": {
+        "ProgressStart": 245250,
+        "Progress": 2220,
+        "TokensRewardCount": 20
+    },
+    "220": {
+        "ProgressStart": 247470,
+        "Progress": 2230,
+        "TokensRewardCount": 20
+    },
+    "221": {
+        "ProgressStart": 249700,
+        "Progress": 2240,
+        "TokensRewardCount": 20
+    },
+    "222": {
+        "ProgressStart": 251940,
+        "Progress": 2250,
+        "TokensRewardCount": 20
+    },
+    "223": {
+        "ProgressStart": 254190,
+        "Progress": 2260,
+        "TokensRewardCount": 20
+    },
+    "224": {
+        "ProgressStart": 256450,
+        "Progress": 2270,
+        "TokensRewardCount": 20
+    },
+    "225": {
+        "ProgressStart": 258720,
+        "Progress": 2280,
+        "TokensRewardCount": 20
+    },
+    "226": {
+        "ProgressStart": 261000,
+        "Progress": 2290,
+        "TokensRewardCount": 20
+    },
+    "227": {
+        "ProgressStart": 263290,
+        "Progress": 2300,
+        "TokensRewardCount": 20
+    },
+    "228": {
+        "ProgressStart": 265590,
+        "Progress": 2310,
+        "TokensRewardCount": 20
+    },
+    "229": {
+        "ProgressStart": 267900,
+        "Progress": 2320,
+        "TokensRewardCount": 20
+    },
+    "230": {
+        "ProgressStart": 270220,
+        "Progress": 2330,
+        "TokensRewardCount": 20
+    },
+    "231": {
+        "ProgressStart": 272550,
+        "Progress": 2340,
+        "TokensRewardCount": 20
+    },
+    "232": {
+        "ProgressStart": 274890,
+        "Progress": 2350,
+        "TokensRewardCount": 20
+    },
+    "233": {
+        "ProgressStart": 277240,
+        "Progress": 2360,
+        "TokensRewardCount": 20
+    },
+    "234": {
+        "ProgressStart": 279600,
+        "Progress": 2370,
+        "TokensRewardCount": 20
+    },
+    "235": {
+        "ProgressStart": 281970,
+        "Progress": 2380,
+        "TokensRewardCount": 20
+    },
+    "236": {
+        "ProgressStart": 284350,
+        "Progress": 2390,
+        "TokensRewardCount": 20
+    },
+    "237": {
+        "ProgressStart": 286740,
+        "Progress": 2400,
+        "TokensRewardCount": 20
+    },
+    "238": {
+        "ProgressStart": 289140,
+        "Progress": 2410,
+        "TokensRewardCount": 20
+    },
+    "239": {
+        "ProgressStart": 291550,
+        "Progress": 2420,
+        "TokensRewardCount": 20
+    },
+    "240": {
+        "ProgressStart": 293970,
+        "Progress": 2430,
+        "TokensRewardCount": 20
+    },
+    "241": {
+        "ProgressStart": 296400,
+        "Progress": 2440,
+        "TokensRewardCount": 20
+    },
+    "242": {
+        "ProgressStart": 298840,
+        "Progress": 2450,
+        "TokensRewardCount": 20
+    },
+    "243": {
+        "ProgressStart": 301290,
+        "Progress": 2460,
+        "TokensRewardCount": 20
+    },
+    "244": {
+        "ProgressStart": 303750,
+        "Progress": 2470,
+        "TokensRewardCount": 20
+    },
+    "245": {
+        "ProgressStart": 306220,
+        "Progress": 2480,
+        "TokensRewardCount": 20
+    },
+    "246": {
+        "ProgressStart": 308700,
+        "Progress": 2490,
+        "TokensRewardCount": 20
+    },
+    "247": {
+        "ProgressStart": 311190,
+        "Progress": 2500,
+        "TokensRewardCount": 20
+    },
+    "248": {
+        "ProgressStart": 313690,
+        "Progress": 2510,
+        "TokensRewardCount": 20
+    },
+    "249": {
+        "ProgressStart": 316200,
+        "Progress": 2520,
+        "TokensRewardCount": 20
+    },
+    "250": {
+        "ProgressStart": 318720,
+        "Progress": 2530,
+        "TokensRewardCount": 20
+    },
+    "251": {
+        "ProgressStart": 321250,
+        "Progress": 2540,
+        "TokensRewardCount": 20
+    },
+    "252": {
+        "ProgressStart": 323790,
+        "Progress": 2550,
+        "TokensRewardCount": 20
+    },
+    "253": {
+        "ProgressStart": 326340,
+        "Progress": 2560,
+        "TokensRewardCount": 20
+    },
+    "254": {
+        "ProgressStart": 328900,
+        "Progress": 2570,
+        "TokensRewardCount": 20
+    },
+    "255": {
+        "ProgressStart": 331470,
+        "Progress": 2580,
+        "TokensRewardCount": 20
+    },
+    "256": {
+        "ProgressStart": 334050,
+        "Progress": 2590,
+        "TokensRewardCount": 20
+    },
+    "257": {
+        "ProgressStart": 336640,
+        "Progress": 2600,
+        "TokensRewardCount": 20
+    },
+    "258": {
+        "ProgressStart": 339240,
+        "Progress": 2610,
+        "TokensRewardCount": 20
+    },
+    "259": {
+        "ProgressStart": 341850,
+        "Progress": 2620,
+        "TokensRewardCount": 20
+    },
+    "260": {
+        "ProgressStart": 344470,
+        "Progress": 2630,
+        "TokensRewardCount": 20
+    },
+    "261": {
+        "ProgressStart": 347100,
+        "Progress": 2640,
+        "TokensRewardCount": 20
+    },
+    "262": {
+        "ProgressStart": 349740,
+        "Progress": 2650,
+        "TokensRewardCount": 20
+    },
+    "263": {
+        "ProgressStart": 352390,
+        "Progress": 2660,
+        "TokensRewardCount": 20
+    },
+    "264": {
+        "ProgressStart": 355050,
+        "Progress": 2670,
+        "TokensRewardCount": 20
+    },
+    "265": {
+        "ProgressStart": 357720,
+        "Progress": 2680,
+        "TokensRewardCount": 20
+    },
+    "266": {
+        "ProgressStart": 360400,
+        "Progress": 2690,
+        "TokensRewardCount": 20
+    },
+    "267": {
+        "ProgressStart": 363090,
+        "Progress": 2700,
+        "TokensRewardCount": 20
+    },
+    "268": {
+        "ProgressStart": 365790,
+        "Progress": 2710,
+        "TokensRewardCount": 20
+    },
+    "269": {
+        "ProgressStart": 368500,
+        "Progress": 2720,
+        "TokensRewardCount": 20
+    },
+    "270": {
+        "ProgressStart": 371220,
+        "Progress": 2730,
+        "TokensRewardCount": 20
+    },
+    "271": {
+        "ProgressStart": 373950,
+        "Progress": 2740,
+        "TokensRewardCount": 20
+    },
+    "272": {
+        "ProgressStart": 376690,
+        "Progress": 2750,
+        "TokensRewardCount": 20
+    },
+    "273": {
+        "ProgressStart": 379440,
+        "Progress": 2760,
+        "TokensRewardCount": 20
+    },
+    "274": {
+        "ProgressStart": 382200,
+        "Progress": 2770,
+        "TokensRewardCount": 20
+    },
+    "275": {
+        "ProgressStart": 384970,
+        "Progress": 2780,
+        "TokensRewardCount": 20
+    },
+    "276": {
+        "ProgressStart": 387750,
+        "Progress": 2790,
+        "TokensRewardCount": 20
+    },
+    "277": {
+        "ProgressStart": 390540,
+        "Progress": 2800,
+        "TokensRewardCount": 20
+    },
+    "278": {
+        "ProgressStart": 393340,
+        "Progress": 2810,
+        "TokensRewardCount": 20
+    },
+    "279": {
+        "ProgressStart": 396150,
+        "Progress": 2820,
+        "TokensRewardCount": 20
+    },
+    "280": {
+        "ProgressStart": 398970,
+        "Progress": 2830,
+        "TokensRewardCount": 20
+    },
+    "281": {
+        "ProgressStart": 401800,
+        "Progress": 2840,
+        "TokensRewardCount": 20
+    },
+    "282": {
+        "ProgressStart": 404640,
+        "Progress": 2850,
+        "TokensRewardCount": 20
+    },
+    "283": {
+        "ProgressStart": 407490,
+        "Progress": 2860,
+        "TokensRewardCount": 20
+    },
+    "284": {
+        "ProgressStart": 410350,
+        "Progress": 2870,
+        "TokensRewardCount": 20
+    },
+    "285": {
+        "ProgressStart": 413220,
+        "Progress": 2880,
+        "TokensRewardCount": 20
+    },
+    "286": {
+        "ProgressStart": 416100,
+        "Progress": 2890,
+        "TokensRewardCount": 20
+    },
+    "287": {
+        "ProgressStart": 418990,
+        "Progress": 2900,
+        "TokensRewardCount": 20
+    },
+    "288": {
+        "ProgressStart": 421890,
+        "Progress": 2910,
+        "TokensRewardCount": 20
+    },
+    "289": {
+        "ProgressStart": 424800,
+        "Progress": 2920,
+        "TokensRewardCount": 20
+    },
+    "290": {
+        "ProgressStart": 427720,
+        "Progress": 2930,
+        "TokensRewardCount": 20
+    },
+    "291": {
+        "ProgressStart": 430650,
+        "Progress": 2940,
+        "TokensRewardCount": 20
+    },
+    "292": {
+        "ProgressStart": 433590,
+        "Progress": 2950,
+        "TokensRewardCount": 20
+    },
+    "293": {
+        "ProgressStart": 436540,
+        "Progress": 2960,
+        "TokensRewardCount": 20
+    },
+    "294": {
+        "ProgressStart": 439500,
+        "Progress": 2970,
+        "TokensRewardCount": 20
+    },
+    "295": {
+        "ProgressStart": 442470,
+        "Progress": 2980,
+        "TokensRewardCount": 20
+    },
+    "296": {
+        "ProgressStart": 445450,
+        "Progress": 2990,
+        "TokensRewardCount": 20
+    },
+    "297": {
+        "ProgressStart": 448440,
+        "Progress": 3000,
+        "TokensRewardCount": 20
+    },
+    "298": {
+        "ProgressStart": 451440,
+        "Progress": 3010,
+        "TokensRewardCount": 20
+    },
+    "299": {
+        "ProgressStart": 454450,
+        "Progress": 3020,
+        "TokensRewardCount": 20
+    },
+    "300": {
+        "ProgressStart": 457470,
+        "Progress": 3030,
+        "TokensRewardCount": 20
+    },
+    "301": {
+        "ProgressStart": 460500,
+        "Progress": 3040,
+        "TokensRewardCount": 20
+    },
+    "302": {
+        "ProgressStart": 463540,
+        "Progress": 3050,
+        "TokensRewardCount": 20
+    },
+    "303": {
+        "ProgressStart": 466590,
+        "Progress": 3060,
+        "TokensRewardCount": 20
+    },
+    "304": {
+        "ProgressStart": 469650,
+        "Progress": 3070,
+        "TokensRewardCount": 20
+    },
+    "305": {
+        "ProgressStart": 472720,
+        "Progress": 3080,
+        "TokensRewardCount": 20
+    },
+    "306": {
+        "ProgressStart": 475800,
+        "Progress": 3090,
+        "TokensRewardCount": 20
+    },
+    "307": {
+        "ProgressStart": 478890,
+        "Progress": 3100,
+        "TokensRewardCount": 20
+    },
+    "308": {
+        "ProgressStart": 481990,
+        "Progress": 3110,
+        "TokensRewardCount": 20
+    },
+    "309": {
+        "ProgressStart": 485100,
+        "Progress": 3120,
+        "TokensRewardCount": 20
+    },
+    "310": {
+        "ProgressStart": 488220,
+        "Progress": 3130,
+        "TokensRewardCount": 20
+    },
+    "311": {
+        "ProgressStart": 491350,
+        "Progress": 3140,
+        "TokensRewardCount": 20
+    },
+    "312": {
+        "ProgressStart": 494490,
+        "Progress": 3150,
+        "TokensRewardCount": 20
+    },
+    "313": {
+        "ProgressStart": 497640,
+        "Progress": 3160,
+        "TokensRewardCount": 20
+    },
+    "314": {
+        "ProgressStart": 500800,
+        "Progress": 3170,
+        "TokensRewardCount": 20
+    },
+    "315": {
+        "ProgressStart": 503970,
+        "Progress": 3180,
+        "TokensRewardCount": 20
+    },
+    "316": {
+        "ProgressStart": 507150,
+        "Progress": 3190,
+        "TokensRewardCount": 20
+    },
+    "317": {
+        "ProgressStart": 510340,
+        "Progress": 3200,
+        "TokensRewardCount": 20
+    },
+    "318": {
+        "ProgressStart": 513540,
+        "Progress": 3210,
+        "TokensRewardCount": 20
+    },
+    "319": {
+        "ProgressStart": 516750,
+        "Progress": 3220,
+        "TokensRewardCount": 20
+    },
+    "320": {
+        "ProgressStart": 519970,
+        "Progress": 3230,
+        "TokensRewardCount": 20
+    },
+    "321": {
+        "ProgressStart": 523200,
+        "Progress": 3240,
+        "TokensRewardCount": 20
+    },
+    "322": {
+        "ProgressStart": 526440,
+        "Progress": 3250,
+        "TokensRewardCount": 20
+    },
+    "323": {
+        "ProgressStart": 529690,
+        "Progress": 3260,
+        "TokensRewardCount": 20
+    },
+    "324": {
+        "ProgressStart": 532950,
+        "Progress": 3270,
+        "TokensRewardCount": 20
+    },
+    "325": {
+        "ProgressStart": 536220,
+        "Progress": 3280,
+        "TokensRewardCount": 20
+    },
+    "326": {
+        "ProgressStart": 539500,
+        "Progress": 3290,
+        "TokensRewardCount": 20
+    },
+    "327": {
+        "ProgressStart": 542790,
+        "Progress": 3300,
+        "TokensRewardCount": 20
+    },
+    "328": {
+        "ProgressStart": 546090,
+        "Progress": 3310,
+        "TokensRewardCount": 20
+    },
+    "329": {
+        "ProgressStart": 549400,
+        "Progress": 3320,
+        "TokensRewardCount": 20
+    },
+    "330": {
+        "ProgressStart": 552720,
+        "Progress": 3330,
+        "TokensRewardCount": 20
+    },
+    "331": {
+        "ProgressStart": 556050,
+        "Progress": 3340,
+        "TokensRewardCount": 20
+    },
+    "332": {
+        "ProgressStart": 559390,
+        "Progress": 3350,
+        "TokensRewardCount": 20
+    },
+    "333": {
+        "ProgressStart": 562740,
+        "Progress": 3360,
+        "TokensRewardCount": 20
+    },
+    "334": {
+        "ProgressStart": 566100,
+        "Progress": 3370,
+        "TokensRewardCount": 20
+    },
+    "335": {
+        "ProgressStart": 569470,
+        "Progress": 3380,
+        "TokensRewardCount": 20
+    },
+    "336": {
+        "ProgressStart": 572850,
+        "Progress": 3390,
+        "TokensRewardCount": 20
+    },
+    "337": {
+        "ProgressStart": 576240,
+        "Progress": 3400,
+        "TokensRewardCount": 20
+    },
+    "338": {
+        "ProgressStart": 579640,
+        "Progress": 3410,
+        "TokensRewardCount": 20
+    },
+    "339": {
+        "ProgressStart": 583050,
+        "Progress": 3420,
+        "TokensRewardCount": 20
+    },
+    "340": {
+        "ProgressStart": 586470,
+        "Progress": 3430,
+        "TokensRewardCount": 20
+    },
+    "341": {
+        "ProgressStart": 589900,
+        "Progress": 3440,
+        "TokensRewardCount": 20
+    },
+    "342": {
+        "ProgressStart": 593340,
+        "Progress": 3450,
+        "TokensRewardCount": 20
+    },
+    "343": {
+        "ProgressStart": 596790,
+        "Progress": 3460,
+        "TokensRewardCount": 20
+    },
+    "344": {
+        "ProgressStart": 600250,
+        "Progress": 3470,
+        "TokensRewardCount": 20
+    },
+    "345": {
+        "ProgressStart": 603720,
+        "Progress": 3480,
+        "TokensRewardCount": 20
+    },
+    "346": {
+        "ProgressStart": 607200,
+        "Progress": 3490,
+        "TokensRewardCount": 20
+    },
+    "347": {
+        "ProgressStart": 610690,
+        "Progress": 3500,
+        "TokensRewardCount": 20
+    },
+    "348": {
+        "ProgressStart": 614190,
+        "Progress": 3510,
+        "TokensRewardCount": 20
+    },
+    "349": {
+        "ProgressStart": 617700,
+        "Progress": 3520,
+        "TokensRewardCount": 20
+    },
+    "350": {
+        "ProgressStart": 621220,
+        "Progress": 3530,
+        "TokensRewardCount": 20
+    },
+    "351": {
+        "ProgressStart": 624750,
+        "Progress": 3540,
+        "TokensRewardCount": 20
+    },
+    "352": {
+        "ProgressStart": 628290,
+        "Progress": 3550,
+        "TokensRewardCount": 20
+    },
+    "353": {
+        "ProgressStart": 631840,
+        "Progress": 3560,
+        "TokensRewardCount": 20
+    },
+    "354": {
+        "ProgressStart": 635400,
+        "Progress": 3570,
+        "TokensRewardCount": 20
+    },
+    "355": {
+        "ProgressStart": 638970,
+        "Progress": 3580,
+        "TokensRewardCount": 20
+    },
+    "356": {
+        "ProgressStart": 642550,
+        "Progress": 3590,
+        "TokensRewardCount": 20
+    },
+    "357": {
+        "ProgressStart": 646140,
+        "Progress": 3600,
+        "TokensRewardCount": 20
+    },
+    "358": {
+        "ProgressStart": 649740,
+        "Progress": 3610,
+        "TokensRewardCount": 20
+    },
+    "359": {
+        "ProgressStart": 653350,
+        "Progress": 3620,
+        "TokensRewardCount": 20
+    },
+    "360": {
+        "ProgressStart": 656970,
+        "Progress": 3630,
+        "TokensRewardCount": 20
+    },
+    "361": {
+        "ProgressStart": 660600,
+        "Progress": 3640,
+        "TokensRewardCount": 20
+    },
+    "362": {
+        "ProgressStart": 664240,
+        "Progress": 3650,
+        "TokensRewardCount": 20
+    },
+    "363": {
+        "ProgressStart": 667890,
+        "Progress": 3660,
+        "TokensRewardCount": 20
+    },
+    "364": {
+        "ProgressStart": 671550,
+        "Progress": 3670,
+        "TokensRewardCount": 20
+    },
+    "365": {
+        "ProgressStart": 675220,
+        "Progress": 3680,
+        "TokensRewardCount": 20
+    },
+    "366": {
+        "ProgressStart": 678900,
+        "Progress": 3690,
+        "TokensRewardCount": 20
+    },
+    "367": {
+        "ProgressStart": 682590,
+        "Progress": 3700,
+        "TokensRewardCount": 20
+    },
+    "368": {
+        "ProgressStart": 686290,
+        "Progress": 3710,
+        "TokensRewardCount": 20
+    },
+    "369": {
+        "ProgressStart": 690000,
+        "Progress": 3720,
+        "TokensRewardCount": 20
+    },
+    "370": {
+        "ProgressStart": 693720,
+        "Progress": 3730,
+        "TokensRewardCount": 20
+    },
+    "371": {
+        "ProgressStart": 697450,
+        "Progress": 3740,
+        "TokensRewardCount": 20
+    },
+    "372": {
+        "ProgressStart": 701190,
+        "Progress": 3750,
+        "TokensRewardCount": 20
+    },
+    "373": {
+        "ProgressStart": 704940,
+        "Progress": 3760,
+        "TokensRewardCount": 20
+    },
+    "374": {
+        "ProgressStart": 708700,
+        "Progress": 3770,
+        "TokensRewardCount": 20
+    },
+    "375": {
+        "ProgressStart": 712470,
+        "Progress": 3780,
+        "TokensRewardCount": 20
+    },
+    "376": {
+        "ProgressStart": 716250,
+        "Progress": 3790,
+        "TokensRewardCount": 20
+    },
+    "377": {
+        "ProgressStart": 720040,
+        "Progress": 3800,
+        "TokensRewardCount": 20
+    },
+    "378": {
+        "ProgressStart": 723840,
+        "Progress": 3810,
+        "TokensRewardCount": 20
+    },
+    "379": {
+        "ProgressStart": 727650,
+        "Progress": 3820,
+        "TokensRewardCount": 20
+    },
+    "380": {
+        "ProgressStart": 731470,
+        "Progress": 3830,
+        "TokensRewardCount": 20
+    },
+    "381": {
+        "ProgressStart": 735300,
+        "Progress": 3840,
+        "TokensRewardCount": 20
+    },
+    "382": {
+        "ProgressStart": 739140,
+        "Progress": 3850,
+        "TokensRewardCount": 20
+    },
+    "383": {
+        "ProgressStart": 742990,
+        "Progress": 3860,
+        "TokensRewardCount": 20
+    },
+    "384": {
+        "ProgressStart": 746850,
+        "Progress": 3870,
+        "TokensRewardCount": 20
+    },
+    "385": {
+        "ProgressStart": 750720,
+        "Progress": 3880,
+        "TokensRewardCount": 20
+    },
+    "386": {
+        "ProgressStart": 754600,
+        "Progress": 3890,
+        "TokensRewardCount": 20
+    },
+    "387": {
+        "ProgressStart": 758490,
+        "Progress": 3900,
+        "TokensRewardCount": 20
+    },
+    "388": {
+        "ProgressStart": 762390,
+        "Progress": 3910,
+        "TokensRewardCount": 20
+    },
+    "389": {
+        "ProgressStart": 766300,
+        "Progress": 3920,
+        "TokensRewardCount": 20
+    },
+    "390": {
+        "ProgressStart": 770220,
+        "Progress": 3930,
+        "TokensRewardCount": 20
+    },
+    "391": {
+        "ProgressStart": 774150,
+        "Progress": 3940,
+        "TokensRewardCount": 20
+    },
+    "392": {
+        "ProgressStart": 778090,
+        "Progress": 3950,
+        "TokensRewardCount": 20
+    },
+    "393": {
+        "ProgressStart": 782040,
+        "Progress": 3960,
+        "TokensRewardCount": 20
+    },
+    "394": {
+        "ProgressStart": 786000,
+        "Progress": 3970,
+        "TokensRewardCount": 20
+    },
+    "395": {
+        "ProgressStart": 789970,
+        "Progress": 3980,
+        "TokensRewardCount": 20
+    },
+    "396": {
+        "ProgressStart": 793950,
+        "Progress": 3990,
+        "TokensRewardCount": 20
+    },
+    "397": {
+        "ProgressStart": 797940,
+        "Progress": 4000,
+        "TokensRewardCount": 20
+    },
+    "398": {
+        "ProgressStart": 801940,
+        "Progress": 4010,
+        "TokensRewardCount": 20
+    },
+    "399": {
+        "ProgressStart": 805950,
+        "Progress": 4020,
+        "TokensRewardCount": 20
+    },
+    "400": {
+        "ProgressStart": 809970,
+        "Progress": 4030,
+        "TokensRewardCount": 20
+    },
+    "401": {
+        "ProgressStart": 814000,
+        "Progress": 4040,
+        "TokensRewardCount": 20
+    },
+    "402": {
+        "ProgressStart": 818040,
+        "Progress": 4050,
+        "TokensRewardCount": 20
+    },
+    "403": {
+        "ProgressStart": 822090,
+        "Progress": 4060,
+        "TokensRewardCount": 20
+    },
+    "404": {
+        "ProgressStart": 826150,
+        "Progress": 4070,
+        "TokensRewardCount": 20
+    },
+    "405": {
+        "ProgressStart": 830220,
+        "Progress": 4080,
+        "TokensRewardCount": 20
+    },
+    "406": {
+        "ProgressStart": 834300,
+        "Progress": 4090,
+        "TokensRewardCount": 20
+    },
+    "407": {
+        "ProgressStart": 838390,
+        "Progress": 4100,
+        "TokensRewardCount": 20
+    },
+    "408": {
+        "ProgressStart": 842490,
+        "Progress": 4110,
+        "TokensRewardCount": 20
+    },
+    "409": {
+        "ProgressStart": 846600,
+        "Progress": 4120,
+        "TokensRewardCount": 20
+    },
+    "410": {
+        "ProgressStart": 850720,
+        "Progress": 4130,
+        "TokensRewardCount": 20
+    },
+    "411": {
+        "ProgressStart": 854850,
+        "Progress": 4140,
+        "TokensRewardCount": 20
+    },
+    "412": {
+        "ProgressStart": 858990,
+        "Progress": 4150,
+        "TokensRewardCount": 20
+    },
+    "413": {
+        "ProgressStart": 863140,
+        "Progress": 4160,
+        "TokensRewardCount": 20
+    },
+    "414": {
+        "ProgressStart": 867300,
+        "Progress": 4170,
+        "TokensRewardCount": 20
+    },
+    "415": {
+        "ProgressStart": 871470,
+        "Progress": 4180,
+        "TokensRewardCount": 20
+    },
+    "416": {
+        "ProgressStart": 875650,
+        "Progress": 4190,
+        "TokensRewardCount": 20
+    },
+    "417": {
+        "ProgressStart": 879840,
+        "Progress": 4200,
+        "TokensRewardCount": 20
+    },
+    "418": {
+        "ProgressStart": 884040,
+        "Progress": 4210,
+        "TokensRewardCount": 20
+    },
+    "419": {
+        "ProgressStart": 888250,
+        "Progress": 4220,
+        "TokensRewardCount": 20
+    },
+    "420": {
+        "ProgressStart": 892470,
+        "Progress": 4230,
+        "TokensRewardCount": 20
+    },
+    "421": {
+        "ProgressStart": 896700,
+        "Progress": 4240,
+        "TokensRewardCount": 20
+    },
+    "422": {
+        "ProgressStart": 900940,
+        "Progress": 4250,
+        "TokensRewardCount": 20
+    },
+    "423": {
+        "ProgressStart": 905190,
+        "Progress": 4260,
+        "TokensRewardCount": 20
+    },
+    "424": {
+        "ProgressStart": 909450,
+        "Progress": 4270,
+        "TokensRewardCount": 20
+    },
+    "425": {
+        "ProgressStart": 913720,
+        "Progress": 4280,
+        "TokensRewardCount": 20
+    },
+    "426": {
+        "ProgressStart": 918000,
+        "Progress": 4290,
+        "TokensRewardCount": 20
+    },
+    "427": {
+        "ProgressStart": 922290,
+        "Progress": 4300,
+        "TokensRewardCount": 20
+    },
+    "428": {
+        "ProgressStart": 926590,
+        "Progress": 4310,
+        "TokensRewardCount": 20
+    },
+    "429": {
+        "ProgressStart": 930900,
+        "Progress": 4320,
+        "TokensRewardCount": 20
+    },
+    "430": {
+        "ProgressStart": 935220,
+        "Progress": 4330,
+        "TokensRewardCount": 20
+    },
+    "431": {
+        "ProgressStart": 939550,
+        "Progress": 4340,
+        "TokensRewardCount": 20
+    },
+    "432": {
+        "ProgressStart": 943890,
+        "Progress": 4350,
+        "TokensRewardCount": 20
+    },
+    "433": {
+        "ProgressStart": 948240,
+        "Progress": 4360,
+        "TokensRewardCount": 20
+    },
+    "434": {
+        "ProgressStart": 952600,
+        "Progress": 4370,
+        "TokensRewardCount": 20
+    },
+    "435": {
+        "ProgressStart": 956970,
+        "Progress": 4380,
+        "TokensRewardCount": 20
+    },
+    "436": {
+        "ProgressStart": 961350,
+        "Progress": 4390,
+        "TokensRewardCount": 20
+    },
+    "437": {
+        "ProgressStart": 965740,
+        "Progress": 4400,
+        "TokensRewardCount": 20
+    },
+    "438": {
+        "ProgressStart": 970140,
+        "Progress": 4410,
+        "TokensRewardCount": 20
+    },
+    "439": {
+        "ProgressStart": 974550,
+        "Progress": 4420,
+        "TokensRewardCount": 20
+    },
+    "440": {
+        "ProgressStart": 978970,
+        "Progress": 4430,
+        "TokensRewardCount": 20
+    },
+    "441": {
+        "ProgressStart": 983400,
+        "Progress": 4440,
+        "TokensRewardCount": 20
+    },
+    "442": {
+        "ProgressStart": 987840,
+        "Progress": 4450,
+        "TokensRewardCount": 20
+    },
+    "443": {
+        "ProgressStart": 992290,
+        "Progress": 4460,
+        "TokensRewardCount": 20
+    },
+    "444": {
+        "ProgressStart": 996750,
+        "Progress": 4470,
+        "TokensRewardCount": 20
+    },
+    "445": {
+        "ProgressStart": 1001220,
+        "Progress": 4480,
+        "TokensRewardCount": 20
+    },
+    "446": {
+        "ProgressStart": 1005700,
+        "Progress": 4490,
+        "TokensRewardCount": 20
+    },
+    "447": {
+        "ProgressStart": 1010190,
+        "Progress": 4500,
+        "TokensRewardCount": 20
+    },
+    "448": {
+        "ProgressStart": 1014690,
+        "Progress": 4510,
+        "TokensRewardCount": 20
+    },
+    "449": {
+        "ProgressStart": 1019200,
+        "Progress": 4520,
+        "TokensRewardCount": 20
+    },
+    "450": {
+        "ProgressStart": 1023720,
+        "Progress": 4530,
+        "TokensRewardCount": 20
+    },
+    "451": {
+        "ProgressStart": 1028250,
+        "Progress": 4540,
+        "TokensRewardCount": 20
+    },
+    "452": {
+        "ProgressStart": 1032790,
+        "Progress": 4550,
+        "TokensRewardCount": 20
+    },
+    "453": {
+        "ProgressStart": 1037340,
+        "Progress": 4560,
+        "TokensRewardCount": 20
+    },
+    "454": {
+        "ProgressStart": 1041900,
+        "Progress": 4570,
+        "TokensRewardCount": 20
+    },
+    "455": {
+        "ProgressStart": 1046470,
+        "Progress": 4580,
+        "TokensRewardCount": 20
+    },
+    "456": {
+        "ProgressStart": 1051050,
+        "Progress": 4590,
+        "TokensRewardCount": 20
+    },
+    "457": {
+        "ProgressStart": 1055640,
+        "Progress": 4600,
+        "TokensRewardCount": 20
+    },
+    "458": {
+        "ProgressStart": 1060240,
+        "Progress": 4610,
+        "TokensRewardCount": 20
+    },
+    "459": {
+        "ProgressStart": 1064850,
+        "Progress": 4620,
+        "TokensRewardCount": 20
+    },
+    "460": {
+        "ProgressStart": 1069470,
+        "Progress": 4630,
+        "TokensRewardCount": 20
+    },
+    "461": {
+        "ProgressStart": 1074100,
+        "Progress": 4640,
+        "TokensRewardCount": 20
+    },
+    "462": {
+        "ProgressStart": 1078740,
+        "Progress": 4650,
+        "TokensRewardCount": 20
+    },
+    "463": {
+        "ProgressStart": 1083390,
+        "Progress": 4660,
+        "TokensRewardCount": 20
+    },
+    "464": {
+        "ProgressStart": 1088050,
+        "Progress": 4670,
+        "TokensRewardCount": 20
+    },
+    "465": {
+        "ProgressStart": 1092720,
+        "Progress": 4680,
+        "TokensRewardCount": 20
+    },
+    "466": {
+        "ProgressStart": 1097400,
+        "Progress": 4690,
+        "TokensRewardCount": 20
+    },
+    "467": {
+        "ProgressStart": 1102090,
+        "Progress": 4700,
+        "TokensRewardCount": 20
+    },
+    "468": {
+        "ProgressStart": 1106790,
+        "Progress": 4710,
+        "TokensRewardCount": 20
+    },
+    "469": {
+        "ProgressStart": 1111500,
+        "Progress": 4720,
+        "TokensRewardCount": 20
+    },
+    "470": {
+        "ProgressStart": 1116220,
+        "Progress": 4730,
+        "TokensRewardCount": 20
+    },
+    "471": {
+        "ProgressStart": 1120950,
+        "Progress": 4740,
+        "TokensRewardCount": 20
+    },
+    "472": {
+        "ProgressStart": 1125690,
+        "Progress": 4750,
+        "TokensRewardCount": 20
+    },
+    "473": {
+        "ProgressStart": 1130440,
+        "Progress": 4760,
+        "TokensRewardCount": 20
+    },
+    "474": {
+        "ProgressStart": 1135200,
+        "Progress": 4770,
+        "TokensRewardCount": 20
+    },
+    "475": {
+        "ProgressStart": 1139970,
+        "Progress": 4780,
+        "TokensRewardCount": 20
+    },
+    "476": {
+        "ProgressStart": 1144750,
+        "Progress": 4790,
+        "TokensRewardCount": 20
+    },
+    "477": {
+        "ProgressStart": 1149540,
+        "Progress": 4800,
+        "TokensRewardCount": 20
+    },
+    "478": {
+        "ProgressStart": 1154340,
+        "Progress": 4810,
+        "TokensRewardCount": 20
+    },
+    "479": {
+        "ProgressStart": 1159150,
+        "Progress": 4820,
+        "TokensRewardCount": 20
+    },
+    "480": {
+        "ProgressStart": 1163970,
+        "Progress": 4830,
+        "TokensRewardCount": 20
+    },
+    "481": {
+        "ProgressStart": 1168800,
+        "Progress": 4840,
+        "TokensRewardCount": 20
+    },
+    "482": {
+        "ProgressStart": 1173640,
+        "Progress": 4850,
+        "TokensRewardCount": 20
+    },
+    "483": {
+        "ProgressStart": 1178490,
+        "Progress": 4860,
+        "TokensRewardCount": 20
+    },
+    "484": {
+        "ProgressStart": 1183350,
+        "Progress": 4870,
+        "TokensRewardCount": 20
+    },
+    "485": {
+        "ProgressStart": 1188220,
+        "Progress": 4880,
+        "TokensRewardCount": 20
+    },
+    "486": {
+        "ProgressStart": 1193100,
+        "Progress": 4890,
+        "TokensRewardCount": 20
+    },
+    "487": {
+        "ProgressStart": 1197990,
+        "Progress": 4900,
+        "TokensRewardCount": 20
+    },
+    "488": {
+        "ProgressStart": 1202890,
+        "Progress": 4910,
+        "TokensRewardCount": 20
+    },
+    "489": {
+        "ProgressStart": 1207800,
+        "Progress": 4920,
+        "TokensRewardCount": 20
+    },
+    "490": {
+        "ProgressStart": 1212720,
+        "Progress": 4930,
+        "TokensRewardCount": 20
+    },
+    "491": {
+        "ProgressStart": 1217650,
+        "Progress": 4940,
+        "TokensRewardCount": 20
+    },
+    "492": {
+        "ProgressStart": 1222590,
+        "Progress": 4950,
+        "TokensRewardCount": 20
+    },
+    "493": {
+        "ProgressStart": 1227540,
+        "Progress": 4960,
+        "TokensRewardCount": 20
+    },
+    "494": {
+        "ProgressStart": 1232500,
+        "Progress": 4970,
+        "TokensRewardCount": 20
+    },
+    "495": {
+        "ProgressStart": 1237470,
+        "Progress": 4980,
+        "TokensRewardCount": 20
+    },
+    "496": {
+        "ProgressStart": 1242450,
+        "Progress": 4990,
+        "TokensRewardCount": 20
+    },
+    "497": {
+        "ProgressStart": 1247440,
+        "Progress": 5000,
+        "TokensRewardCount": 20
+    },
+    "498": {
+        "ProgressStart": 1252440,
+        "Progress": 5010,
+        "TokensRewardCount": 20
+    },
+    "499": {
+        "ProgressStart": 1257450,
+        "Progress": 5020,
+        "TokensRewardCount": 20
+    }
+}

@@ -40,7 +40,7 @@ default_stats = {
 }
 
 default_user = {
-    "exp": 0,
+    "xp": 0,
     "gold": 0,
     "lvl": 1,
     "starpoints": 0,
@@ -96,15 +96,19 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         self.BRAWLERS: dict = None
         self.REWARDS: dict = None
+        self.XP_LEVELS: dict = None
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
         rewards_fp = bundled_data_path(self) / "rewards.json"
+        xp_levels_fp = bundled_data_path(self) / "xp_levels.json"
 
         with brawlers_fp.open("r") as f:
             self.BRAWLERS = json.load(f)
         with rewards_fp.open("r") as f:
             self.REWARDS = json.load(f)
+        with xp_levels_fp.open("r") as f:
+            self.XP_LEVELS = json.load(f)
 
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -254,11 +258,19 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             else:
                 is_starplayer = False
             rewards = await self.brawl_rewards(user, points, is_starplayer)
+            await ctx.send("Direct messaging rewards!")
+            level_up = await self.xp_handler(user)
             try:
                 await user.send(embed=rewards)
+                if level_up:
+                    await user.send(level_up[0])
+                    await user.send(level_up[1])
             except:
-                await ctx.send(f"Cannot DM {user.mention}")
+                await ctx.send(f"Cannot direct message {user.mention}")
                 await ctx.send(embed=rewards)
+                if level_up:
+                    await ctx.send(level_up[0])
+                    await ctx.send(level_up[1])
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -297,17 +309,40 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         await self.config.user(author).tutorial_finished.set(True)
 
-    # @commands.command(name="stat_test")
-    # async def stat_test(self, ctx: Context, user: discord.User):
-    #     """"""
+    @commands.command(name="profile", aliases=["p", "pro"])
+    async def _profile(self, ctx: Context, user: discord.User = None):
+        """Display your or specified user's profile."""
 
-    #     s = await self.get_player_stat(user, 'selected', is_iter=True)
+        if not user:
+            user = ctx.author
+        
+        embed = discord.Embed(color=0xFFFFFF)
+        embed.set_author(name=f"{user}'s Profile", icon_url=user.avatar_url)
 
-    #     await ctx.send(s['brawler'])
+        trophies = await self.get_trophies(user)
+        embed.add_field(name="Trophies", value=f"{emojis['trophies']} {trophies:,}")
 
-    #     s = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
-    #     await ctx.send(s)
+        xp = await self.get_player_stat(user, 'xp')
+        lvl = await self.get_player_stat(user, 'lvl')
+        next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
+        embed.add_field(name="Experience Level", value=f"{emojis['xp']} {lvl} ({xp}/{next_xp})")
+
+        gold = await self.get_player_stat(user, 'gold')
+        embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}")
+
+        tokens = await self.get_player_stat(user, 'tokens')
+        embed.add_field(name="Tokens", value=f"{emojis['tokens']} {tokens}")
+
+        selected = await self.get_player_stat(user, 'selected', is_iter=True)
+        brawler = selected['brawler']
+        skin = selected['brawler_skin']
+        gamemode = selected['gamemode']
+
+        embed.add_field(name="Brawler", 
+                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}")
+        embed.add_field(name="Game Mode", value=gamemode)
+    
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -409,15 +444,15 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         reward_trophies = self.trophies_to_reward_mapping(
             trophies, '3v3', position)
 
-        exp = await self.get_player_stat(user, 'exp')
-        exp += reward_xp
+        xp = await self.get_player_stat(user, 'xp')
+        xp += reward_xp
 
         tokens += reward_tokens
         trophies += reward_trophies
 
         await self.update_player_stat(user, 'tokens', tokens)
         await self.update_player_stat(user, 'tokens_in_bank', tokens_in_bank)
-        await self.update_player_stat(user, 'exp', exp)
+        await self.update_player_stat(user, 'xp', xp)
         await self.update_player_stat(user, 'brawlers', trophies,
                                       substat=selected_brawler, sub_index='trophies')
 
@@ -428,7 +463,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         user_avatar = user.avatar_url
 
-        embed = discord.Embed(color=0x71DDE4, title="Rewards")
+        embed = discord.Embed(color=0xFFFFFF, title="Rewards")
         embed.set_author(name=user, icon_url=user_avatar)
         # reward_str = f""
 
@@ -455,7 +490,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
         print("}")
 
-    def trophies_to_reward_mapping(self, trophies, game_type="3v3", position=1):
+    def trophies_to_reward_mapping(self, trophies: int, game_type="3v3", position=1):
 
         # position correlates with the list index
 
@@ -489,3 +524,33 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             reward = self.REWARDS[game_type]["1200+"][position]
 
         return reward
+
+    async def xp_handler(self, user: discord.User):
+        """Handle xp level ups."""
+
+        # xp = await self.config.user(ctx.author).xp()
+        # lvl = await self.config.user(ctx.author).lvl()
+
+        xp = await self.get_player_stat(user, 'xp')
+        lvl = await self.get_player_stat(user, 'lvl')
+
+        next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
+
+        if xp >= next_xp:
+            carry = xp - next_xp
+        else:
+            return False
+
+        await self.update_player_stat(user, 'xp', carry)
+        await self.update_player_stat(user, 'lvl', lvl+1)
+
+        level_up_msg = f"Level up! You have reached level {lvl+1}."
+
+        tokens_reward = self.XP_LEVELS[str(lvl)]["TokensRewardCount"]
+        reward_msg = f"Rewards: {tokens_reward} {emojis['tokens']}"
+
+        tokens = await self.get_player_stat(user, 'tokens')
+        tokens += tokens_reward
+        await self.update_player_stat(user, 'tokens', tokens)
+
+        return (level_up_msg, reward_msg)
