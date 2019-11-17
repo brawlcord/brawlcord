@@ -237,20 +237,26 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             else:
                 points += 0
 
-        # final_result = None
-        starplayer = None
+        starplayer = "AI"
 
+        player_mentions = ' '.join([player.mention for player in players])
+        
         if points > 0:
-            max_margin = 0
-            for result in results.keys():
-                if results[result]['margin'] > max_margin:
-                    max_margin = results[result]['margin']
-                    starplayer = result
-            await ctx.send("You won!")
+            # max_margin = 0
+            # for result in results.keys():
+            #     if results[result]['margin'] > max_margin:
+            #         max_margin = results[result]['margin']
+            #         starplayer = result
+            #         if len(results) > 3:
+            starplayer = random.choice([result for result in results])
+            await ctx.send(f"{player_mentions} You won! Star Player: {starplayer}")
         elif points < 1:
-            await ctx.send("You lost!")
+            await ctx.send(f"{player_mentions} You lost! Star Player: {starplayer}")
         else:
-            await ctx.send("The match ended in a draw!")
+            chance = random.randint(1, 2)
+            if chance == 1:
+                starplayer = random.choice([result for result in results])
+            await ctx.send(f"The match ended in a draw! Star Player: {starplayer}")
 
         for user in results:
             if user == starplayer:
@@ -463,12 +469,11 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         embed.set_author(name=user, icon_url=user_avatar)
         # reward_str = f""
 
-        embed.add_field(
-            name="Trophies", value=f"{emojis['trophies']} {reward_trophies}", inline=True)
-        embed.add_field(
-            name="Tokens", value=f"{emojis['xp']} {reward_tokens}", inline=True)
-        embed.add_field(name="Experience",
-                        value=f"{emojis['token']} {reward_xp}", inline=True)
+        reward_xp_str = f"{f'{reward_xp-10} + 10 (Star Player)' if is_starplayer else f'{reward_xp}'}"
+
+        embed.add_field(name="Trophies", value=f"{emojis['trophies']} {reward_trophies}")
+        embed.add_field(name="Tokens", value=f"{emojis['token']} {reward_tokens}")
+        embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
 
         return embed
 
