@@ -156,8 +156,8 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
         winner = "Computer"
 
         while True:
-            print(f"You before attack: {user_health}")
-            print(f"Computer before attack: {opp_health}")
+            # print(f"You before attack: {user_health}")
+            # print(f"Computer before attack: {opp_health}")
             if user_counter > 0 and user_counter % 5 == 0:
                 res = user1._ult(user_brawler_level)
                 opp_health -= res
@@ -181,8 +181,8 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
                 user_health -= res_o
                 opp_health -= res_u
             
-            print(f"You after attack: {user_health}")
-            print(f"Computer after attack: {opp_health}")
+            # print(f"You after attack: {user_health}")
+            # print(f"Computer after attack: {opp_health}")
             
             if user_health <= 0 and opp_health > 0:
                 break
