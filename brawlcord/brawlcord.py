@@ -138,6 +138,8 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             if teammate:
                 if teammate == author:
                     return await ctx.send("You can't play with yourself!")
+                elif teammate == guild.me:
+                    return await ctx.send("I can't play!")
                 players.append(teammate)
 
         # await ctx.send(teammates)
@@ -237,7 +239,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             else:
                 points += 0
 
-        starplayer = "AI"
+        starplayer = guild.me
 
         player_mentions = ' '.join([player.mention for player in players])
         
@@ -249,14 +251,14 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             #         starplayer = result
             #         if len(results) > 3:
             starplayer = random.choice([result for result in results])
-            await ctx.send(f"{player_mentions} You won! Star Player: {starplayer}")
+            await ctx.send(f"{player_mentions} You won! Star Player: {starplayer}.")
         elif points < 1:
-            await ctx.send(f"{player_mentions} You lost! Star Player: {starplayer}")
+            await ctx.send(f"{player_mentions} You lost! Star Player: {starplayer}.")
         else:
             chance = random.randint(1, 2)
             if chance == 1:
                 starplayer = random.choice([result for result in results])
-            await ctx.send(f"The match ended in a draw! Star Player: {starplayer}")
+            await ctx.send(f"The match ended in a draw! Star Player: {starplayer}.")
 
         for user in results:
             if user == starplayer:
@@ -323,7 +325,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             user = ctx.author
         
         embed = discord.Embed(color=0xFFFFFF)
-        embed.set_author(name=f"{user}'s Profile", icon_url=user.avatar_url)
+        embed.set_author(name=f"{user.name}'s Profile", icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
         embed.add_field(name="Trophies", value=f"{emojis['trophies']} {trophies:,}")
@@ -332,7 +334,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         lvl = await self.get_player_stat(user, 'lvl')
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
-        embed.add_field(name="Experience Level", value=f"{emojis['xp']} {lvl} ({xp}/{next_xp})")
+        embed.add_field(name="Experience Level", value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
         gold = await self.get_player_stat(user, 'gold')
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}")
@@ -466,10 +468,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         user_avatar = user.avatar_url
 
         embed = discord.Embed(color=0xFFFFFF, title="Rewards")
-        embed.set_author(name=user, icon_url=user_avatar)
-        # reward_str = f""
+        embed.set_author(name=user.name, icon_url=user_avatar)
 
-        reward_xp_str = f"{f'{reward_xp-10} + 10 (Star Player)' if is_starplayer else f'{reward_xp}'}"
+        reward_xp_str = f"{f'{reward_xp} (Star Player)' if is_starplayer else f'{reward_xp}'}"
 
         embed.add_field(name="Trophies", value=f"{emojis['trophies']} {reward_trophies}")
         embed.add_field(name="Tokens", value=f"{emojis['token']} {reward_tokens}")
@@ -548,7 +549,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         level_up_msg = f"Level up! You have reached level {lvl+1}."
 
         tokens_reward = self.XP_LEVELS[str(lvl)]["TokensRewardCount"]
-        reward_msg = f"Rewards: {tokens_reward} {emojis['tokens']}"
+        reward_msg = f"Rewards: {tokens_reward} {emojis['token']}"
 
         tokens = await self.get_player_stat(user, 'tokens')
         tokens += tokens_reward
