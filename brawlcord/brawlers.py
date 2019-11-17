@@ -16,7 +16,8 @@ emojis = {
     "pb": "<:pb:645340943956049981>",
     "speed": "<:speed:645341012654293023>",
     "info": "<:info:645341012448903168>",
-    "xp": "<:xp:645337312431046657>"
+    "xp": "<:xp:645337312431046657>",
+    "token": "<:token:645694990302838789>"
 }
 
 sp_icons = {
@@ -30,6 +31,39 @@ rarity_colors = {
     "Epic": 0xa80564,
     "Mythic": 0xe20000,
     "Legendary": 0xf2da02
+}
+
+brawler_emojis = {
+    "Barley": "<:Barley:645584757903589377>",
+    "Bull": "<:Bull:645584757949988874>",
+    "Bo": "<:Bo:645584758046195742>",
+    "Brock": "<:Brock:645584758163767296>",
+    "8Bit": "<:8Bit:645584758364962816>",
+    "Bibi": "<:Bibi:645584758700507137>",
+    "Colt": "<:Colt:645584759141171212>",
+    "Spike": "<:Spike:645584759262674976>",
+    "Carl": "<:Carl:645584759422189578>",
+    "Crow": "<:Crow:645584759459807242>",
+    "Jessie": "<:Jessie:645584759501881355>",
+    "Gene": "<:Gene:645584759761666048>",
+    "Tick": "<:Tick:645584759829037067>",
+    "El-Primo": "<:ElPrimo:645589193900425236>",
+    "Rosa": "<:Rosa:645584760168644609>",
+    "Dynamike": "<:Dynamike:645584760185552897>",
+    "Tara": "<:Tara:645584760260919296>",
+    "Darryl": "<:Darryl:645584760395005973>",
+    "Frank": "<:Frank:645584760424497153>",
+    "Pam": "<:Pam:645584760487411744>",
+    "Leon": "<:Leon:645584760550457346>",
+    "Nita": "<:Nita:645584760911167488>",
+    "Poco": "<:Poco:645584760915230740>",
+    "Emz": "<:Emz:645584760923750430>",
+    "Mortis": "<:Mortis:645584760952848404>",
+    "Sandy": "<:Sandy:645584761191923712>",
+    "Shelly": "<:Shelly:645584761200574464>",
+    "Rico": "<:Rico:645584761204506634>",
+    "Penny": "<:Penny:645584761208700948>",
+    "Piper": "<:Piper:645584761250775050>",
 }
 
 # image_urls = {
@@ -134,6 +168,9 @@ class Brawler:
         # power = f"\n\n**Power:** {level} | {emojis['powerpoint']} **{pp}**/**{next_level_pp}**"
 
         # description = self.desc + trophies_str + power 
+        brawler_name = brawler_name.replace(" ", "-")
+        brawler_name = brawler_name.replace("_", "-")
+
         url = brawler_url.format(brawler_name)
 
         embed = discord.Embed(color=rarity_colors[self.rarity], title=brawler_name, 
