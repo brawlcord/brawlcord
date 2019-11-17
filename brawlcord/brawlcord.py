@@ -9,7 +9,7 @@ import time
 import discord
 
 # Redbot
-from redbot.core import Config, commands
+from redbot.core import Config, commands, checks
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.chat_formatting import pagify
@@ -19,7 +19,7 @@ from redbot.core.utils.menus import (DEFAULT_CONTROLS, menu,
 # from redbot.core.utils.chat_formatting import box
 from redbot.core.utils.predicates import ReactionPredicate
 
-from .brawlers import Brawler, Shelly, Nita, Colt
+from .brawlers import emojis, brawler_emojis, Brawler, Shelly, Nita, Colt
 
 
 BaseCog = getattr(commands, "Cog", object)
@@ -76,7 +76,7 @@ imgur_links = {
 }
 
 
-class BrawlCord(BaseCog, name="Brawl Cord"):
+class BrawlCord(BaseCog, name="BrawlCord"):
     """Simulate Brawl Stars."""
 
     def __init__(self, bot):
@@ -94,13 +94,17 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
 
         self.config.register_user(**default_user)
 
-        self.BRAWLERS = None
+        self.BRAWLERS: dict = None
+        self.REWARDS: dict = None
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
+        rewards_fp = bundled_data_path(self) / "rewards.json"
 
         with brawlers_fp.open("r") as f:
             self.BRAWLERS = json.load(f)
+        with rewards_fp.open("r") as f:
+            self.REWARDS = json.load(f)
 
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -122,86 +126,139 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
             return await ctx.send(f"{author.mention} You have not finished tutorial yet."
                                   "Use  `-tutorial` to start tutorial.")
 
-        # teammates = {
-        #     teammate1: False,
-        #     teammate2: False
-        # }
+        teammates = [teammate1, teammate2]
 
-        # for teammate in teammates:
-        #     if teammate:
-        #         teammates[teammate] = True
+        players = [author]
+
+        for teammate in teammates:
+            if teammate:
+                if teammate == author:
+                    return await ctx.send("You can't play with yourself!")
+                players.append(teammate)
 
         # await ctx.send(teammates)
 
-        selected_brawler = (await self.get_player_stat(author, "selected"))["brawler"]
+        results = {}
 
-        user_brawler_level = (await self.get_player_stat(author, "brawlers"))[selected_brawler]["level"]
+        for player in players:
+            selected_brawler = (await self.get_player_stat(player, "selected"))["brawler"]
 
-        opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(user_brawler_level)
+            user_brawler_level = (await self.get_player_stat(player, "brawlers"))[selected_brawler]["level"]
 
-        user1: Brawler = brawlers_map[selected_brawler](self.BRAWLERS, selected_brawler)
-        # opp1: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
-        opp1 = Shelly(self.BRAWLERS, "Shelly")
+            opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(
+                user_brawler_level)
 
-        # await ctx.send(embed=user1.brawler_info("Shelly", 10, 10, 5, 0, 200))
+            user1: Brawler = brawlers_map[selected_brawler](
+                self.BRAWLERS, selected_brawler)
+            # opp1: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
+            opp1 = Shelly(self.BRAWLERS, "Shelly")
 
-        user_health = user1._health(user_brawler_level)
-        opp_health = opp1._health(opp_brawler_level)
+            # await ctx.send(embed=user1.brawler_info("Shelly", 10, 10, 5, 0, 200))
 
-        opp_health -= user1._attack(user_brawler_level)
+            user_health = user1._health(user_brawler_level)
+            opp_health = opp1._health(opp_brawler_level)
 
-        user_counter = 0
-        opp_counter = 0
+            opp_health -= user1._attack(user_brawler_level)
 
-        winner = "Computer"
+            user_counter = 0
+            opp_counter = 0
 
-        while True:
-            # print(f"You before attack: {user_health}")
-            # print(f"Computer before attack: {opp_health}")
-            if user_counter > 0 and user_counter % 5 == 0:
-                res = user1._ult(user_brawler_level)
-                opp_health -= res
-                if res > 0:
-                    user_counter += 1
-            if opp_counter > 0 and opp_counter % 5 == 0:
-                res = opp1._ult(opp_brawler_level)
-                user_health -= res
-                if res > 0:
-                    opp_counter += 1
-            
+            winner = "Computer"
+            margin = 0
+
+            while True:
+                # print(f"You before attack: {user_health}")
+                # print(f"Computer before attack: {opp_health}")
+                if user_counter > 0 and user_counter % 5 == 0:
+                    res = user1._ult(user_brawler_level)
+                    opp_health -= res
+                    if res > 0:
+                        user_counter += 1
+                if opp_counter > 0 and opp_counter % 5 == 0:
+                    res = opp1._ult(opp_brawler_level)
+                    user_health -= res
+                    if res > 0:
+                        opp_counter += 1
+
+                else:
+                    res_u = user1._attack(user_brawler_level)
+                    res_o = opp1._attack(opp_brawler_level)
+
+                    if res_u > 0:
+                        user_counter += 1
+                    if res_o > 0:
+                        opp_counter += 1
+
+                    user_health -= res_o
+                    opp_health -= res_u
+
+                # print(f"You after attack: {user_health}")
+                # print(f"Computer after attack: {opp_health}")
+
+                margin = abs(user_health-opp_health)
+
+                if user_health <= 0 and opp_health > 0:
+                    break
+                if opp_health <= 0 and user_health > 0:
+                    winner = "User"
+                    break
+                if opp_health <= 0 and user_health <= 0:
+                    winner = "Draw"
+                    break
+                else:
+                    continue
+
+            if winner == "Computer":
+                results[player] = {
+                    "brawl_res": -1,
+                    "margin": margin
+                }
+            elif winner == "User":
+                results[player] = {
+                    "brawl_res": 1,
+                    "margin": margin
+                }
             else:
-                res_u = user1._attack(user_brawler_level)
-                res_o = opp1._attack(opp_brawler_level)
+                results[player] = {
+                    "brawl_res": 0,
+                    "margin": margin
+                }
 
-                if res_u > 0:
-                    user_counter += 1
-                if res_o > 0:
-                    opp_counter += 1
-                
-                user_health -= res_o
-                opp_health -= res_u
-            
-            # print(f"You after attack: {user_health}")
-            # print(f"Computer after attack: {opp_health}")
-            
-            if user_health <= 0 and opp_health > 0:
-                break
-            if opp_health <= 0 and user_health > 0:
-                winner = "User"
-                break
-            if opp_health <= 0 and user_health <= 0:
-                winner = "Draw"
-                break
+        points = 0
+        for result in results:
+            if results[result]['brawl_res'] == 1:
+                points += 1
+            elif results[result]['brawl_res'] == -1:
+                points -= 1
             else:
-                continue
-            
-        if winner == "Computer":
-            await ctx.send(f"{author.mention} You lose!")
-        elif winner == "User":
-            await ctx.send(f"{author.mention} You win!")
+                points += 0
+
+        # final_result = None
+        starplayer = None
+
+        if points > 0:
+            max_margin = 0
+            for result in results.keys():
+                if results[result]['margin'] > max_margin:
+                    max_margin = results[result]['margin']
+                    starplayer = result
+            await ctx.send("You won!")
+        elif points < 1:
+            await ctx.send("You lost!")
         else:
-            await ctx.send(f"{author.mention} The match ended as a draw!")
-            
+            await ctx.send("The match ended in a draw!")
+
+        for user in results:
+            if user == starplayer:
+                is_starplayer = True
+            else:
+                is_starplayer = False
+            rewards = await self.brawl_rewards(user, points, is_starplayer)
+            try:
+                await user.send(embed=rewards)
+            except:
+                await ctx.send(f"Cannot DM {user.mention}")
+                await ctx.send(embed=rewards)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -241,20 +298,40 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
         await self.config.user(author).tutorial_finished.set(True)
 
     # @commands.command(name="stat_test")
-    # async def stat_test(self, ctx: Context):
+    # async def stat_test(self, ctx: Context, user: discord.User):
     #     """"""
-    #     s = Shelly(self.BRAWLERS, "Shelly")
 
-    #     damage = s.get_stat("attack", "damage")
+    #     s = await self.get_player_stat(user, 'selected', is_iter=True)
 
-    #     return await ctx.send(damage)
+    #     await ctx.send(s['brawler'])
 
-    async def get_player_stat(self, user: discord.User, stat: str):
+    #     s = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
+    #     await ctx.send(s)
+
+    async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
-        # if not stat:
-        #     return False
 
-        return await getattr(self.config.user(user), stat)()
+        if not is_iter:
+            return await getattr(self.config.user(user), stat)()
+
+        async with getattr(self.config.user(user), stat)() as stat:
+            if not substat:
+                return stat
+            else:
+                return stat[substat]
+
+    async def update_player_stat(self, user: discord.User, stat: str, value, substat: str = None, sub_index=None):
+        """Update stats of a player."""
+
+        if substat:
+            async with getattr(self.config.user(user), stat)() as stat:
+                if not sub_index:
+                    stat[substat] = value
+                else:
+                    stat[substat][sub_index] = value
+        else:
+            stat_attr = getattr(self.config.user(user), stat)
+            await stat_attr.set(value)
 
     def matchmaking(self, brawler_level: int):
         """Get an opponent!"""
@@ -267,10 +344,10 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
         if opp_brawler_level > 10:
             opp_brawler_level = 10
             opp_brawler_sp = random.randint(1, 2)
-        
+
         if opp_brawler_level < 1:
             opp_brawler_level = 1
-        
+
         return opp_brawler, opp_brawler_level, opp_brawler_sp
 
     async def get_trophies(self, user: discord.User, brawler_name: str = None):
@@ -295,3 +372,120 @@ class BrawlCord(BaseCog, name="Brawl Cord"):
             brawler.attack["damage"],
             brawler.ult["damage"]
         ]
+
+    async def brawl_rewards(self, user: discord.User, points: int, is_starplayer=False):
+        """Adjust user variables and return string containing reward."""
+
+        if points > 0:
+            reward_tokens = 20
+            reward_xp = 8
+            position = 1
+        elif points < 0:
+            reward_tokens = 10
+            reward_xp = 4
+            position = 2
+        else:
+            reward_tokens = 15
+            reward_xp = 6
+            position = 0
+
+        if is_starplayer:
+            reward_xp += 10
+
+        tokens = await self.get_player_stat(user, 'tokens')
+        tokens_in_bank = await self.get_player_stat(user, 'tokens_in_bank')
+
+        if reward_tokens > tokens_in_bank:
+            reward_tokens = tokens_in_bank
+
+        tokens_in_bank -= reward_tokens
+
+        # brawler trophies
+        selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=selected_brawler)
+        print(brawler_data)
+        trophies = brawler_data['trophies']
+
+        reward_trophies = self.trophies_to_reward_mapping(
+            trophies, '3v3', position)
+
+        exp = await self.get_player_stat(user, 'exp')
+        exp += reward_xp
+
+        tokens += reward_tokens
+        trophies += reward_trophies
+
+        await self.update_player_stat(user, 'tokens', tokens)
+        await self.update_player_stat(user, 'tokens_in_bank', tokens_in_bank)
+        await self.update_player_stat(user, 'exp', exp)
+        await self.update_player_stat(user, 'brawlers', trophies,
+                                      substat=selected_brawler, sub_index='trophies')
+
+        # test (3 lines)
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=selected_brawler)
+        trophies = brawler_data['trophies']
+        print(trophies)
+
+        user_avatar = user.avatar_url
+
+        embed = discord.Embed(color=0x71DDE4, title="Rewards")
+        embed.set_author(name=user, icon_url=user_avatar)
+        # reward_str = f""
+
+        embed.add_field(
+            name="Trophies", value=f"{emojis['trophies']} {reward_trophies}", inline=True)
+        embed.add_field(
+            name="Tokens", value=f"{emojis['xp']} {reward_tokens}", inline=True)
+        embed.add_field(name="Experience",
+                        value=f"{emojis['token']} {reward_xp}", inline=True)
+
+        return embed
+
+    @commands.command(name="emojis")
+    @checks.is_owner()
+    async def get_all_emotes(self, ctx: Context):
+        """Get all emojis of the server."""
+
+        guild = ctx.guild
+
+        server_emojis = await guild.fetch_emojis()
+
+        print("brawler_emojis = {")
+        for emoji in server_emojis:
+            print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
+        print("}")
+
+    def trophies_to_reward_mapping(self, trophies, game_type="3v3", position=1):
+
+        # position correlates with the list index
+
+        if trophies in range(0, 50):
+            reward = self.REWARDS[game_type]["0-49"][position]
+        elif trophies in range(50, 100):
+            reward = self.REWARDS[game_type]["50-99"][position]
+        elif trophies in range(100, 200):
+            reward = self.REWARDS[game_type]["100-199"][position]
+        elif trophies in range(200, 300):
+            reward = self.REWARDS[game_type]["200-299"][position]
+        elif trophies in range(300, 400):
+            reward = self.REWARDS[game_type]["300-399"][position]
+        elif trophies in range(400, 500):
+            reward = self.REWARDS[game_type]["400-499"][position]
+        elif trophies in range(500, 600):
+            reward = self.REWARDS[game_type]["500-599"][position]
+        elif trophies in range(600, 700):
+            reward = self.REWARDS[game_type]["600-699"][position]
+        elif trophies in range(700, 800):
+            reward = self.REWARDS[game_type]["700-799"][position]
+        elif trophies in range(800, 900):
+            reward = self.REWARDS[game_type]["800-899"][position]
+        elif trophies in range(900, 1000):
+            reward = self.REWARDS[game_type]["900-999"][position]
+        elif trophies in range(1000, 1100):
+            reward = self.REWARDS[game_type]["1000-1099"][position]
+        elif trophies in range(1100, 1200):
+            reward = self.REWARDS[game_type]["1100-1199"][position]
+        else:
+            reward = self.REWARDS[game_type]["1200+"][position]
+
+        return reward
