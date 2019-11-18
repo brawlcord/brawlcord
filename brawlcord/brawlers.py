@@ -160,27 +160,35 @@ class Brawler:
         
         return stats
 
-    def brawler_info(self, brawler_name: str, trophies:int, pb:int, level: int, 
-            pp: int, next_level_pp: int, sp1 = False, sp2 = False):
+    def brawler_info(
+            self, 
+            brawler_name: str, 
+            trophies: int = None, 
+            pb:int = None, 
+            level: int = None, 
+            pp: int = None, 
+            next_level_pp: int = None, 
+            sp1=False, 
+            sp2=False
+        ):
         """Display brawler info in a formatted way."""
 
-        # trophies_str = f"\n\n**Trophies:** {emojis['trophies']} {trophies} | **Personal Best:** {emojis['pb']} {pb}"
-
-        # power = f"\n\n**Power:** {level} | {emojis['powerpoint']} **{pp}**/**{next_level_pp}**"
-
-        # description = self.desc + trophies_str + power 
         brawler_name = brawler_name.replace(" ", "-")
         brawler_name = brawler_name.replace("_", "-")
 
         url = brawler_url.format(brawler_name)
 
+        if not trophies:
+            brawler_name = f"{brawler_name} [Not unlocked]"
+        
         embed = discord.Embed(color=rarity_colors[self.rarity], title=brawler_name, 
             description=self.desc, url=url)
         embed.set_thumbnail(url=brawler_thumb.format(brawler_name.title()))
-        embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
-        embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
-        embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
-        embed.add_field(name="PERSONAL BEST", value=f"{emojis['pb']} {pb}")
+        if trophies:
+            embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
+            embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
+            embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
+            embed.add_field(name="PERSONAL BEST", value=f"{emojis['pb']} {pb}")
         # embed.set_author(name=f"Power {level} - {pp}/{next_level_pp}", icon_url=image_urls['powerpoint'])
         return embed
 
@@ -253,8 +261,21 @@ class Shelly(Brawler):
 
         return super().buff_stats(stats, level)
 
-    def brawler_info(self, brawler_name, trophies, pb, level, pp, next_level_pp, sp1=False, sp2=False):
-        embed = super().brawler_info(brawler_name, trophies, pb, level, pp, next_level_pp, sp1=sp1, sp2=sp2)
+    def brawler_info(
+            self, 
+            brawler_name: str, 
+            trophies: int = None, 
+            pb:int = None, 
+            level: int = None, 
+            pp: int = None, 
+            next_level_pp: int = None, 
+            sp1=False, 
+            sp2=False
+        ):
+        """Return embed with Brawler info."""
+
+        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, 
+                        pb=pb, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
 
         stats = self.buff_stats(level)
 
@@ -269,18 +290,19 @@ class Shelly(Brawler):
         super_str = super_desc + f"\n{emojis['super']} Damage per shell: {stats['ult_damage']}"
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
+        u1 = u2 = ""
+
         if sp1:
-            u1 = True
+            u1 = " [Owned]"
         if sp2:
-            u2 = True
+            u2 = " [Owned]"
         
-        sp_str = (f"{sp_icons['Shelly'][0]} **{self.sp1['name']}**\n> {self.sp1['desc']}"
-                            f"\n{sp_icons['Shelly'][1]} **{self.sp2['name']}**\n> {self.sp2['desc']}")
+        sp_str = (f"{sp_icons['Shelly'][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
+                            f"\n{sp_icons['Shelly'][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
         return embed
-
 
 class Nita(Brawler):
     pass
