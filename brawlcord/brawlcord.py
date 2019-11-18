@@ -4,6 +4,7 @@ import json
 import logging
 import random
 import time
+from typing import Optional
 
 # Discord
 import discord
@@ -75,6 +76,22 @@ imgur_links = {
     "shelly_tut": "https://i.imgur.com/QfKYzso.png"
 }
 
+
+gamemode_emotes = {
+    "Big Game": "<:big_game:645925169344282624>",
+    "Bounty": "<:bounty:645925169252270081>",
+    "Boss Fight": "<:bossfight:645925170397052929>",
+    "Brawl Ball": "<:brawlball:645925169650466816>",
+    "Gem Grab": "<:gemgrab:645925169730289664>",
+    "Duo Showdown": "<:duo_showdown:645925169805656076>",
+    "Heist": "<:heist:645925170195988491>",
+    "raid": "<:raid:645925170397052929>",
+    "Siege": "<:siege:645925170481201163>",
+    "Solo Showdown": "<:solo_showdown:645925170539921428>",
+    "Robo Rumble": "<:roborumble:645925170594316288>",
+    "Lone Star": "<:lonestar:645925170610962452>",
+    "Takedown": "<:takedown:645925171034587146>",
+}
 
 class BrawlCord(BaseCog, name="BrawlCord"):
     """Simulate Brawl Stars."""
@@ -260,13 +277,17 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 starplayer = random.choice([result for result in results])
             await ctx.send(f"The match ended in a draw! Star Player: {starplayer}.")
 
+        count = 0
         for user in results:
             if user == starplayer:
                 is_starplayer = True
             else:
                 is_starplayer = False
             rewards = await self.brawl_rewards(user, points, is_starplayer)
-            await ctx.send("Direct messaging rewards!")
+            
+            count += 1
+            if count == 1:
+                await ctx.send("Direct messaging rewards!")
             level_up = await self.xp_handler(user)
             try:
                 await user.send(embed=rewards)
@@ -324,11 +345,14 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         if not user:
             user = ctx.author
         
-        embed = discord.Embed(color=0xFFFFFF)
+        embed = discord.Embed(colour=0xFFFFFF)
         embed.set_author(name=f"{user.name}'s Profile", icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
         embed.add_field(name="Trophies", value=f"{emojis['trophies']} {trophies:,}")
+
+        pb = await self.get_trophies(user=user, pb=True)
+        embed.add_field(name="Personal Best", value=f"{emojis['pb']} {pb:,}")
 
         xp = await self.get_player_stat(user, 'xp')
         lvl = await self.get_player_stat(user, 'lvl')
@@ -349,9 +373,70 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         embed.add_field(name="Brawler", 
                 value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}")
-        embed.add_field(name="Game Mode", value=gamemode)
+        embed.add_field(name="Game Mode", value=f"{gamemode_emotes[gamemode]} {gamemode}")
 
         await ctx.send(embed=embed)
+    
+    @commands.command(name="brawler", aliases=['binfo'])
+    async def _brawler(self, ctx: Context, brawler_name: str, user: discord.User = None):
+        """Get stats of a Brawler."""
+
+        if not user:
+            user = ctx.author
+        
+        brawlers = self.BRAWLERS
+
+        # for users who input 'el-primo' or 'el_primo'
+        brawler_name = brawler_name.replace("-", " ")
+        brawler_name = brawler_name.replace("_", " ")
+
+        brawler_name = brawler_name.title()
+
+        for brawler in brawlers:
+            if brawler_name in brawler:
+                break
+            else:
+                brawler = None
+        
+        if not brawler:
+            return await ctx.send(f"{brawler_name} does not exist.")
+        
+        owned_brawlers = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        owned = True if brawler in owned_brawlers else False
+
+        b: Brawler = brawlers_map[brawler](self.BRAWLERS, brawler)
+
+        if owned:
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+            pp = brawler_data['powerpoints']
+            next_level_pp = 20
+            trophies = brawler_data['trophies']
+            level = brawler_data['level']
+            pb = brawler_data['pb']
+            sp1 = brawler_data['sp1']
+            sp2 = brawler_data['sp2']
+
+            embed = b.brawler_info(brawler, trophies, pb, level, pp, next_level_pp, sp1, sp2)
+
+        else:
+            embed = b.brawler_info(brawler)
+
+        await ctx.send(embed=embed)
+
+    @commands.command(name="emojis")
+    @checks.is_owner()
+    async def get_all_emotes(self, ctx: Context):
+        """Get all emojis of the server."""
+
+        guild = ctx.guild
+
+        server_emojis = await guild.fetch_emojis()
+
+        print("brawler_emojis = {")
+        for emoji in server_emojis:
+            print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
+        print("}")
     
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
@@ -365,7 +450,8 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             else:
                 return stat[substat]
 
-    async def update_player_stat(self, user: discord.User, stat: str, value, substat: str = None, sub_index=None):
+    async def update_player_stat(self, user: discord.User, stat: str, 
+                                                                    value, substat: str = None, sub_index=None):
         """Update stats of a player."""
 
         if substat:
@@ -395,7 +481,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         return opp_brawler, opp_brawler_level, opp_brawler_sp
 
-    async def get_trophies(self, user: discord.User, brawler_name: str = None):
+    async def get_trophies(self, user: discord.User, pb = False, brawler_name: str = None):
         """Get total trophies or trophies of a specified Brawler of an user.
 
         Returns total trophies if a brawler is not specified.
@@ -403,10 +489,12 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         brawlers = await self.get_player_stat(user, "brawlers")
 
+        stat = "trophies" if not pb else "pb"
+
         if not brawler_name:
-            return sum([brawlers[brawler]["trophies"] for brawler in brawlers])
+            return sum([brawlers[brawler][stat] for brawler in brawlers])
         else:
-            return brawler_name[brawler_name]["trophies"]
+            return brawlers[brawler_name][stat]
 
     def buff_stats(self, brawler: Brawler, level: int):
         """Get Brawler stats by specified level."""
@@ -464,10 +552,11 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         await self.update_player_stat(user, 'xp', xp)
         await self.update_player_stat(user, 'brawlers', trophies,
                                       substat=selected_brawler, sub_index='trophies')
+        await self.handle_pb(user, selected_brawler)
 
         user_avatar = user.avatar_url
 
-        embed = discord.Embed(color=0xFFFFFF, title="Rewards")
+        embed = discord.Embed(colour=0xFFFFFF, title="Rewards")
         embed.set_author(name=user.name, icon_url=user_avatar)
 
         reward_xp_str = f"{f'{reward_xp} (Star Player)' if is_starplayer else f'{reward_xp}'}"
@@ -477,20 +566,6 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
 
         return embed
-
-    @commands.command(name="emojis")
-    @checks.is_owner()
-    async def get_all_emotes(self, ctx: Context):
-        """Get all emojis of the server."""
-
-        guild = ctx.guild
-
-        server_emojis = await guild.fetch_emojis()
-
-        print("brawler_emojis = {")
-        for emoji in server_emojis:
-            print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
-        print("}")
 
     def trophies_to_reward_mapping(self, trophies: int, game_type="3v3", position=1):
 
@@ -556,3 +631,20 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         await self.update_player_stat(user, 'tokens', tokens)
 
         return (level_up_msg, reward_msg)
+
+    async def handle_pb(self, user: discord.User, brawler: str):
+        """Handle personal best changes."""
+
+        # individual brawler 
+        trophies = await self.get_trophies(user=user, brawler_name=brawler)
+        pb = await self.get_trophies(user=user, pb=True, brawler_name=brawler)
+
+        if trophies > pb:
+            await self.update_player_stat(user, 'brawlers', trophies, substat=brawler, sub_index='pb')
+        
+        # total trophies 
+        # total_trophies = await self.get_trophies(user)
+        # total_pb = await self.get_trophies(user=user, pb=True)
+
+        # if total_trophies > total_pb:
+        #     await self.up
