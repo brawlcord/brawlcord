@@ -3,7 +3,9 @@ import asyncio
 import json
 import logging
 import random
-import time
+
+from datetime import datetime, timedelta
+from math import ceil
 from typing import Optional
 
 # Discord
@@ -50,6 +52,7 @@ default_user = {
     "tokens_in_bank": 200,
     # "trophies": 0,
     "tutorial_finished": False,
+    "bank_update_ts": None,
     "brawlers": {
         "Shelly": default_stats
     },
@@ -104,8 +107,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         self.tasks = {}
         self.locks = {}
 
-        self.config = Config.get_conf(
-            self, 1_070_701_001, force_registration=True)
+        self.config = Config.get_conf(self, 1_070_701_001, force_registration=True)
 
         self.path = bundled_data_path(self)
 
@@ -114,6 +116,18 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         self.BRAWLERS: dict = None
         self.REWARDS: dict = None
         self.XP_LEVELS: dict = None
+
+        def error_callback(fut):
+            try:
+                fut.result()
+            except asyncio.CancelledError:
+                pass
+            except Exception as exc:
+                logging.exception("Error in something", exc_info=exc)
+                # print("Error in something:", exc)
+
+        self.bank_update_task = self.bot.loop.create_task(self.update_token_bank())
+        self.bank_update_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -320,7 +334,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         #     )
 
         desc = ("Hi, I'm Shelly! I'll introduce you to the world of BrawlCord."
-                "Don't worry Brawler, it will only take a minute!")
+                " Don't worry Brawler, it will only take a minute!")
 
         embed = discord.Embed(
             colour=0x9D4D4F, title="Tutorial", description=desc)
@@ -336,7 +350,15 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         await ctx.send(embed=embed)
 
-        await self.config.user(author).tutorial_finished.set(True)
+        await self.update_player_stat(author, 'tutorial_finished', True)
+        dt_now = datetime.utcnow()
+
+        epoch = datetime(1970, 1, 1)
+
+        # get timestamp in UTC 
+        timestamp = (dt_now - epoch).total_seconds()
+
+        await self.update_player_stat(author, 'bank_update_ts', timestamp)
 
     @commands.command(name="profile", aliases=["p", "pro"])
     async def _profile(self, ctx: Context, user: discord.User = None):
@@ -648,3 +670,39 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         # if total_trophies > total_pb:
         #     await self.up
+
+    async def update_token_bank(self):
+        """Task to update token banks."""
+        while True:
+            for user in self.bot.users:
+                tokens_in_bank = await self.get_player_stat(user, 'tokens_in_bank')
+                if tokens_in_bank == 200:
+                    continue
+                tokens_in_bank += 20
+                if tokens_in_bank > 200:
+                    tokens_in_bank = 200
+
+                bank_update_timestamp = await self.get_player_stat(user, 'bank_update_ts')
+                
+                if not bank_update_timestamp:
+                    continue
+
+                bank_update_ts = datetime.utcfromtimestamp(bank_update_timestamp)
+                time_now = datetime.utcnow()
+                delta = time_now - bank_update_ts
+                delta_min = delta.total_seconds() / 60
+
+                if delta_min >= 80:
+                    await self.update_player_stat(user, 'tokens_in_bank', tokens_in_bank)
+                    epoch = datetime(1970, 1, 1)
+
+                    # get timestamp in UTC 
+                    timestamp = (time_now - epoch).total_seconds()
+                    await self.update_player_stat(user, 'bank_update_ts', timestamp)
+
+            await asyncio.sleep(60)
+
+    def cog_unload(self):
+        self.bank_update_task.cancel()
+    
+    __unload = cog_unload
