@@ -1,0 +1,566 @@
+{
+    "1": {
+        "Trophies": 5,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "2": {
+        "Trophies": 10,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Nita"
+    },
+    "3": {
+        "Trophies": 20,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "4": {
+        "Trophies": 30,
+        "RewardType": 13,
+        "RewardCount": 0,
+        "RewardExtraData": "Showdown"
+    },
+    "5": {
+        "Trophies": 40,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "6": {
+        "Trophies": 60,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Colt"
+    },
+    "7": {
+        "Trophies": 100,
+        "RewardType": 9,
+        "RewardCount": 200,
+        "RewardExtraData": ""
+    },
+    "8": {
+        "Trophies": 150,
+        "RewardType": 13,
+        "RewardCount": 0,
+        "RewardExtraData": "Brawl Ball"
+    },
+    "9": {
+        "Trophies": 200,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "10": {
+        "Trophies": 250,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Bull"
+    },
+    "11": {
+        "Trophies": 300,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "12": {
+        "Trophies": 350,
+        "RewardType": 13,
+        "RewardCount": 0,
+        "RewardExtraData": "Ticket events"
+    },
+    "13": {
+        "Trophies": 400,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "14": {
+        "Trophies": 450,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "15": {
+        "Trophies": 500,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Jessie"
+    },
+    "16": {
+        "Trophies": 550,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "17": {
+        "Trophies": 600,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "18": {
+        "Trophies": 650,
+        "RewardType": 14,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "19": {
+        "Trophies": 700,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "20": {
+        "Trophies": 750,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "21": {
+        "Trophies": 800,
+        "RewardType": 13,
+        "RewardCount": 0,
+        "RewardExtraData": "Team events"
+    },
+    "22": {
+        "Trophies": 850,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "23": {
+        "Trophies": 900,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "24": {
+        "Trophies": 950,
+        "RewardType": 7,
+        "RewardCount": 10,
+        "RewardExtraData": ""
+    },
+    "25": {
+        "Trophies": 1000,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Brock"
+    },
+    "26": {
+        "Trophies": 1100,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "27": {
+        "Trophies": 1200,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "28": {
+        "Trophies": 1300,
+        "RewardType": 12,
+        "RewardCount": 75,
+        "RewardExtraData": ""
+    },
+    "29": {
+        "Trophies": 1400,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "30": {
+        "Trophies": 1500,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "31": {
+        "Trophies": 1600,
+        "RewardType": 13,
+        "RewardCount": 0,
+        "RewardExtraData": "Solo events"
+    },
+    "32": {
+        "Trophies": 1700,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "33": {
+        "Trophies": 1800,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "34": {
+        "Trophies": 1900,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "35": {
+        "Trophies": 2000,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Dynamike"
+    },
+    "36": {
+        "Trophies": 2100,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "37": {
+        "Trophies": 2200,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "38": {
+        "Trophies": 2300,
+        "RewardType": 12,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "39": {
+        "Trophies": 2400,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "40": {
+        "Trophies": 2500,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "41": {
+        "Trophies": 2600,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "42": {
+        "Trophies": 2700,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "43": {
+        "Trophies": 2800,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "44": {
+        "Trophies": 2900,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "45": {
+        "Trophies": 3000,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Bo"
+    },
+    "46": {
+        "Trophies": 3100,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "47": {
+        "Trophies": 3200,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "48": {
+        "Trophies": 3300,
+        "RewardType": 1,
+        "RewardCount": 300,
+        "RewardExtraData": ""
+    },
+    "49": {
+        "Trophies": 3400,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "50": {
+        "Trophies": 3500,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "51": {
+        "Trophies": 3600,
+        "RewardType": 9,
+        "RewardCount": 600,
+        "RewardExtraData": ""
+    },
+    "52": {
+        "Trophies": 3700,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "53": {
+        "Trophies": 3800,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "54": {
+        "Trophies": 3900,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "55": {
+        "Trophies": 4000,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Tick"
+    },
+    "56": {
+        "Trophies": 4150,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "57": {
+        "Trophies": 4300,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "58": {
+        "Trophies": 4500,
+        "RewardType": 14,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "59": {
+        "Trophies": 4750,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "60": {
+        "Trophies": 5000,
+        "RewardType": 10,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "61": {
+        "Trophies": 5150,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "62": {
+        "Trophies": 5300,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "63": {
+        "Trophies": 5500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "64": {
+        "Trophies": 5750,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "65": {
+        "Trophies": 6000,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "8-Bit"
+    },
+    "66": {
+        "Trophies": 6150,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "67": {
+        "Trophies": 6300,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "68": {
+        "Trophies": 6500,
+        "RewardType": 12,
+        "RewardCount": 75,
+        "RewardExtraData": ""
+    },
+    "69": {
+        "Trophies": 6750,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "70": {
+        "Trophies": 7000,
+        "RewardType": 10,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "71": {
+        "Trophies": 7150,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "72": {
+        "Trophies": 7300,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "73": {
+        "Trophies": 7500,
+        "RewardType": 14,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "74": {
+        "Trophies": 7750,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "75": {
+        "Trophies": 8000,
+        "RewardType": 3,
+        "RewardCount": 1,
+        "RewardExtraData": "Emz"
+    },
+    "76": {
+        "Trophies": 8150,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "77": {
+        "Trophies": 8300,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "78": {
+        "Trophies": 8500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "79": {
+        "Trophies": 8750,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "80": {
+        "Trophies": 9000,
+        "RewardType": 10,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "81": {
+        "Trophies": 9150,
+        "RewardType": 1,
+        "RewardCount": 50,
+        "RewardExtraData": ""
+    },
+    "82": {
+        "Trophies": 9300,
+        "RewardType": 12,
+        "RewardCount": 25,
+        "RewardExtraData": ""
+    },
+    "83": {
+        "Trophies": 9500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "84": {
+        "Trophies": 9750,
+        "RewardType": 6,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "85": {
+        "Trophies": 10000,
+        "RewardType": 10,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "86": {
+        "Trophies": 10500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "87": {
+        "Trophies": 11000,
+        "RewardType": 1,
+        "RewardCount": 300,
+        "RewardExtraData": ""
+    },
+    "88": {
+        "Trophies": 11500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "89": {
+        "Trophies": 12000,
+        "RewardType": 10,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "90": {
+        "Trophies": 12500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "91": {
+        "Trophies": 13000,
+        "RewardType": 1,
+        "RewardCount": 300,
+        "RewardExtraData": ""
+    },
+    "92": {
+        "Trophies": 13500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    },
+    "93": {
+        "Trophies": 14000,
+        "RewardType": 10,
+        "RewardCount": 1,
+        "RewardExtraData": ""
+    },
+    "94": {
+        "Trophies": 14500,
+        "RewardType": 1,
+        "RewardCount": 150,
+        "RewardExtraData": ""
+    }
+}
