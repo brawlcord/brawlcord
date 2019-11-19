@@ -20,7 +20,7 @@ from redbot.core.utils.common_filters import filter_various_mentions
 from redbot.core.utils.menus import (DEFAULT_CONTROLS, menu,
                                      start_adding_reactions)
 # from redbot.core.utils.chat_formatting import box
-from redbot.core.utils.predicates import ReactionPredicate
+from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
 from .brawlers import emojis, brawler_emojis, rank_emojis, Brawler, Shelly, Nita, Colt
 
@@ -49,8 +49,10 @@ default_user = {
     "lvl": 1,
     "starpoints": 0,
     "startokens": 0,
+    "tickets": 0,
     "tokens": 0,
     "tokens_in_bank": 200,
+    "token_doubler": 0,
     # "trophies": 0,
     "tutorial_finished": False,
     "bank_update_ts": None,
@@ -67,7 +69,17 @@ default_user = {
         "starpower": None
     },
     "tppassed": [],
-    "tpstored": []
+    "tpstored": [],
+    "brawl_stats": {
+        "solo": [0, 0], # [wins, losses]
+        "3v3_wins": [0, 0], # [wins, losses]
+        "duo_wins": [0, 0], # [wins, losses]
+    },
+    "boxes": {
+        "brawl": 0,
+        "big": 0,
+        "mega": 0
+    }
 }
 
 brawlers_map = {
@@ -81,7 +93,6 @@ brawlers_map = {
 imgur_links = {
     "shelly_tut": "https://i.imgur.com/QfKYzso.png"
 }
-
 
 gamemode_emotes = {
     "Big Game": "<:big_game:645925169344282624>",
@@ -97,6 +108,18 @@ gamemode_emotes = {
     "Robo Rumble": "<:roborumble:645925170594316288>",
     "Lone Star": "<:lonestar:645925170610962452>",
     "Takedown": "<:takedown:645925171034587146>",
+}
+
+reward_types = {
+    1: ["Gold", emojis["gold"]],
+    3: ["Brawler", brawler_emojis],
+    6: ["Brawl Box", emojis["brawlbox"]],
+    7: ["Tickets", emojis['ticket']],
+    9: ["Token Doubler", emojis['tokendoubler']],
+    10: ["Mega Box", emojis["megabox"]],
+    12: ["Power Points", emojis["powerpoint"]],
+    13: ["Game Mode", gamemode_emotes],
+    14: ["Big Box", emojis["bigbox"]]
 }
 
 class BrawlCord(BaseCog, name="BrawlCord"):
@@ -467,7 +490,62 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             embed = b.brawler_info(brawler)
 
         await ctx.send(embed=embed)
+ 
+    @commands.group(name="rewards", autohelp=False)
+    async def _rewards(self, ctx: Context):
+        """View and claim collected trophy road rewards!"""
+        pass            
+    
+    @_rewards.command(name="list")
+    async def rewards_list(self, ctx: Context):
+        """View collected trophy road rewards."""
 
+        user = ctx.author
+        
+        tpstored = await self.get_player_stat(user, 'tpstored')
+
+        desc = "Use `-rewards claim <reward_number>` or `-rewards claimall` to claim rewards!"
+        embed = discord.Embed(color=0xFFA232, title="Rewards List", description=desc)
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        
+        embed_str = ""
+        
+        for tier in tpstored:
+            reward_data = self.TROPHY_ROAD[tier]
+            reward_name, reward_emoji, reward_str = self.tp_reward_strings(reward_data, tier)
+
+            embed_str += f"\n**{tier}.** {reward_name}: {reward_emoji} {reward_str}"
+        
+        embed.add_field(name="Rewards", value=embed_str.strip())
+
+        await ctx.send(embed=embed)
+
+    @_rewards.command(name="claim")
+    async def rewards_claim(self, ctx: Context, reward_number: str):
+        """Claim collected trophy road reward."""
+
+        user = ctx.author
+        
+        tpstored = await self.get_player_stat(user, 'tpstored')
+
+        if reward_number not in tpstored:
+            return await ctx.send(f"You do not have {reward_number} collected.")
+        
+        await self.handle_reward_claims(ctx, reward_number)
+        
+        await ctx.send("Reward successfully claimed.")    
+        
+    @_rewards.command(name="claimall")
+    async def rewards_claim_all(self, ctx: Context):
+        user = ctx.author
+
+        tpstored = await self.get_player_stat(user, 'tpstored')
+
+        for tier in tpstored:
+            await self.handle_reward_claims(ctx, tier)
+        
+        await ctx.send("Rewards successfully claimed.")    
+    
     @commands.command(name="emojis")
     @checks.is_owner()
     async def get_all_emotes(self, ctx: Context):
@@ -495,18 +573,28 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 return stat[substat]
 
     async def update_player_stat(self, user: discord.User, stat: str, 
-                                                value, substat: str = None, sub_index=None):
+                                                value, substat: str = None, sub_index=None, add_self=False):
         """Update stats of a player."""
 
         if substat:
             async with getattr(self.config.user(user), stat)() as stat:
                 if not sub_index:
-                    stat[substat] = value
+                    if not add_self:
+                        stat[substat] = value
+                    else:
+                        stat[substat] += value
                 else:
-                    stat[substat][sub_index] = value
+                    if not add_self:
+                        stat[substat][sub_index] = value
+                    else:
+                        stat[substat][sub_index] += value
         else:
             stat_attr = getattr(self.config.user(user), stat)
-            await stat_attr.set(value)
+            if not add_self:
+                old_val = 0
+            else:
+                old_val = self.get_player_stat(user, stat)
+            await stat_attr.set(value+old_val)
 
     def matchmaking(self, brawler_level: int):
         """Get an opponent!"""
@@ -775,17 +863,6 @@ class BrawlCord(BaseCog, name="BrawlCord"):
     
     async def handle_trophy_road(self, user: discord.User):
         """Function to handle trophy road progress."""   
-        reward_types = {
-            1: ["Gold", emojis["gold"]],
-            3: ["Brawler", brawler_emojis],
-            6: ["Brawl Box", emojis["brawlbox"]],
-            7: ["Tickets", emojis['ticket']],
-            9: ["Token Doubler", emojis['tokendoubler']],
-            10: ["Mega Box", emojis["megabox"]],
-            12: ["Power Points", emojis["powerpoint"]],
-            13: ["Game Mode", gamemode_emotes],
-            14: ["Big Box", emojis["bigbox"]]
-        }
 
         trophies = await self.get_trophies(user)
         tppased = await self.get_player_stat(user, 'tppassed')
@@ -801,25 +878,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 async with self.config.user(user).tpstored() as tpstored:
                     tpstored.append(tier)
                 
-                reward_type = self.TROPHY_ROAD[tier]['RewardType']
-                reward_name = reward_types[reward_type][0]
-                reward_emoji_root = reward_types[reward_type][1]
-                if reward_type not in [3, 13]:
-                    reward_str = f"x{self.TROPHY_ROAD[tier]['RewardCount']}"
-                    reward_emoji = reward_emoji_root
-                else:
-                    reward_str = self.TROPHY_ROAD[tier]['RewardExtraData']
-                    if reward_type == 3:
-                        reward_emoji = reward_emoji_root[reward_str]
-                    else:
-                        if reward_str == "Brawl Ball":
-                            reward_emoji = reward_emoji_root[reward_str]
-                        elif reward_str == "Showdown":
-                            reward_emoji = reward_emoji_root["Solo Showdown"]
-                        else:
-                            reward_emoji = emojis["bsstar"]
+                reward_name, reward_emoji, reward_str = self.tp_reward_strings(self.TROPHY_ROAD[tier], tier)
                 
-                desc = "Claim the reward by using the `-claim` command!"
+                desc = "Claim the reward by using the `-rewards` command!"
                 embed = discord.Embed(color=0xFFA232, title="Trophy Road Reward", description=desc)
                 embed.set_author(name=user.name, icon_url=user.avatar_url)
                 embed.add_field(name=reward_name, value=f"{reward_emoji} {reward_str}")
@@ -829,6 +890,106 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         else:
             return False
 
+    def tp_reward_strings(self, reward_data, tier):
+        reward_type = reward_data["RewardType"]
+        reward_name = reward_types[reward_type][0]
+        reward_emoji_root = reward_types[reward_type][1]
+        if reward_type not in [3, 13]:
+            reward_str = f"x{self.TROPHY_ROAD[tier]['RewardCount']}"
+            reward_emoji = reward_emoji_root
+        else:
+            reward_str = self.TROPHY_ROAD[tier]['RewardExtraData']
+            if reward_type == 3:
+                reward_emoji = reward_emoji_root[reward_str]
+            else:
+                if reward_str == "Brawl Ball":
+                    reward_emoji = reward_emoji_root[reward_str]
+                elif reward_str == "Showdown":
+                    reward_emoji = reward_emoji_root["Solo Showdown"]
+                else:
+                    reward_emoji = emojis["bsstar"]
+            
+        return reward_name, reward_emoji, reward_str
+    
+    async def handle_reward_claims(self, ctx: Context, reward_number: str):
+        """Function to handle reward claims."""
+
+        user = ctx.author
+        
+        reward_type = self.TROPHY_ROAD[reward_number]["RewardType"]
+        reward_count = self.TROPHY_ROAD[reward_number]["RewardCount"]
+        reward_extra = self.TROPHY_ROAD[reward_number]["RewardExtraData"]
+
+        if reward_type == 1:
+            await self.update_player_stat(user, 'gold', reward_count, add_self=True)
+        
+        elif reward_type == 3:
+            async with self.config.user(user).brawlers() as brawlers:
+                brawlers[reward_extra] = default_stats
+        
+        elif reward_type == 6:
+            async with self.config.user(user).boxes() as boxes:
+                boxes['brawl'] += reward_count
+        
+        elif reward_type == 7:
+            await self.update_player_stat(user, 'tickets', reward_count, add_self=True)
+        
+        elif reward_type == 9:
+            await self.update_player_stat(user, 'token_doubler', reward_count, add_self=True)
+        
+        elif reward_type == 10:
+            async with self.config.user(user).boxes() as boxes:
+                boxes['mega'] += reward_count
+        
+        elif reward_type == 12:
+            await ctx.send("Enter the name of Brawler to add powerpoints to:")
+            pred = await self.bot.wait_for("message", check=MessagePredicate.same_context(ctx))
+            
+            brawler = pred.content
+            # for users who input 'el-primo' or 'el_primo'
+            brawler = brawler.replace("-", " ")
+            brawler = brawler.replace("_", " ")
+            
+            brawler = brawler.title()
+
+            user_brawlers = await self.get_player_stat(user, 'brawlers', is_iter=True)
+            
+            if brawler not in brawlers:
+                return await ctx.send(f"You do not own {brawler}!")
+            
+            await self.update_player_stat(user, 'brawlers', reward_count, substat=brawler, 
+                                                sub_index='powerpoints', add_self=True)
+        
+        elif reward_type == 13:
+            async with self.config.user(user).gamemodes() as gamemodes:
+                if reward_extra == "Brawl Ball":
+                    gamemodes.append(reward_extra)
+
+                elif reward_extra == "Showdown":
+                    gamemodes.append("Solo Showdown")
+                    gamemodes.append("Duo Showdown")
+
+                elif reward_extra == "Ticket Events":
+                    gamemodes.append("Robo Rumble")
+                    gamemodes.append("Boss Fight")
+                    gamemodes.append("Big Game")
+
+                elif reward_extra == "Team Events":
+                    gamemodes.append("Heist")
+                    gamemodes.append("Bounty")
+                    gamemodes.append("Siege")
+
+                elif reward_extra == "Solo Events":
+                    gamemodes.append("Lone Star")
+                    gamemodes.append("Takedown")
+        
+        elif reward_type == 14:
+            async with self.config.user(user).boxes() as boxes:
+                boxes['big'] += reward_count
+
+        async with self.config.user(user).tpstored() as tpstored:
+            tpstored.remove(reward_number)
+        
     def cog_unload(self):
         self.bank_update_task.cancel()
     
