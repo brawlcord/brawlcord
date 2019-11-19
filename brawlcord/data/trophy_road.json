@@ -69,7 +69,7 @@
         "Trophies": 350,
         "RewardType": 13,
         "RewardCount": 0,
-        "RewardExtraData": "Ticket events"
+        "RewardExtraData": "Ticket Events"
     },
     "13": {
         "Trophies": 400,
@@ -123,7 +123,7 @@
         "Trophies": 800,
         "RewardType": 13,
         "RewardCount": 0,
-        "RewardExtraData": "Team events"
+        "RewardExtraData": "Team Events"
     },
     "22": {
         "Trophies": 850,
@@ -183,7 +183,7 @@
         "Trophies": 1600,
         "RewardType": 13,
         "RewardCount": 0,
-        "RewardExtraData": "Solo events"
+        "RewardExtraData": "Solo Events"
     },
     "32": {
         "Trophies": 1700,
