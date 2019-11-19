@@ -17,7 +17,3 @@ class GameSession:
         self.message_id = 0
         teamred: Set[discord.Member] = set()
         teamblue: Set[discord.Member] = set()
-
-
-class Box:
-    """"""
