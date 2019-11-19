@@ -225,7 +225,7 @@ class Brawler:
 
         url = brawler_url.format(brawler_name)
 
-        if trophies:
+        if level:
             title = f"{rank_emojis['br'+str(rank)]} {brawler_name}"
         else:
             title = f"{brawler_name} [Not unlocked]"
@@ -233,7 +233,7 @@ class Brawler:
         embed = discord.Embed(color=rarity_colors[self.rarity], title=title, 
             description=self.desc, url=url)
         embed.set_thumbnail(url=brawler_thumb.format(brawler_name.title()))
-        if trophies:
+        if level:
             embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
             embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
             embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
