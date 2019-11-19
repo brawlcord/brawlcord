@@ -19,7 +19,13 @@ emojis = {
     "xp": "<:xp:645337312431046657>",
     "token": "<:token:645694990302838789>",
     "gold": "<:gold:645337311923404851>",
-    "starpoints": "<:starpoint:646249196042715138>"
+    "starpoints": "<:starpoint:646249196042715138>",
+    "brawlbox": "<:brawlbox:646307503650373632>",
+    "bigbox": "<:bigbox:646307503524544518>",
+    "megabox": "<:megabox:646307503835054080>",
+    "ticket": "<:bsticket:645337313131495434>",
+    "tokendoubler": "<:token_doubler:646308736130088961>",
+    "bsstar": "<:bs_icon_ready:646310961241653253>"
 }
 
 sp_icons = {
