@@ -175,9 +175,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         with trophy_road_fp.open("r") as f:
             self.TROPHY_ROAD = json.load(f)
 
-    @commands.command(name="brawl", aliases=["b"])
-    @commands.guild_only()
-    # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
+    # @commands.command(name="brawl", aliases=["b"])
+    # @commands.guild_only()
+    # # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
     async def _brawl(
         self,
         ctx: Context,
@@ -186,175 +186,468 @@ class BrawlCord(BaseCog, name="BrawlCord"):
     ):
         """Brawl against others!"""
 
-        author = ctx.author
-        guild = ctx.guild
+        # author = ctx.author
+        # guild = ctx.guild
 
-        tutorial_finished = await self.get_player_stat(author, "tutorial_finished")
+        # tutorial_finished = await self.get_player_stat(author, "tutorial_finished")
 
-        if not tutorial_finished:
-            return await ctx.send(f"{author.mention} You have not finished tutorial yet."
-                                  "Use  `-tutorial` to start tutorial.")
+        # if not tutorial_finished:
+        #     return await ctx.send(f"{author.mention} You have not finished tutorial yet."
+        #                           "Use  `-tutorial` to start tutorial.")
 
-        teammates = [teammate1, teammate2]
+        # teammates = [teammate1, teammate2]
 
-        players = [author]
+        # players = [author]
 
-        for teammate in teammates:
-            if teammate:
-                if teammate == author:
-                    return await ctx.send("You can't play with yourself!")
-                elif teammate == guild.me:
-                    return await ctx.send("I can't play!")
-                players.append(teammate)
+        # for teammate in teammates:
+        #     if teammate:
+        #         if teammate == author:
+        #             return await ctx.send("You can't play with yourself!")
+        #         elif teammate == guild.me:
+        #             return await ctx.send("I can't play!")
+        #         players.append(teammate)
 
-        # await ctx.send(teammates)
+        # # await ctx.send(teammates)
 
-        results = {}
+        # results = {}
 
-        for player in players:
-            selected_brawler = (await self.get_player_stat(player, "selected"))["brawler"]
+        # for player in players:
+        #     selected_brawler = (await self.get_player_stat(player, "selected"))["brawler"]
 
-            user_brawler_level = (await self.get_player_stat(player, "brawlers"))[selected_brawler]["level"]
+        #     user_brawler_level = (await self.get_player_stat(player, "brawlers"))[selected_brawler]["level"]
 
-            opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(
-                user_brawler_level)
+        #     opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(
+        #         user_brawler_level)
 
-            user1: Brawler = brawlers_map[selected_brawler](
-                self.BRAWLERS, selected_brawler)
-            # opp1: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
-            opp1 = Shelly(self.BRAWLERS, "Shelly")
+        #     user1: Brawler = brawlers_map[selected_brawler](
+        #         self.BRAWLERS, selected_brawler)
+        #     # opp1: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
+        #     opp1 = Shelly(self.BRAWLERS, "Shelly")
 
-            # await ctx.send(embed=user1.brawler_info("Shelly", 10, 10, 5, 0, 200))
+        #     # await ctx.send(embed=user1.brawler_info("Shelly", 10, 10, 5, 0, 200))
 
-            user_health = user1._health(user_brawler_level)
-            opp_health = opp1._health(opp_brawler_level)
+        #     user_health = user1._health(user_brawler_level)
+        #     opp_health = opp1._health(opp_brawler_level)
 
-            opp_health -= user1._attack(user_brawler_level)
+        #     opp_health -= user1._attack(user_brawler_level)
 
-            user_counter = 0
-            opp_counter = 0
+        #     user_counter = 0
+        #     opp_counter = 0
 
-            winner = "Computer"
-            margin = 0
+        #     winner = "Computer"
+        #     margin = 0
 
-            while True:
-                # print(f"You before attack: {user_health}")
-                # print(f"Computer before attack: {opp_health}")
-                if user_counter > 0 and user_counter % 5 == 0:
-                    res = user1._ult(user_brawler_level)
-                    opp_health -= res
-                    if res > 0:
-                        user_counter += 1
-                if opp_counter > 0 and opp_counter % 5 == 0:
-                    res = opp1._ult(opp_brawler_level)
-                    user_health -= res
-                    if res > 0:
-                        opp_counter += 1
+        #     while True:
+        #         # print(f"You before attack: {user_health}")
+        #         # print(f"Computer before attack: {opp_health}")
+        #         if user_counter > 0 and user_counter % 5 == 0:
+        #             res = user1._ult(user_brawler_level)
+        #             opp_health -= res
+        #             if res > 0:
+        #                 user_counter += 1
+        #         if opp_counter > 0 and opp_counter % 5 == 0:
+        #             res = opp1._ult(opp_brawler_level)
+        #             user_health -= res
+        #             if res > 0:
+        #                 opp_counter += 1
 
-                else:
-                    res_u = user1._attack(user_brawler_level)
-                    res_o = opp1._attack(opp_brawler_level)
+        #         else:
+        #             res_u = user1._attack(user_brawler_level)
+        #             res_o = opp1._attack(opp_brawler_level)
 
-                    if res_u > 0:
-                        user_counter += 1
-                    if res_o > 0:
-                        opp_counter += 1
+        #             if res_u > 0:
+        #                 user_counter += 1
+        #             if res_o > 0:
+        #                 opp_counter += 1
 
-                    user_health -= res_o
-                    opp_health -= res_u
+        #             user_health -= res_o
+        #             opp_health -= res_u
 
-                # print(f"You after attack: {user_health}")
-                # print(f"Computer after attack: {opp_health}")
+        #         # print(f"You after attack: {user_health}")
+        #         # print(f"Computer after attack: {opp_health}")
 
-                margin = abs(user_health-opp_health)
+        #         margin = abs(user_health-opp_health)
 
-                if user_health <= 0 and opp_health > 0:
-                    break
-                if opp_health <= 0 and user_health > 0:
-                    winner = "User"
-                    break
-                if opp_health <= 0 and user_health <= 0:
-                    winner = "Draw"
-                    break
-                else:
-                    continue
+        #         if user_health <= 0 and opp_health > 0:
+        #             break
+        #         if opp_health <= 0 and user_health > 0:
+        #             winner = "User"
+        #             break
+        #         if opp_health <= 0 and user_health <= 0:
+        #             winner = "Draw"
+        #             break
+        #         else:
+        #             continue
 
-            if winner == "Computer":
-                results[player] = {
-                    "brawl_res": -1,
-                    "margin": margin
-                }
-            elif winner == "User":
-                results[player] = {
-                    "brawl_res": 1,
-                    "margin": margin
-                }
-            else:
-                results[player] = {
-                    "brawl_res": 0,
-                    "margin": margin
-                }
+        #     if winner == "Computer":
+        #         results[player] = {
+        #             "brawl_res": -1,
+        #             "margin": margin
+        #         }
+        #     elif winner == "User":
+        #         results[player] = {
+        #             "brawl_res": 1,
+        #             "margin": margin
+        #         }
+        #     else:
+        #         results[player] = {
+        #             "brawl_res": 0,
+        #             "margin": margin
+        #         }
 
-        points = 0
-        for result in results:
-            if results[result]['brawl_res'] == 1:
-                points += 1
-            elif results[result]['brawl_res'] == -1:
-                points -= 1
-            else:
-                points += 0
+        # points = 0
+        # for result in results:
+        #     if results[result]['brawl_res'] == 1:
+        #         points += 1
+        #     elif results[result]['brawl_res'] == -1:
+        #         points -= 1
+        #     else:
+        #         points += 0
 
-        starplayer = guild.me
+        # starplayer = guild.me
 
-        player_mentions = ' '.join([player.mention for player in players])
+        # player_mentions = ' '.join([player.mention for player in players])
         
-        if points > 0:
-            # max_margin = 0
-            # for result in results.keys():
-            #     if results[result]['margin'] > max_margin:
-            #         max_margin = results[result]['margin']
-            #         starplayer = result
-            #         if len(results) > 3:
-            starplayer = random.choice([result for result in results])
-            await ctx.send(f"{player_mentions} You won! Star Player: {starplayer}.")
-        elif points < 1:
-            await ctx.send(f"{player_mentions} You lost! Star Player: {starplayer}.")
+        # if points > 0:
+        #     # max_margin = 0
+        #     # for result in results.keys():
+        #     #     if results[result]['margin'] > max_margin:
+        #     #         max_margin = results[result]['margin']
+        #     #         starplayer = result
+        #     #         if len(results) > 3:
+        #     starplayer = random.choice([result for result in results])
+        #     await ctx.send(f"{player_mentions} You won! Star Player: {starplayer}.")
+        # elif points < 1:
+        #     await ctx.send(f"{player_mentions} You lost! Star Player: {starplayer}.")
+        # else:
+        #     chance = random.randint(1, 2)
+        #     if chance == 1:
+        #         starplayer = random.choice([result for result in results])
+        #     await ctx.send(f"The match ended in a draw! Star Player: {starplayer}.")
+
+        # count = 0
+        # for user in results:
+        #     if user == starplayer:
+        #         is_starplayer = True
+        #     else:
+        #         is_starplayer = False
+        #     brawl_rewards, rank_up_rewards, trophy_road_reward = await self.brawl_rewards(user, points, is_starplayer)
+            
+        #     count += 1
+        #     if count == 1:
+        #         await ctx.send("Direct messaging rewards!")
+        #     level_up = await self.xp_handler(user)
+        #     try:
+        #         await user.send(embed=brawl_rewards)
+        #         if level_up:
+        #             await user.send(f"{level_up[0]}\n{level_up[1]}")
+        #         if rank_up_rewards:
+        #             await user.send(embed=rank_up_rewards)
+        #         if trophy_road_reward:
+        #             await user.send(embed=trophy_road_reward)
+        #     except:
+        #         await ctx.send(f"Cannot direct message {user.mention}")
+        #         await ctx.send(embed=brawl_rewards)
+        #         if level_up:
+        #             await ctx.send(f"{user.mention} {level_up[0]}\n{level_up[1]}")
+        #             await ctx.send()
+        #         if rank_up_rewards:
+        #             await ctx.send(embed=rank_up_rewards)
+        #         if trophy_road_reward:
+        #             await ctx.send(embed=trophy_road_reward)
+
+        pass
+
+    @commands.command(name="brawl", aliases=["b"])
+    @commands.guild_only()
+    async def _brawl(self, ctx: Context, opponent: discord.User = None):
+        """Brawl against others!"""
+
+        guild = ctx.guild
+        user = ctx.author
+
+        user_brawler = await self.get_player_stat(user, "selected", is_iter=True, substat="brawler")
+        brawler_data = await self.get_player_stat(user, "brawlers", is_iter=True, substat=user_brawler)
+        user_brawler_level = brawler_data['level']
+
+        ub: Brawler = brawlers_map[user_brawler](self.BRAWLERS, user_brawler)
+
+        if opponent:
+            opp_brawler = await self.get_player_stat(opponent, "selected", is_iter=True, substat="brawler")
+            opp_data = await self.get_player_stat(opponent, "brawlers", is_iter=True, substat=opp_brawler)
+            opp_brawler_level = brawler_data['level']
+
+            ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
+
         else:
-            chance = random.randint(1, 2)
-            if chance == 1:
-                starplayer = random.choice([result for result in results])
-            await ctx.send(f"The match ended in a draw! Star Player: {starplayer}.")
+            opponent = guild.me
+            opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(user_brawler_level)
+
+            ob = Shelly(self.BRAWLERS, "Shelly")
+        
+        if opponent != guild.me:
+            try:
+                msg = await opponent.send(f"{user.mention} has challenged you for a brawl. Accept?")
+                start_adding_reactions(msg, ReactionPredicate.YES_OR_NO_EMOJIS)
+
+                pred = ReactionPredicate.yes_or_no(msg, opponent)
+                await ctx.bot.wait_for("reaction_add", check=pred)
+                if pred.result is True:
+                    # User responded with tick
+                    pass
+                else:
+                    # User responded with cross
+                    return await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled."
+                    f" Reason: {opponent.name} rejected the challenge.")    
+            except:
+                return await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled." 
+                    f" Reason: Unable to DM {opponent.name}. DMs are required to brawl!")
+            
+        first_move_chance = random.randint(1, 2)
+
+        if first_move_chance == 1:
+            first = ub
+            second = ob
+            first_player = user
+            second_player = opponent
+            first_brawler = user_brawler
+            second_brawler = opp_brawler
+            fp_brawler_level = user_brawler_level
+            sp_brawler_level = opp_brawler_level
+        else:
+            first = ob
+            second = ub
+            first_player = opponent
+            second_player = user
+            first_brawler = opp_brawler
+            second_brawler = user_brawler
+            sp_brawler_level = user_brawler_level
+            fp_brawler_level = opp_brawler_level
+            
+        sfh = first._health(user_brawler_level) # static first health
+        ssh = second._health(opp_brawler_level) # static second health
+        
+        first_health = sfh
+        second_health = ssh
+
+        first_gems = 0
+        second_gems = 0
+        
+        first_attacks = 0
+        second_attacks = 0
+        
+        first_invincibility = False
+        second_invincibility = False
+        
+        while True:
+            
+            if second_player != guild.me:
+                try:
+                    await second_player.send("Waiting for opponent to pick a move...")
+                except:
+                    return await ctx.send(f"{first_player.mention} {second_player.mention} Brawl cancelled."
+                    f" Reason: {second_player.name} rejected the challenge.")
+                
+            if first_attacks >= 6:
+                first_can_super = True
+                end = 4
+            else:
+                first_can_super = False
+                end = 3
+        
+            if first_player != guild.me:
+                desc = "Pick a move by typing the corresponding move number below."
+                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {second_player.name}")
+                embed.set_author(name=first_player.name, icon_url=first_player.avatar_url)
+                
+                embed.add_field(name="Your Brawler", value=f"{brawler_emojis[first_brawler]} {first_brawler}")
+                embed.add_field(name="Your Health", value=f"{emojis['health']} {int(first_health)}")
+                embed.add_field(name="Your Gems", value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
+                
+                embed.add_field(name="Opponent's Brawler", value=f"{brawler_emojis[second_brawler]} {second_brawler}")
+                embed.add_field(name="Opponent's Health", value=f"{emojis['health']} {int(second_health)}")
+                embed.add_field(name="Opponent's Gems", value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
+
+                moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
+                            f"\n{'4. Use Super' if first_can_super else ''}").strip()
+                
+                embed.add_field(name="Available Moves", value=moves, inline=False)
+
+                try:
+                    msg = await first_player.send(embed=embed)
+
+                    react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
+                    start_adding_reactions(msg, react_emojis)
+
+                    pred = ReactionPredicate.with_emojis(react_emojis, msg)
+                    await ctx.bot.wait_for("reaction_add", check=pred)
+
+                    # pred.result is  the index of the letter in `emojis`
+
+                    choice = pred.result + 1
+                except:
+                    return await ctx.send(f"{first_player.mention} {second_player.mention}" 
+                            f"Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+
+            else:
+                # develop bot logic
+                if first_can_super:
+                    choice = random.randint(1, 4)
+                else:
+                    choice = random.randint(1, 3)
+            
+            if choice == 1:
+                damage = first._attack(fp_brawler_level)
+                if not second_invincibility:
+                    second_health -= damage
+                    first_attacks += 1
+                else:
+                    second_invincibility = False
+            elif choice == 2:
+                first_gems += 1
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 3:
+                first_invincibility = True
+                if second_invincibility:
+                    second_invincibility = False
+            else:
+                damage = first._ult(fp_brawler_level)
+                first_attacks = 0
+                if not second_invincibility:
+                    second_health -= damage
+                else:
+                    second_health -= damage * 0.5
+                    second_invincibility = False
+            
+            winner, loser = self.check_if_win(first_player, second_player, first_health, 
+                    second_health, first_gems, second_gems)
+            
+            if winner == False:
+                pass
+            else:
+                break
+            
+            if first_player != guild.me:
+                await first_player.send("Waiting for opponent to pick a move...")
+            
+            if second_attacks >= 6:
+                second_can_super = True
+                end = 4
+            else:
+                second_can_super = False
+                end = 3
+
+            if second_player != guild.me:
+                desc = "Pick a move by typing the corresponding move number below."
+                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {first_player.name}")
+                embed.set_author(name=second_player.name, icon_url=second_player.avatar_url)
+                
+                embed.add_field(name="Your Brawler", value=f"{brawler_emojis[second_brawler]} {second_brawler}")
+                embed.add_field(name="Your Health", value=f"{emojis['health']} {int(second_health)}")
+                embed.add_field(name="Your Gems", value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
+                
+                embed.add_field(name="Opponent's Brawler", value=f"{brawler_emojis[first_brawler]} {first_brawler}")
+                embed.add_field(name="Opponent's Health", value=f"{emojis['health']} {int(first_health)}")
+                embed.add_field(name="Opponent's Gems", value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
+                
+                moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
+                            f"\n{'4. Use Super' if second_can_super else ''}").strip()
+                
+                embed.add_field(name="Available Moves", value=moves, inline=False)
+
+                msg = await second_player.send(embed=embed)
+
+                react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
+                start_adding_reactions(msg, react_emojis)
+
+                pred = ReactionPredicate.with_emojis(react_emojis, msg)
+                await ctx.bot.wait_for("reaction_add", check=pred)
+
+                # pred.result is  the index of the letter in `emojis`
+
+                choice = pred.result + 1
+
+            else:
+                # develop bot logic
+                if second_can_super:
+                    choice = random.randint(1, 4)
+                else:
+                    choice = random.randint(1, 3)
+
+            if choice == 1:
+                damage = second._attack(fp_brawler_level)
+                if not first_invincibility:
+                    first_health -= damage
+                    second_attacks += 1
+                else:
+                    first_invincibility = False
+            elif choice == 2:
+                second_gems += 1
+                if first_invincibility:
+                    first_invincibility = False
+            elif choice == 3:
+                second_invincibility = True
+                if first_invincibility:
+                    first_invincibility = False
+            else:
+                damage = second._ult(fp_brawler_level)
+                second_attacks = 0
+                if not first_invincibility:
+                    first_health -= damage
+                else:
+                    first_health -= damage * 0.5
+                    first_invincibility = False
+
+            winner, loser = self.check_if_win(first_player, second_player, first_health, 
+                    second_health, first_gems, second_gems)
+            
+            if winner == False:
+                pass
+            else:
+                break
+
+        players = [first_player, second_player]
+        
+        starplayer = random.choice(players)
+
+        if winner:
+            # starplayer = winner
+            await ctx.send(f"{first_player.mention} {second_player.mention} Match ended. Winner: {winner.name}!")
+        else:
+            # starplayer = random.choice(players)
+            await ctx.send(f"{first_player.mention} {second_player.mention} The match ended in a draw!")
+        
+        starplayer = None
 
         count = 0
-        for user in results:
-            if user == starplayer:
+        for player in players:
+            if player == guild.me:
+                continue
+            if player == winner:
+                points = 1
+            elif player == loser:
+                points = -1
+            else:
+                points = 0
+
+            if player == starplayer:
                 is_starplayer = True
             else:
                 is_starplayer = False
-            brawl_rewards, rank_up_rewards, trophy_road_reward = await self.brawl_rewards(user, points, is_starplayer)
+            brawl_rewards, rank_up_rewards, trophy_road_reward = await self.brawl_rewards(player, points, is_starplayer)
             
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
-            level_up = await self.xp_handler(user)
-            try:
-                await user.send(embed=brawl_rewards)
-                if level_up:
-                    await user.send(f"{level_up[0]}\n{level_up[1]}")
-                if rank_up_rewards:
-                    await user.send(embed=rank_up_rewards)
-                if trophy_road_reward:
-                    await user.send(embed=trophy_road_reward)
-            except:
-                await ctx.send(f"Cannot direct message {user.mention}")
-                await ctx.send(embed=brawl_rewards)
-                if level_up:
-                    await ctx.send(f"{user.mention} {level_up[0]}\n{level_up[1]}")
-                    await ctx.send()
-                if rank_up_rewards:
-                    await ctx.send(embed=rank_up_rewards)
-                if trophy_road_reward:
-                    await ctx.send(embed=trophy_road_reward)
+            level_up = await self.xp_handler(player)
+            await player.send(embed=brawl_rewards)
+            if level_up:
+                await player.send(f"{level_up[0]}\n{level_up[1]}")
+            if rank_up_rewards:
+                await player.send(embed=rank_up_rewards)
+            if trophy_road_reward:
+                await player.send(embed=trophy_road_reward)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -990,6 +1283,23 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         async with self.config.user(user).tpstored() as tpstored:
             tpstored.remove(reward_number)
         
+    def check_if_win(self, first_player, second_player, first_health, 
+            second_health, first_gems, second_gems):
+        if (second_health <= 0 and first_health > 0) or (first_gems >= 10 and second_gems < 10):
+            winner = first_player
+            loser = second_player
+        elif (first_health <= 0 and second_health > 0) or (second_gems >= 10 and first_gems < 10):
+            winner = second_player
+            loser = first_player
+        elif (first_health <= 0 and second_health <= 0) or (second_gems >= 10 and first_gems >= 10):
+            winner = None
+            loser = None
+        else:
+            winner = False
+            loser = False
+
+        return winner, loser
+    
     def cog_unload(self):
         self.bank_update_task.cancel()
     
