@@ -168,7 +168,7 @@ class Brawler:
 
         return stats
 
-    def _health(self, level):
+    def _health(self, level) -> int:
         """Function to get health of Brawler of specified power level."""
         stats = self.buff_stats(level)
 
@@ -353,6 +353,7 @@ class Shelly(Brawler):
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
         return embed
+
 
 class Nita(Brawler):
     pass
