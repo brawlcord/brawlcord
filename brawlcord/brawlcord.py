@@ -35,6 +35,7 @@ __author__ = "Snowsee"
 default_stats = {
     "trophies": 0,
     "pb": 0,
+    "rank": 1,
     "level": 1,
     "powerpoints": 0,
     "skins": ["Default"],
@@ -301,23 +302,27 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 is_starplayer = True
             else:
                 is_starplayer = False
-            rewards = await self.brawl_rewards(user, points, is_starplayer)
+            brawl_rewards, rank_up_rewards = await self.brawl_rewards(user, points, is_starplayer)
             
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
             level_up = await self.xp_handler(user)
             try:
-                await user.send(embed=rewards)
+                await user.send(embed=brawl_rewards)
                 if level_up:
                     await user.send(level_up[0])
                     await user.send(level_up[1])
+                if rank_up_rewards:
+                    await user.send(embed=rank_up_rewards)
             except:
                 await ctx.send(f"Cannot direct message {user.mention}")
-                await ctx.send(embed=rewards)
+                await ctx.send(embed=brawl_rewards)
                 if level_up:
-                    await ctx.send(level_up[0])
+                    await ctx.send(f"{user.mention} {level_up[0]}")
                     await ctx.send(level_up[1])
+                if rank_up_rewards:
+                    await ctx.send(embed=rank_up_rewards)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -392,6 +397,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         tokens = await self.get_player_stat(user, 'tokens')
         embed.add_field(name="Tokens", value=f"{emojis['token']} {tokens}")
 
+        starpoints = await self.get_player_stat(user, 'starpoints')
+        embed.add_field(name="Star Points", value=f"{emojis['starpoints']} {starpoints}")
+
         selected = await self.get_player_stat(user, 'selected', is_iter=True)
         brawler = selected['brawler']
         skin = selected['brawler_skin']
@@ -438,11 +446,11 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             pp = brawler_data['powerpoints']
             next_level_pp = 20
             trophies = brawler_data['trophies']
+            rank = brawler_data['rank']
             level = brawler_data['level']
             pb = brawler_data['pb']
             sp1 = brawler_data['sp1']
             sp2 = brawler_data['sp2']
-            rank = self.get_rank(pb)
 
             embed = b.brawler_info(brawler, trophies, pb, rank, level, pp, next_level_pp, sp1, sp2)
 
@@ -478,7 +486,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 return stat[substat]
 
     async def update_player_stat(self, user: discord.User, stat: str, 
-                                                                    value, substat: str = None, sub_index=None):
+                                                value, substat: str = None, sub_index=None):
         """Update stats of a player."""
 
         if substat:
@@ -592,7 +600,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         embed.add_field(name="Tokens", value=f"{emojis['token']} {reward_tokens}")
         embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
 
-        return embed
+        rank_up = await self.handle_rank_ups(user, selected_brawler)
+        
+        return embed, rank_up
 
     def trophies_to_reward_mapping(self, trophies: int, game_type="3v3", position=1):
 
@@ -692,7 +702,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 if not bank_update_timestamp:
                     continue
 
-                bank_update_ts = ceil(datetime.utcfromtimestamp(bank_update_timestamp))
+                bank_update_ts = datetime.utcfromtimestamp(ceil(bank_update_timestamp))
                 time_now = datetime.utcnow()
                 delta = time_now - bank_update_ts
                 delta_min = delta.total_seconds() / 60
@@ -707,17 +717,51 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
             await asyncio.sleep(60)
 
-    async def get_rank(self, pb):
+    def get_rank(self, pb):
         """Return rank of the Brawler based on its personal best."""
 
         for rank in self.RANKS:
             start = self.RANKS[rank]["ProgressStart"]
             end = start + self.RANKS[rank]["Progress"]  # 1 is not subtracted as we're calling range 
-
             if pb in range(start, end):
                 return int(rank)
-            else:
-                return 35
+        else:
+            return 35
+    
+    async def handle_rank_ups(self, user: discord.User, brawler: str):
+        """Function to handle rank ups. 
+        
+        Returns an embed containing rewards if a brawler rank ups.
+        """
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+        
+        pb = brawler_data['pb']
+        rank = brawler_data['rank']
+
+        rank_as_per_pb = self.get_rank(pb)
+
+        if rank_as_per_pb > rank:
+            await self.update_player_stat(user, 'brawlers', rank_as_per_pb, brawler, 'rank')
+            
+            rank_up_tokens = self.RANKS[str(rank)]["PrimaryLvlUpRewardCount"]
+            rank_up_starpoints = self.RANKS[str(rank)]["SecondaryLvlUpRewardCount"]
+
+            tokens = await self.get_player_stat(user, "tokens")
+            starpoints = await self.get_player_stat(user, "starpoints")
+
+            await self.update_player_stat(user, 'tokens', tokens+rank_up_tokens)
+            await self.update_player_stat(user, 'starpoints', starpoints+rank_up_starpoints)
+
+            embed = discord.Embed(color=0xFFA232, title=f"Rank Up! {rank}-> {rank_as_per_pb}")
+            embed.set_author(name=user.name, icon_url=user.avatar_url)
+            embed.add_field(name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
+            embed.add_field(name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
+            if rank_up_starpoints:
+                embed.add_field(name="Star Points", 
+                            value=f"{emojis['starpoints']} {rank_up_starpoints}")
+            return embed
+        else:
+            return False
     
     def cog_unload(self):
         self.bank_update_task.cancel()
