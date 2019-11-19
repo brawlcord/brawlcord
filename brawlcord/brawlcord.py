@@ -65,7 +65,9 @@ default_user = {
         "brawler_skin": "Default",
         "gamemode": "Gem Grab",
         "starpower": None
-    }
+    },
+    "tppassed": [],
+    "tpstored": []
 }
 
 brawlers_map = {
@@ -118,6 +120,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         self.REWARDS: dict = None
         self.XP_LEVELS: dict = None
         self.RANKS: dict = None
+        self.TROPHY_ROAD: dict = None
 
         def error_callback(fut):
             try:
@@ -126,7 +129,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 pass
             except Exception as exc:
                 logging.exception("Error in something", exc_info=exc)
-                # print("Error in something:", exc)
+                print("Error in something:", exc)
 
         self.bank_update_task = self.bot.loop.create_task(self.update_token_bank())
         self.bank_update_task.add_done_callback(error_callback)
@@ -136,6 +139,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         rewards_fp = bundled_data_path(self) / "rewards.json"
         xp_levels_fp = bundled_data_path(self) / "xp_levels.json"
         ranks_fp = bundled_data_path(self) / "ranks.json"
+        trophy_road_fp = bundled_data_path(self) / "trophy_road.json"
 
         with brawlers_fp.open("r") as f:
             self.BRAWLERS = json.load(f)
@@ -145,6 +149,8 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             self.XP_LEVELS = json.load(f)
         with ranks_fp.open("r") as f:
             self.RANKS = json.load(f)
+        with trophy_road_fp.open("r") as f:
+            self.TROPHY_ROAD = json.load(f)
 
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -302,7 +308,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 is_starplayer = True
             else:
                 is_starplayer = False
-            brawl_rewards, rank_up_rewards = await self.brawl_rewards(user, points, is_starplayer)
+            brawl_rewards, rank_up_rewards, trophy_road_reward = await self.brawl_rewards(user, points, is_starplayer)
             
             count += 1
             if count == 1:
@@ -311,18 +317,21 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             try:
                 await user.send(embed=brawl_rewards)
                 if level_up:
-                    await user.send(level_up[0])
-                    await user.send(level_up[1])
+                    await user.send(f"{level_up[0]}\n{level_up[1]}")
                 if rank_up_rewards:
                     await user.send(embed=rank_up_rewards)
+                if trophy_road_reward:
+                    await user.send(embed=trophy_road_reward)
             except:
                 await ctx.send(f"Cannot direct message {user.mention}")
                 await ctx.send(embed=brawl_rewards)
                 if level_up:
-                    await ctx.send(f"{user.mention} {level_up[0]}")
-                    await ctx.send(level_up[1])
+                    await ctx.send(f"{user.mention} {level_up[0]}\n{level_up[1]}")
+                    await ctx.send()
                 if rank_up_rewards:
                     await ctx.send(embed=rank_up_rewards)
+                if trophy_road_reward:
+                    await ctx.send(embed=trophy_road_reward)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -542,7 +551,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         ]
 
     async def brawl_rewards(self, user: discord.User, points: int, is_starplayer=False):
-        """Adjust user variables and return string containing reward."""
+        """Adjust user variables and return embed containing reward."""
 
         if points > 0:
             reward_tokens = 20
@@ -601,8 +610,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
 
         rank_up = await self.handle_rank_ups(user, selected_brawler)
+        trophy_road_reward = await self.handle_trophy_road(user)
         
-        return embed, rank_up
+        return embed, rank_up, trophy_road_reward
 
     def trophies_to_reward_mapping(self, trophies: int, game_type="3v3", position=1):
 
@@ -752,7 +762,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             await self.update_player_stat(user, 'tokens', tokens+rank_up_tokens)
             await self.update_player_stat(user, 'starpoints', starpoints+rank_up_starpoints)
 
-            embed = discord.Embed(color=0xFFA232, title=f"Rank Up! {rank}-> {rank_as_per_pb}")
+            embed = discord.Embed(color=0xFFA232, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
             embed.set_author(name=user.name, icon_url=user.avatar_url)
             embed.add_field(name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
             embed.add_field(name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
@@ -763,6 +773,62 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         else:
             return False
     
+    async def handle_trophy_road(self, user: discord.User):
+        """Function to handle trophy road progress."""   
+        reward_types = {
+            1: ["Gold", emojis["gold"]],
+            3: ["Brawler", brawler_emojis],
+            6: ["Brawl Box", emojis["brawlbox"]],
+            7: ["Tickets", emojis['ticket']],
+            9: ["Token Doubler", emojis['tokendoubler']],
+            10: ["Mega Box", emojis["megabox"]],
+            12: ["Power Points", emojis["powerpoint"]],
+            13: ["Game Mode", gamemode_emotes],
+            14: ["Big Box", emojis["bigbox"]]
+        }
+
+        trophies = await self.get_trophies(user)
+        tppased = await self.get_player_stat(user, 'tppassed')
+
+        for tier in self.TROPHY_ROAD:
+            if tier in tppased:
+                continue
+            threshold = self.TROPHY_ROAD[tier]['Trophies']
+
+            if trophies > threshold:
+                async with self.config.user(user).tppassed() as tppassed:
+                    tppassed.append(tier)
+                async with self.config.user(user).tpstored() as tpstored:
+                    tpstored.append(tier)
+                
+                reward_type = self.TROPHY_ROAD[tier]['RewardType']
+                reward_name = reward_types[reward_type][0]
+                reward_emoji_root = reward_types[reward_type][1]
+                if reward_type not in [3, 13]:
+                    reward_str = f"x{self.TROPHY_ROAD[tier]['RewardCount']}"
+                    reward_emoji = reward_emoji_root
+                else:
+                    reward_str = self.TROPHY_ROAD[tier]['RewardExtraData']
+                    if reward_type == 3:
+                        reward_emoji = reward_emoji_root[reward_str]
+                    else:
+                        if reward_str == "Brawl Ball":
+                            reward_emoji = reward_emoji_root[reward_str]
+                        elif reward_str == "Showdown":
+                            reward_emoji = reward_emoji_root["Solo Showdown"]
+                        else:
+                            reward_emoji = emojis["bsstar"]
+                
+                desc = "Claim the reward by using the `-claim` command!"
+                embed = discord.Embed(color=0xFFA232, title="Trophy Road Reward", description=desc)
+                embed.set_author(name=user.name, icon_url=user.avatar_url)
+                embed.add_field(name=reward_name, value=f"{reward_emoji} {reward_str}")
+
+                return embed
+        
+        else:
+            return False
+
     def cog_unload(self):
         self.bank_update_task.cancel()
     
