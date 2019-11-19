@@ -71,6 +71,45 @@ brawler_emojis = {
 #     "powerpoint": "https://cdn.discordapp.com/emojis/645333239103488029.png?v=1"
 # }
 
+rank_emojis = {
+    "br2": "<:br2:646238169276088322>",
+    "br7": "<:br7:646238169410568194>",
+    "br1": "<:br1:646238169506906123>",
+    "br5": "<:br5:646238169720815616>",
+    "br3": "<:br3:646238169754501130>",
+    "br8_": "<:br8_:646238169821609985>",
+    "br10": "<:br10:646238169909428249>",
+    "br16": "<:br16:646238170001833985>",
+    "br4": "<:br4:646238170027130880>",
+    "br9": "<:br9:646238170043908109>",
+    "br14": "<:br14:646238170081525760>",
+    "br24": "<:br24:646238170140377091>",
+    "br12": "<:br12:646238170148634634>",
+    "br6": "<:br6:646238170211418142>",
+    "br18": "<:br18:646238170257817600>",
+    "br11": "<:br11:646238170262011914>",
+    "br15": "<:br15:646238170379452427>",
+    "br20": "<:br20:646238170437910537>",
+    "br13": "<:br13:646238170442235905>",
+    "br19": "<:br19:646238170442366986>",
+    "br34": "<:br34:646238170450624512>",
+    "br28": "<:br28:646238170517864448>",
+    "br32": "<:br32:646238170521927680>",
+    "br17": "<:br17:646238170526121984>",
+    "br21": "<:br21:646238170530185217>",
+    "br29": "<:br29:646238170564001797>",
+    "br33": "<:br33:646238170593361920>",
+    "br35": "<:br35:646238170610008064>",
+    "br31": "<:br31:646238170689830912>",
+    "br22": "<:br22:646238170719059968>",
+    "br27": "<:br27:646238170735706112>",
+    "br26": "<:br26:646238170807009280>",
+    "br25": "<:br25:646238171058667521>",
+    "br23": "<:br23:646238171469709323>",
+    "br30": "<:br30:646238171474165760>",
+}
+
+
 class Brawler:
     """Class to represent a Brawler."""
 
@@ -165,6 +204,7 @@ class Brawler:
             brawler_name: str, 
             trophies: int = None, 
             pb:int = None, 
+            rank: int = None,
             level: int = None, 
             pp: int = None, 
             next_level_pp: int = None, 
@@ -178,10 +218,12 @@ class Brawler:
 
         url = brawler_url.format(brawler_name)
 
-        if not trophies:
-            brawler_name = f"{brawler_name} [Not unlocked]"
+        if trophies:
+            title = f"{rank_emojis['br'+str(rank)]} {brawler_name}"
+        else:
+            title = f"{brawler_name} [Not unlocked]"
         
-        embed = discord.Embed(color=rarity_colors[self.rarity], title=brawler_name, 
+        embed = discord.Embed(color=rarity_colors[self.rarity], title=title, 
             description=self.desc, url=url)
         embed.set_thumbnail(url=brawler_thumb.format(brawler_name.title()))
         if trophies:
@@ -266,6 +308,7 @@ class Shelly(Brawler):
             brawler_name: str, 
             trophies: int = None, 
             pb:int = None, 
+            rank: int = None,
             level: int = None, 
             pp: int = None, 
             next_level_pp: int = None, 
@@ -274,8 +317,8 @@ class Shelly(Brawler):
         ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, 
-                        pb=pb, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
+                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
 
         stats = self.buff_stats(level)
 

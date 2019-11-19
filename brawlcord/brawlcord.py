@@ -22,7 +22,7 @@ from redbot.core.utils.menus import (DEFAULT_CONTROLS, menu,
 # from redbot.core.utils.chat_formatting import box
 from redbot.core.utils.predicates import ReactionPredicate
 
-from .brawlers import emojis, brawler_emojis, Brawler, Shelly, Nita, Colt
+from .brawlers import emojis, brawler_emojis, rank_emojis, Brawler, Shelly, Nita, Colt
 
 
 BaseCog = getattr(commands, "Cog", object)
@@ -116,6 +116,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         self.BRAWLERS: dict = None
         self.REWARDS: dict = None
         self.XP_LEVELS: dict = None
+        self.RANKS: dict = None
 
         def error_callback(fut):
             try:
@@ -133,6 +134,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
         rewards_fp = bundled_data_path(self) / "rewards.json"
         xp_levels_fp = bundled_data_path(self) / "xp_levels.json"
+        ranks_fp = bundled_data_path(self) / "ranks.json"
 
         with brawlers_fp.open("r") as f:
             self.BRAWLERS = json.load(f)
@@ -140,6 +142,8 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             self.REWARDS = json.load(f)
         with xp_levels_fp.open("r") as f:
             self.XP_LEVELS = json.load(f)
+        with ranks_fp.open("r") as f:
+            self.RANKS = json.load(f)
 
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -438,8 +442,9 @@ class BrawlCord(BaseCog, name="BrawlCord"):
             pb = brawler_data['pb']
             sp1 = brawler_data['sp1']
             sp2 = brawler_data['sp2']
+            rank = self.get_rank(pb)
 
-            embed = b.brawler_info(brawler, trophies, pb, level, pp, next_level_pp, sp1, sp2)
+            embed = b.brawler_info(brawler, trophies, pb, rank, level, pp, next_level_pp, sp1, sp2)
 
         else:
             embed = b.brawler_info(brawler)
@@ -455,7 +460,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
         server_emojis = await guild.fetch_emojis()
 
-        print("brawler_emojis = {")
+        print("_emojis = {")
         for emoji in server_emojis:
             print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
         print("}")
@@ -687,7 +692,7 @@ class BrawlCord(BaseCog, name="BrawlCord"):
                 if not bank_update_timestamp:
                     continue
 
-                bank_update_ts = datetime.utcfromtimestamp(bank_update_timestamp)
+                bank_update_ts = ceil(datetime.utcfromtimestamp(bank_update_timestamp))
                 time_now = datetime.utcnow()
                 delta = time_now - bank_update_ts
                 delta_min = delta.total_seconds() / 60
@@ -702,6 +707,18 @@ class BrawlCord(BaseCog, name="BrawlCord"):
 
             await asyncio.sleep(60)
 
+    async def get_rank(self, pb):
+        """Return rank of the Brawler based on its personal best."""
+
+        for rank in self.RANKS:
+            start = self.RANKS[rank]["ProgressStart"]
+            end = start + self.RANKS[rank]["Progress"]  # 1 is not subtracted as we're calling range 
+
+            if pb in range(start, end):
+                return int(rank)
+            else:
+                return 35
+    
     def cog_unload(self):
         self.bank_update_task.cancel()
     

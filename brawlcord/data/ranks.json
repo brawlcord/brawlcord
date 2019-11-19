@@ -1,0 +1,206 @@
+{
+    "1": {
+        "ProgressStart": 0,
+        "Progress": 10,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "2": {
+        "ProgressStart": 10,
+        "Progress": 10,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "3": {
+        "ProgressStart": 20,
+        "Progress": 10,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "4": {
+        "ProgressStart": 30,
+        "Progress": 10,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "5": {
+        "ProgressStart": 40,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "6": {
+        "ProgressStart": 60,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "7": {
+        "ProgressStart": 80,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "8": {
+        "ProgressStart": 100,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "9": {
+        "ProgressStart": 120,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 100
+    },
+    "10": {
+        "ProgressStart": 140,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "11": {
+        "ProgressStart": 160,
+        "Progress": 20,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "12": {
+        "ProgressStart": 180,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "13": {
+        "ProgressStart": 220,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "14": {
+        "ProgressStart": 260,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 200
+    },
+    "15": {
+        "ProgressStart": 300,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "16": {
+        "ProgressStart": 340,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "17": {
+        "ProgressStart": 380,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "18": {
+        "ProgressStart": 420,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "19": {
+        "ProgressStart": 460,
+        "Progress": 40,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 300
+    },
+    "20": {
+        "ProgressStart": 500,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "21": {
+        "ProgressStart": 550,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "22": {
+        "ProgressStart": 600,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "23": {
+        "ProgressStart": 650,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "24": {
+        "ProgressStart": 700,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 400
+    },
+    "25": {
+        "ProgressStart": 750,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "26": {
+        "ProgressStart": 800,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "27": {
+        "ProgressStart": 850,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "28": {
+        "ProgressStart": 900,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "29": {
+        "ProgressStart": 950,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 500
+    },
+    "30": {
+        "ProgressStart": 1000,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "31": {
+        "ProgressStart": 1050,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "32": {
+        "ProgressStart": 1100,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "33": {
+        "ProgressStart": 1150,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 0
+    },
+    "34": {
+        "ProgressStart": 1200,
+        "Progress": 50,
+        "PrimaryLvlUpRewardCount": 10,
+        "SecondaryLvlUpRewardCount": 600
+    }
+}
