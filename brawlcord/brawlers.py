@@ -25,13 +25,11 @@ emojis = {
     "megabox": "<:megabox:646307503835054080>",
     "ticket": "<:bsticket:645337313131495434>",
     "tokendoubler": "<:token_doubler:646308736130088961>",
-    "bsstar": "<:bs_icon_ready:646310961241653253>",
-    "superhealth": "<:super_health:646723200436404285>"
+    "bsstar": "<:bs_icon_ready:646310961241653253>"
 }
 
 sp_icons = {
-    "Shelly": ["<:ShellShock:645349547127603246>", "<:BandAid:645349544837644322>"],
-    "Nita": ["<:BearWithMe:645349544304967753>", "<:HyperBear:645349548411191336>"]
+    "Shelly": ["<:ShellShock:645349547127603246>", "<:BandAid:645349544837644322>"]
 }
 
 rarity_colors = {
@@ -118,7 +116,6 @@ rank_emojis = {
     "br30": "<:br30:646238171474165760>",
 }
 
-# average_range = 7.23
 
 class Brawler:
     """Class to represent a Brawler."""
@@ -178,11 +175,11 @@ class Brawler:
         return stats['health']
     
     def _attack(self, level):
-        """Represent the attack ability of the Brawler. """
+        """Function to represent the attack of the Brawler. """
         pass
         
     def _ult(self, level):
-        """Represent the Super ability of the Brawler."""
+        """Function to represent the Super of the Brawler."""
         pass
 
     def _sp1(self):
@@ -193,10 +190,6 @@ class Brawler:
         """Function to represent the second SP of the Brawler."""
         pass
 
-    def _spawn(self, level):
-        """Represent the spawned character of the Brawler."""
-        return None
-    
     def buff_stats(self, stats: dict, level: int):
         """Get Brawler stats by specified level."""
 
@@ -207,8 +200,6 @@ class Brawler:
 
         for stat in stats:
             upgrader = stats[stat]/20
-            print(upgrader)
-            print(level)
             stats[stat] += int(upgrader * (level - 1))
             # upd_stats[stat] = stats[stat]
             # upd_stats.append(stat)
@@ -234,9 +225,10 @@ class Brawler:
 
         url = brawler_url.format(brawler_name)
 
-        title = f"{brawler_emojis[brawler_name]} {brawler_name}"
-        if not level:
-            title += f" [Not unlocked]"
+        if level:
+            title = f"{rank_emojis['br'+str(rank)]} {brawler_name}"
+        else:
+            title = f"{brawler_name} [Not unlocked]"
         
         embed = discord.Embed(color=rarity_colors[self.rarity], title=title, 
             description=self.desc, url=url)
@@ -245,10 +237,8 @@ class Brawler:
             embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
             embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
             embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
-            embed.add_field(name="PERSONAL BEST", value=f"{rank_emojis['br'+str(rank)]} {pb}")
+            embed.add_field(name="PERSONAL BEST", value=f"{emojis['pb']} {pb}")
         # embed.set_author(name=f"Power {level} - {pp}/{next_level_pp}", icon_url=image_urls['powerpoint'])
-        else:
-            embed.add_field(name="POWER", value=f"{emojis['xp']} 1")
         return embed
 
 
@@ -256,9 +246,10 @@ class Shelly(Brawler):
     """A class to represent Shelly."""
     
     def _attack(self, level):
-        """Represent the attack ability of Shelly."""
+        """Function to represent the attack of the Brawler. """
         
         # getting all values 
+        name = self.attack["name"]
         att_range = self.attack["range"]
         att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
@@ -283,9 +274,10 @@ class Shelly(Brawler):
             return 0
 
     def _ult(self, level):
-        """Represent the Super ability of Shelly."""
+        """Function to represent the Super of the Brawler. """
 
         # getting all values 
+        name = self.ult["name"]
         damage = self.ult["damage"]
         ult_range = self.ult["range"]
         projectiles = self.ult["projectiles"]
@@ -294,20 +286,20 @@ class Shelly(Brawler):
 
         damage = stats['ult_damage']
 
-        raw = damage * projectiles * 0.7 
+        raw = damage * projectiles * 0.7
 
         chance = random.randint(0, 10)
 
         if chance >= 9:
-            return raw, None
+            return raw
         elif chance >= 6:
-            return raw * 0.7, None
+            return raw * 0.7
         elif chance >= 4:
-            return raw * 0.5, None
+            return raw * 0.5
         elif chance >= 2:
-            return raw * 0.3, None
+            return raw * 0.3
         else:
-            return 0, None
+            return 0
 
     def buff_stats(self, level: int):
         stats = {
@@ -334,9 +326,6 @@ class Shelly(Brawler):
 
         embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
                             rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
-
-        if not level:
-            level = 1
 
         stats = self.buff_stats(level)
 
@@ -367,258 +356,8 @@ class Shelly(Brawler):
 
 
 class Nita(Brawler):
-    """A class to represent Nita."""
-
-    def _attack(self, level):
-        """Represent the attack ability of Nita. """
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
-        projectiles = self.attack["projectiles"]
-
-        stats = self.buff_stats(level)
-
-        damage = stats['att_damage']
-
-        raw = damage * projectiles * 0.7
-
-        chance = random.randint(0, 10)
-
-        if chance >= 9:
-            return raw
-        elif chance >= 6:
-            return raw * 0.7
-        elif chance >= 4:
-            return raw * 0.5
-        elif chance >= 2:
-            return raw * 0.3
-        else:
-            return 0
-
-    def _ult(self, level):
-        """Represent the Super ability of Nita."""
-
-        # getting all values
-        bear = self.ult["bear"]
-        br_range = bear["range"]
-        speed = bear["speed"]
-        
-        stats = self.buff_stats(level)
-
-        damage = stats["bear_damage"]
-        health = stats["bear_health"]
-
-        raw = damage * 0.8
-
-        chance = random.randint(0, 10)
-
-        if chance >= 9:
-            raw *= 1
-        elif chance >= 6:
-            raw *= 0.7
-        elif chance >= 4:
-            raw *= 0.5
-        elif chance >= 2:
-            raw *= 0.3
-        else:
-            raw = 0       
-        
-        return raw, health
-
-    def buff_stats(self, level: int):
-        stats = {
-            "health": self.health,
-            "att_damage": self.attack["damage"],
-            "bear_damage": self.ult["bear"]["damage"],
-            "bear_health": self.ult["bear"]["health"]
-        }
-
-        return super().buff_stats(stats, level)
-    
-    def _spawn(self, level):
-        a_none_type_object = super()._spawn(level)
-
-        stats = self.buff_stats(level)
-
-        damage = stats["bear_damage"]
-
-        raw = damage * 0.8
-
-        chance = random.randint(0, 10)
-
-        if chance >= 9:
-            raw *= 1
-        elif chance >= 6:
-            raw *= 0.7
-        elif chance >= 4:
-            raw *= 0.5
-        elif chance >= 2:
-            raw *= 0.3
-        else:
-            raw = 0
-
-        return raw
-
-    def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
-        """Return embed with Brawler info."""
-
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
-
-        if not level:
-            level = 1
-        
-        stats = self.buff_stats(level)
-
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
-        embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
-
-        attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
-        embed.add_field(name="ATTACK", value=attack_str, inline=False)
-
-        super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + (f"\n{emojis['super']} Bear Damage: {stats['bear_damage']}"
-                    f"\n{emojis['superhealth']} Bear Health: {stats['bear_health']}")
-                    
-        embed.add_field(name="SUPER", value=super_str, inline=False)
-
-        u1 = u2 = ""
-
-        if sp1:
-            u1 = " [Owned]"
-        if sp2:
-            u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons['Nita'][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons['Nita'][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
-
-        embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
-
-        return embed
+    pass
 
 
 class Colt(Brawler):
-    """A class to represent Colt."""
-
-    def _attack(self, level):
-        """Represent the attack ability of Shelly."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
-        projectiles = self.attack["projectiles"]
-
-        stats = self.buff_stats(level)
-
-        damage = stats['att_damage']
-
-        raw = damage * projectiles * 0.7
-
-        chance = random.randint(0, 10)
-
-        if chance >= 9:
-            return raw
-        elif chance >= 6:
-            return raw * 0.7
-        elif chance >= 4:
-            return raw * 0.5
-        elif chance >= 2:
-            return raw * 0.3
-        else:
-            return 0
-
-    def _ult(self, level):
-        """Represent the Super ability of Shelly."""
-
-        # getting all values 
-        damage = self.ult["damage"]
-        ult_range = self.ult["range"]
-        projectiles = self.ult["projectiles"]
-
-        stats = self.buff_stats(level)
-
-        damage = stats['ult_damage']
-
-        raw = damage * projectiles * 0.7 
-
-        chance = random.randint(0, 10)
-
-        if chance >= 9:
-            return raw, None
-        elif chance >= 6:
-            return raw * 0.7, None
-        elif chance >= 4:
-            return raw * 0.5, None
-        elif chance >= 2:
-            return raw * 0.3, None
-        else:
-            return 0, None
-
-    def buff_stats(self, level: int):
-        stats = {
-            "health": self.health,
-            "att_damage": self.attack["damage"],
-            "ult_damage": self.ult["damage"]
-        }
-
-        return super().buff_stats(stats, level)
-
-    def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
-        """Return embed with Brawler info."""
-
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
-
-        if not level:
-            level = 1
-        
-        stats = self.buff_stats(level)
-
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
-        embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
-
-        attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
-        embed.add_field(name="ATTACK", value=attack_str, inline=False)
-
-        super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
-        embed.add_field(name="SUPER", value=super_str, inline=False)
-
-        u1 = u2 = ""
-
-        if sp1:
-            u1 = " [Owned]"
-        if sp2:
-            u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons['Shelly'][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons['Shelly'][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
-
-        embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
-
-        return embed
+    pass

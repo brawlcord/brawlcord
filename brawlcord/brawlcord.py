@@ -23,7 +23,6 @@ from redbot.core.utils.menus import (DEFAULT_CONTROLS, menu,
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
 from .brawlers import emojis, brawler_emojis, rank_emojis, Brawler, Shelly, Nita, Colt
-from .utils import Box
 
 
 BaseCog = getattr(commands, "Cog", object)
@@ -39,7 +38,6 @@ default_stats = {
     "rank": 1,
     "level": 1,
     "powerpoints": 0,
-    "total_powerpoints": 0,
     "skins": ["Default"],
     "sp1": False,
     "sp2": False
@@ -124,15 +122,7 @@ reward_types = {
     14: ["Big Box", emojis["bigbox"]]
 }
 
-spawn_text = {
-    "Nita": "Bear",
-    "Penny": "Cannon",
-    "Jessie": "Turrent",
-    "Pam": "Healing Station",
-    "8-Bit": "Turret"
-}
-
-class Brawlcord(BaseCog, name="Brawlcord"):
+class BrawlCord(BaseCog, name="BrawlCord"):
     """Simulate Brawl Stars."""
 
     def __init__(self, bot):
@@ -188,7 +178,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     # @commands.command(name="brawl", aliases=["b"])
     # @commands.guild_only()
     # # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
-    async def brawl(
+    async def _brawl(
         self,
         ctx: Context,
         teammate1: discord.Member = None,
@@ -380,8 +370,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         brawler_data = await self.get_player_stat(user, "brawlers", is_iter=True, substat=user_brawler)
         user_brawler_level = brawler_data['level']
 
-        gamemode = await self.get_player_stat(user, "selected", is_iter=True, substat="gamemode")
-
         ub: Brawler = brawlers_map[user_brawler](self.BRAWLERS, user_brawler)
 
         if opponent:
@@ -389,18 +377,17 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             opp_data = await self.get_player_stat(opponent, "brawlers", is_iter=True, substat=opp_brawler)
             opp_brawler_level = brawler_data['level']
 
-            # ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
+            ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
 
         else:
             opponent = guild.me
             opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(user_brawler_level)
 
-        ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
+            ob = Shelly(self.BRAWLERS, "Shelly")
         
         if opponent != guild.me:
             try:
-                msg = await opponent.send(f"{user.mention} has challenged you for a brawl."
-                    f" Game Mode: **{gamemode}**. Accept?")
+                msg = await opponent.send(f"{user.mention} has challenged you for a brawl. Accept?")
                 start_adding_reactions(msg, ReactionPredicate.YES_OR_NO_EMOJIS)
 
                 pred = ReactionPredicate.yes_or_no(msg, opponent)
@@ -436,10 +423,190 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             second_brawler = user_brawler
             sp_brawler_level = user_brawler_level
             fp_brawler_level = opp_brawler_level
+            
+        sfh = first._health(user_brawler_level) # static first health
+        ssh = second._health(opp_brawler_level) # static second health
         
-        winner, loser = await self.gemgrab(ctx, first, second, first_player, second_player, 
-                            first_brawler, second_brawler, fp_brawler_level, sp_brawler_level)
+        first_health = sfh
+        second_health = ssh
+
+        first_gems = 0
+        second_gems = 0
         
+        first_attacks = 0
+        second_attacks = 0
+        
+        first_invincibility = False
+        second_invincibility = False
+        
+        while True:
+            
+            if second_player != guild.me:
+                try:
+                    await second_player.send("Waiting for opponent to pick a move...")
+                except:
+                    return await ctx.send(f"{first_player.mention} {second_player.mention} Brawl cancelled."
+                    f" Reason: {second_player.name} rejected the challenge.")
+                
+            if first_attacks >= 6:
+                first_can_super = True
+                end = 4
+            else:
+                first_can_super = False
+                end = 3
+        
+            if first_player != guild.me:
+                desc = "Pick a move by typing the corresponding move number below."
+                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {second_player.name}")
+                embed.set_author(name=first_player.name, icon_url=first_player.avatar_url)
+                
+                embed.add_field(name="Your Brawler", value=f"{brawler_emojis[first_brawler]} {first_brawler}")
+                embed.add_field(name="Your Health", value=f"{emojis['health']} {int(first_health)}")
+                embed.add_field(name="Your Gems", value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
+                
+                embed.add_field(name="Opponent's Brawler", value=f"{brawler_emojis[second_brawler]} {second_brawler}")
+                embed.add_field(name="Opponent's Health", value=f"{emojis['health']} {int(second_health)}")
+                embed.add_field(name="Opponent's Gems", value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
+
+                moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
+                            f"\n{'4. Use Super' if first_can_super else ''}").strip()
+                
+                embed.add_field(name="Available Moves", value=moves, inline=False)
+
+                try:
+                    msg = await first_player.send(embed=embed)
+
+                    react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
+                    start_adding_reactions(msg, react_emojis)
+
+                    pred = ReactionPredicate.with_emojis(react_emojis, msg)
+                    await ctx.bot.wait_for("reaction_add", check=pred)
+
+                    # pred.result is  the index of the letter in `emojis`
+
+                    choice = pred.result + 1
+                except:
+                    return await ctx.send(f"{first_player.mention} {second_player.mention}" 
+                            f"Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+
+            else:
+                # develop bot logic
+                if first_can_super:
+                    choice = random.randint(1, 4)
+                else:
+                    choice = random.randint(1, 3)
+            
+            if choice == 1:
+                damage = first._attack(fp_brawler_level)
+                if not second_invincibility:
+                    second_health -= damage
+                    first_attacks += 1
+                else:
+                    second_invincibility = False
+            elif choice == 2:
+                first_gems += 1
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 3:
+                first_invincibility = True
+                if second_invincibility:
+                    second_invincibility = False
+            else:
+                damage = first._ult(fp_brawler_level)
+                first_attacks = 0
+                if not second_invincibility:
+                    second_health -= damage
+                else:
+                    second_health -= damage * 0.5
+                    second_invincibility = False
+            
+            winner, loser = self.check_if_win(first_player, second_player, first_health, 
+                    second_health, first_gems, second_gems)
+            
+            if winner == False:
+                pass
+            else:
+                break
+            
+            if first_player != guild.me:
+                await first_player.send("Waiting for opponent to pick a move...")
+            
+            if second_attacks >= 6:
+                second_can_super = True
+                end = 4
+            else:
+                second_can_super = False
+                end = 3
+
+            if second_player != guild.me:
+                desc = "Pick a move by typing the corresponding move number below."
+                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {first_player.name}")
+                embed.set_author(name=second_player.name, icon_url=second_player.avatar_url)
+                
+                embed.add_field(name="Your Brawler", value=f"{brawler_emojis[second_brawler]} {second_brawler}")
+                embed.add_field(name="Your Health", value=f"{emojis['health']} {int(second_health)}")
+                embed.add_field(name="Your Gems", value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
+                
+                embed.add_field(name="Opponent's Brawler", value=f"{brawler_emojis[first_brawler]} {first_brawler}")
+                embed.add_field(name="Opponent's Health", value=f"{emojis['health']} {int(first_health)}")
+                embed.add_field(name="Opponent's Gems", value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
+                
+                moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
+                            f"\n{'4. Use Super' if second_can_super else ''}").strip()
+                
+                embed.add_field(name="Available Moves", value=moves, inline=False)
+
+                msg = await second_player.send(embed=embed)
+
+                react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
+                start_adding_reactions(msg, react_emojis)
+
+                pred = ReactionPredicate.with_emojis(react_emojis, msg)
+                await ctx.bot.wait_for("reaction_add", check=pred)
+
+                # pred.result is  the index of the letter in `emojis`
+
+                choice = pred.result + 1
+
+            else:
+                # develop bot logic
+                if second_can_super:
+                    choice = random.randint(1, 4)
+                else:
+                    choice = random.randint(1, 3)
+
+            if choice == 1:
+                damage = second._attack(fp_brawler_level)
+                if not first_invincibility:
+                    first_health -= damage
+                    second_attacks += 1
+                else:
+                    first_invincibility = False
+            elif choice == 2:
+                second_gems += 1
+                if first_invincibility:
+                    first_invincibility = False
+            elif choice == 3:
+                second_invincibility = True
+                if first_invincibility:
+                    first_invincibility = False
+            else:
+                damage = second._ult(fp_brawler_level)
+                second_attacks = 0
+                if not first_invincibility:
+                    first_health -= damage
+                else:
+                    first_health -= damage * 0.5
+                    first_invincibility = False
+
+            winner, loser = self.check_if_win(first_player, second_player, first_health, 
+                    second_health, first_gems, second_gems)
+            
+            if winner == False:
+                pass
+            else:
+                break
+
         players = [first_player, second_player]
         
         starplayer = random.choice(players)
@@ -500,7 +667,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         #         " It's time to test your skills in the real world!"
         #     )
 
-        desc = ("Hi, I'm Shelly! I'll introduce you to the world of Brawlcord."
+        desc = ("Hi, I'm Shelly! I'll introduce you to the world of BrawlCord."
                 " Don't worry Brawler, it will only take a minute!")
 
         embed = discord.Embed(
@@ -672,75 +839,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         await ctx.send("Rewards successfully claimed.")    
     
-    @commands.group(name="select", autohelp=False)
-    async def _select(self, ctx: Context):
-        """Select Brawler or game mode!"""
-        pass
-    
-    @_select.command(name="brawler", aliases=['b'])
-    async def select_brawler(self, ctx: Context, *, brawler_name: str):
-        """Select Brawler to brawl with!"""
-
-        user_owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
-
-        # for users who input 'el-primo' or 'el_primo'
-        brawler_name = brawler_name.replace("-", " ")
-        brawler_name = brawler_name.replace("_", " ")
-
-        brawler_name = brawler_name.title()
-
-        if brawler_name not in user_owned:
-            return await ctx.send(f"You do not own {brawler_name}!")
-        
-        await self.update_player_stat(ctx.author, 'selected', brawler_name, substat='brawler')
-
-        await ctx.send(f"Changed selected Brawler to {brawler_name}!")
-
-    @_select.command(name="gamemode", aliases=['gm'])
-    async def select_gamemode(self, ctx: Context, *, gamemode: str):
-        """Select a game mode to brawl!"""
-
-        return await ctx.send("The game only supports **Gem Grab** at the moment." 
-                " More game modes will be added soon!")
-        
-        # for users who input 'gem-grab' or 'gem_grab'
-        gamemode = gamemode.replace("-", " ")
-        gamemode = gamemode.replace("_", " ")
-        
-        if gamemode.lower() == "showdown":
-            return await ctx.send("Please select one between Solo and Duo Showdown.")
-        
-        possible_names = {
-            "Gem Grab": ["gem grab", "gemgrab", "gg", "gem"],
-            "Brawl Ball": ["brawl ball", "brawlball", "bb", "bball", "ball"],
-            "Solo Showdown": ["solo showdown","ssd", "solo sd", "soloshowdown", "solo", "s sd"],
-            "Duo Showdown": ["duo showdown", "dsd", "duo sd", "duoshowdown", "duo", "d sd"],
-            "Bounty": ["bounty", "bonty", "bunty"],
-            "Heist": ["heist", "heis"],
-            "Lone Star": ["lone star", "lonestar", "ls", "lone"],
-            "Takedown": ["takedown", "take down", "td"],
-            "Robo Rumble": ["robo rumble", "rr", "roborumble", "robo", "rumble"],
-            "Big Game": ["big game", "biggame", "bg", "big"],
-            "Boss Fight": ["boss fight", "bossfight", "bf", "boss"]
-        }
-        
-        for gmtype in possible_names:
-            modes = possible_names[gmtype]
-            if gamemode.lower() in modes:
-                gamemode = gmtype
-                break
-        else:
-            return await ctx.send("Unable to identify game mode.")
-
-        user_owned = await self.get_player_stat(ctx.author, 'gamemodes', is_iter=True)
-        
-        if gamemode not in user_owned:
-            return await ctx.send(f"You do not own {gamemode}!")
-        
-        await self.update_player_stat(ctx.author, 'selected', gamemode, substat='gamemode')
-
-        await ctx.send(f"Changed selected game mode to {gamemode}!")
-    
     @commands.command(name="emojis")
     @checks.is_owner()
     async def get_all_emotes(self, ctx: Context):
@@ -822,6 +920,16 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return sum([brawlers[brawler][stat] for brawler in brawlers])
         else:
             return brawlers[brawler_name][stat]
+
+    def buff_stats(self, brawler: Brawler, level: int):
+        """Get Brawler stats by specified level."""
+
+        # list of stats to buff
+        stats_to_buff = [
+            brawler.health,
+            brawler.attack["damage"],
+            brawler.ult["damage"]
+        ]
 
     async def brawl_rewards(self, user: discord.User, points: int, is_starplayer=False):
         """Adjust user variables and return embed containing reward."""
@@ -1029,8 +1137,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             rank_up_tokens = self.RANKS[str(rank)]["PrimaryLvlUpRewardCount"]
             rank_up_starpoints = self.RANKS[str(rank)]["SecondaryLvlUpRewardCount"]
 
-            await self.update_player_stat(user, 'tokens', rank_up_tokens, add_self=True)
-            await self.update_player_stat(user, 'starpoints', rank_up_starpoints, add_self=True)
+            tokens = await self.get_player_stat(user, "tokens")
+            starpoints = await self.get_player_stat(user, "starpoints")
+
+            await self.update_player_stat(user, 'tokens', tokens+rank_up_tokens)
+            await self.update_player_stat(user, 'starpoints', starpoints+rank_up_starpoints)
 
             embed = discord.Embed(color=0xFFA232, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
             embed.set_author(name=user.name, icon_url=user.avatar_url)
@@ -1139,20 +1250,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             if brawler not in brawlers:
                 return await ctx.send(f"You do not own {brawler}!")
             
-            total_powerpoints = (await self.get_player_stat(user, 'brawlers', 
-                        is_iter=True, substat=brawler))['total_powerpoints']
-
-            if total_powerpoints == Box.max_pp:
-                return await ctx.send(f"{brawler} can not recieve more powerpoints.")
-            elif total_powerpoints + reward_count > Box.max_pp:
-                return await ctx.send(f"{brawler} can not recieve {reward_count} powerpoints.")
-            else:
-                pass
-            
             await self.update_player_stat(user, 'brawlers', reward_count, substat=brawler, 
                                                 sub_index='powerpoints', add_self=True)
-            await self.update_player_stat(user, 'brawlers', reward_count, substat=brawler, 
-                                                sub_index='total_powerpoints', add_self=True)
         
         elif reward_type == 13:
             async with self.config.user(user).gamemodes() as gamemodes:
@@ -1199,264 +1298,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             winner = False
             loser = False
 
-        return winner, loser
-    
-    async def gemgrab(self, ctx, first: Brawler, second: Brawler, first_player, second_player, 
-                first_brawler, second_brawler, fp_brawler_level, sp_brawler_level):
-        """Function to play Gem Grab!"""
-        
-        guild = ctx.guild
-        
-        sfh = first._health(fp_brawler_level) # static first health
-        ssh = second._health(sp_brawler_level) # static second health
-        
-        first_health = sfh
-        second_health = ssh
-
-        first_gems = 0
-        second_gems = 0
-        
-        first_attacks = 0
-        second_attacks = 0
-        
-        first_invincibility = False
-        second_invincibility = False
-
-        first_spawn = None
-        second_spawn = None
-        
-        try:
-            first_spawn_str = spawn_text[first_brawler]
-        except:
-            first_spawn_str = ""
-        
-        try:
-            second_spawn_str = spawn_text[second_brawler]
-        except:
-            second_spawn_str = ""
-        
-        while True:
-            
-            if second_player != guild.me:
-                try:
-                    await second_player.send("Waiting for opponent to pick a move...")
-                except:
-                    return await ctx.send(f"{first_player.mention} {second_player.mention} Brawl cancelled."
-                    f" Reason: {second_player.name} rejected the challenge.")
-                
-            if first_attacks >= 6:
-                first_can_super = True
-                end = 4
-            else:
-                first_can_super = False
-                end = 3
-            if second_spawn:
-                end += 1
-
-        
-            if first_player != guild.me:
-                desc = "Pick a move by typing the corresponding move number below."
-                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {second_player.name}")
-                embed.set_author(name=first_player.name, icon_url=first_player.avatar_url)
-
-                embed.add_field(name="Your Brawler", value=f"{brawler_emojis[first_brawler]} {first_brawler}")
-                embed.add_field(name="Your Health", value=f"{emojis['health']} {int(first_health)}")
-                embed.add_field(name="Your Gems", value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
-                
-                if first_spawn:
-                    embed.add_field(name=f"Your {first_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(first_spawn)}", inline=False)
-                
-                embed.add_field(name="Opponent's Brawler", value=f"{brawler_emojis[second_brawler]} {second_brawler}")
-                embed.add_field(name="Opponent's Health", value=f"{emojis['health']} {int(second_health)}")
-                embed.add_field(name="Opponent's Gems", value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
-
-                if second_spawn:
-                    embed.add_field(name=f"Opponent's {second_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(second_spawn)}", inline=False)
-                
-                moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
-                            f"\n{'4. Use Super' if first_can_super else ''}").strip()
-                
-                if first_can_super and not second_spawn:
-                    moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
-                elif first_can_super and second_spawn:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super\n5. Attack {second_spawn_str}"
-                elif not first_can_super and second_spawn:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move\n4. Attack enemy {second_spawn_str}"
-                else:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
-
-                embed.add_field(name="Available Moves", value=moves, inline=False)
-
-                try:
-                    msg = await first_player.send(embed=embed)
-
-                    react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
-                    start_adding_reactions(msg, react_emojis)
-
-                    pred = ReactionPredicate.with_emojis(react_emojis, msg)
-                    await ctx.bot.wait_for("reaction_add", check=pred)
-
-                    # pred.result is  the index of the letter in `emojis`
-
-                    choice = pred.result + 1
-                except:
-                    return await ctx.send(f"{first_player.mention} {second_player.mention}" 
-                            f"Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
-
-            else:
-                # develop bot logic
-                choice = random.randint(1, end)
-            
-            if choice == 1:
-                damage = first._attack(fp_brawler_level)
-                if not second_invincibility:
-                    second_health -= damage
-                    first_attacks += 1
-                else:
-                    second_invincibility = False
-            elif choice == 2:
-                first_gems += 1
-                if second_invincibility:
-                    second_invincibility = False
-            elif choice == 3:
-                first_invincibility = True
-                if second_invincibility:
-                    second_invincibility = False
-            elif choice == 4:
-                if first_can_super:
-                    damage, first_spawn = first._ult(fp_brawler_level)
-                    first_attacks = 0
-                    if not second_invincibility:
-                        second_health -= damage
-                    else:
-                        second_health -= damage * 0.5
-                        second_invincibility = False
-                else:
-                    second_spawn -= first._attack(fp_brawler_level)
-            elif choice == 5:
-                second_spawn -= first._attack(fp_brawler_level)
-            
-            if first_spawn:
-                damage = first._spawn(fp_brawler_level)
-                if not second_invincibility:
-                    second_health -= damage
-                    first_attacks += 1
-                else:
-                    second_invincibility = False
-
-            winner, loser = self.check_if_win(first_player, second_player, first_health, 
-                    second_health, first_gems, second_gems)
-            
-            if winner == False:
-                pass
-            else:
-                break
-            
-            if first_player != guild.me:
-                await first_player.send("Waiting for opponent to pick a move...")
-            
-            if second_attacks >= 6:
-                second_can_super = True
-                end = 4
-            else:
-                second_can_super = False
-                end = 3
-
-            if second_player != guild.me:
-                desc = "Pick a move by typing the corresponding move number below."
-                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {first_player.name}")
-                embed.set_author(name=second_player.name, icon_url=second_player.avatar_url)
-                
-                embed.add_field(name="Your Brawler", value=f"{brawler_emojis[second_brawler]} {second_brawler}")
-                embed.add_field(name="Your Health", value=f"{emojis['health']} {int(second_health)}")
-                embed.add_field(name="Your Gems", value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
-                
-                if second_spawn:
-                    embed.add_field(name=f"Your {second_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(second_spawn)}", inline=False)
-                
-                embed.add_field(name="Opponent's Brawler", value=f"{brawler_emojis[first_brawler]} {first_brawler}")
-                embed.add_field(name="Opponent's Health", value=f"{emojis['health']} {int(first_health)}")
-                embed.add_field(name="Opponent's Gems", value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
-                
-                if first_spawn:
-                    embed.add_field(name=f"Opponent's {first_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(first_spawn)}", inline=False)
-                
-                if second_can_super and not first_spawn:
-                    moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
-                elif second_can_super and first_spawn:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super\n5. Attack {first_spawn_str}"
-                elif not second_can_super and first_spawn:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move\n4. Attack enemy {first_spawn_str}"
-                else:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
-                
-                embed.add_field(name="Available Moves", value=moves, inline=False)
-
-                msg = await second_player.send(embed=embed)
-
-                react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
-                start_adding_reactions(msg, react_emojis)
-
-                pred = ReactionPredicate.with_emojis(react_emojis, msg)
-                await ctx.bot.wait_for("reaction_add", check=pred)
-
-                # pred.result is  the index of the letter in `emojis`
-
-                choice = pred.result + 1
-
-            else:
-                # develop bot logic
-                choice = random.randint(1, end)
-
-            if choice == 1:
-                damage = second._attack(sp_brawler_level)
-                if not first_invincibility:
-                    first_health -= damage
-                    second_attacks += 1
-                else:
-                    first_invincibility = False
-            elif choice == 2:
-                second_gems += 1
-                if first_invincibility:
-                    first_invincibility = False
-            elif choice == 3:
-                second_invincibility = True
-                if first_invincibility:
-                    first_invincibility = False
-            elif choice == 4:
-                if second_can_super:
-                    damage, second_spawn = second._ult(sp_brawler_level)
-                    second_attacks = 0
-                    if not first_invincibility:
-                        first_health -= damage
-                    else:
-                        first_health -= damage * 0.5
-                        first_invincibility = False
-                else:
-                    first_spawn -= second._attack(sp_brawler_level)
-            elif choice == 5:
-                first_spawn -= second._attack(sp_brawler_level)
-
-            if second_spawn:
-                damage = second._spawn(sp_brawler_level)
-                if not first_invincibility:
-                    first_health -= damage
-                    second_attacks += 1
-                else:
-                    second_invincibility = False
-            
-            winner, loser = self.check_if_win(first_player, second_player, first_health, 
-                    second_health, first_gems, second_gems)
-            
-            if winner == False:
-                pass
-            else:
-                break
-         
         return winner, loser
     
     def cog_unload(self):
