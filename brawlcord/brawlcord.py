@@ -15,11 +15,7 @@ import discord
 from redbot.core import Config, commands, checks
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
-from redbot.core.utils.chat_formatting import pagify
-from redbot.core.utils.common_filters import filter_various_mentions
-from redbot.core.utils.menus import (DEFAULT_CONTROLS, menu,
-                                     start_adding_reactions)
-# from redbot.core.utils.chat_formatting import box
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
 from .brawlers import emojis, brawler_emojis, rank_emojis, Brawler, Shelly, Nita, Colt
