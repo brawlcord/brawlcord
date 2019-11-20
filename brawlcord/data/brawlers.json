@@ -31,7 +31,7 @@
         "skins": {
             "Bandita": 80,
             "Star": -1,
-            "Witch": 150
+            "Witch": -1
         }
     },
     "Nita": {
@@ -68,42 +68,43 @@
         },
         "skins": {
             "Panda": 30,
-            "Red Nose": 109,
+            "Red Nose": -1,
             "Shiba": 150
         }
     },
     "Colt": {
-        "health": 3600,
+        "desc": "Colt fires an accurate burst of bullets from his dual revolvers. His Super shreds cover and extends the bullet barrage!",
+        "health": 2800,
         "attack": {
-            "name": "Buckshot",
-            "damage": 1500,
-            "desc": "Shelly's boomstick fires a wide spread of pellets to a medium range. The more pellets hit, the greater the damage.",
-            "range": 7.67,
+            "name": "Six Shooters",
+            "damage": 300,
+            "desc": "Colt shoots six straight long-range shots out of his revolvers.",
+            "range": 8.67,
             "reload": 1.5,
-            "projectiles": 5
+            "projectiles": 6
         },
         "speed": 720,
         "rarity": "Trophy Road",
-        "unlockTrp": 0,
+        "unlockTrp": 60,
         "ult": {
-            "name": "Super Shell",
-            "damage": 320,
-            "desc": "Shelly's Super Shell obliterates both cover and enemies. Any survivors get knocked back.",
-            "range": 7.33,
-            "projectiles": 9
+            "name": "Bullet Storm",
+            "damage": 300,
+            "desc": "Colt rattles off a massive burst of bullets that shoot extra far and destroy cover.",
+            "range": 11,
+            "projectiles": 12
         },
         "sp1": {
-            "name": "Shell Shock",
-            "desc": "Shelly's Super shells slow down enemies for 3.0 seconds!"
+            "name": "Slick Boots",
+            "desc": "Colt's movement speed is increased by 10%."
         },
         "sp2": {
-            "name": "Band-Aid",
-            "desc": "When Shelly falls below 40% health, she instantly heals for 1800 health. Band-Aid recharges in 20.0 seconds."
+            "name": "Magnum Special",
+            "desc": "Colt's attack range and bullet speed are increased by 11%."
         },
         "skins": {
-            "Bandita": 80,
-            "Star": -1,
-            "Witch": 150
+            "Rockstar": 80,
+            "Royal Agent": -1,
+            "Outlaw": -1
         }
     }
 }
