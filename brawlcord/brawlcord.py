@@ -751,6 +751,25 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
         print("}")
     
+    @commands.command(name="box")
+    async def open_box(self, ctx: Context):
+        """Open a brawl box!"""
+        user = ctx.author
+        
+        tokens = await self.get_player_stat(user, 'tokens')
+
+        if tokens < 100:
+            return await ctx.send("You do not have enough tokens to open a brawl box.")
+        
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        box = Box(self.BRAWLERS, brawler_data)
+        embed = await box.brawlbox(self.config.user(user), user)
+
+        await ctx.send(embed=embed)
+
+        await self.update_player_stat(user, 'tokens', -100, add_self=True)
+    
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -784,7 +803,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             if not add_self:
                 old_val = 0
             else:
-                old_val = self.get_player_stat(user, stat)
+                old_val = await self.get_player_stat(user, stat)
             await stat_attr.set(value+old_val)
 
     def matchmaking(self, brawler_level: int):
@@ -1108,6 +1127,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         elif reward_type == 6:
             async with self.config.user(user).boxes() as boxes:
                 boxes['brawl'] += reward_count
+            
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+            box = Box(self.BRAWLERS, brawler_data)
+            embed = await box.brawlbox(self.config.user(user), user)
+
+            await ctx.send(embed=embed)
         
         elif reward_type == 7:
             await self.update_player_stat(user, 'tickets', reward_count, add_self=True)
@@ -1454,6 +1482,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 break
          
         return winner, loser
+    
+    @commands.command(name="tokens")
+    @checks.is_owner()
+    async def tokens(self, ctx: Context, user: discord.User = None):
+        if not user:
+            user = ctx.author
+        
+        await self.update_player_stat(user, 'tokens', 1000)
     
     def cog_unload(self):
         self.bank_update_task.cancel()
