@@ -9,10 +9,11 @@
 	],
 	"short": "A simplified version of Brawl Stars for Discord.",
 	"tags": [
-		"rpg",
+		"duel",
         "supercell",
         "brawlstars",
-        "games"
+		"games",
+		"game"
 	],
 	"type": "COG"
 }
