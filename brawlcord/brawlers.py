@@ -57,7 +57,7 @@ brawler_emojis = {
     "Jessie": "<:Jessie:645584759501881355>",
     "Gene": "<:Gene:645584759761666048>",
     "Tick": "<:Tick:645584759829037067>",
-    "El-Primo": "<:ElPrimo:645589193900425236>",
+    "El Primo": "<:ElPrimo:645589193900425236>",
     "Rosa": "<:Rosa:645584760168644609>",
     "Dynamike": "<:Dynamike:645584760185552897>",
     "Tara": "<:Tara:645584760260919296>",
@@ -122,17 +122,6 @@ rank_emojis = {
 
 class Brawler:
     """Class to represent a Brawler."""
-
-    name: str
-    desc: str
-    health: int
-    attack: dict = {}
-    speed: int
-    rarity: str
-    unlockTrp: int  # for trophy road brawlers only 
-    ult: dict = {}
-    sp1: dict = {}
-    sp2: dict = {}
 
     def __init__(self, raw_data: dict, brawler: str):
         
