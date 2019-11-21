@@ -106,5 +106,51 @@
             "Royal Agent": -1,
             "Outlaw": -1
         }
+    },
+    "Bull": {
+        "desc": "Bull deals massive damage up close with his shotgun. For his Super move, he charges through barriers and knocks back enemies!",
+        "health": 4900,
+        "attack": {
+            "name": "Double-Barrel",
+            "damage": 400,
+            "desc": "Bull's double-barreled shotgun deals heavy damage. It has very short range, so Bull likes to get up close and personal.",
+            "range": 5,
+            "reload": 1.6,
+            "projectiles": 5
+        },
+        "speed": 720,
+        "rarity": "Trophy Road",
+        "unlockTrp": 0,
+        "ult": {
+            "name": "Bulldozer",
+            "damage": 800,
+            "desc": "Bull puts his head down and bulldozes through opponents and obstacles. He's always been headstrong!",
+            "range": 11.67
+        },
+        "sp1": {
+            "name": "Berserker",
+            "desc": "When Bull falls below 40% health, his reload speed doubles!"
+        },
+        "sp2": {
+            "name": "Tough Guy",
+            "desc": "When Bull falls below 40% health, he gains a shield that reduces all damage he takes by 30%."
+        },
+        "skins": {
+            "Viking": 80,
+            "Touchdown": 80,
+            "Linebacker": -1
+        }
+    },
+    "Rico": {
+        "rarity": "Rare",
+        "unlockTrp": -1
+    },
+    "Barley": {
+        "rarity": "Super Rare",
+        "unlockTrp": -1
+    },
+    "El Primo": {
+        "rarity": "Mythic",
+        "unlockTrp": -1
     }
 }
