@@ -33,6 +33,7 @@ default_user = {
     "xp": 0,
     "gold": 0,
     "lvl": 1,
+    "gems": 0,
     "starpoints": 0,
     "startokens": 0,
     "tickets": 0,
@@ -1480,6 +1481,18 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             brawlers.pop('Rico', None)
             brawlers.pop('El Primo', None)
             brawlers.pop('Barley', None)
+    
+    @commands.command(name="max")
+    @checks.is_owner()
+    async def max_shelly(self, ctx: Context, user: discord.User = None):
+        if not user:
+            user = ctx.author
+        
+        await self.update_player_stat(user, 'brawlers', 1410, substat="Shelly", sub_index="total_powerpoints")
+        await self.update_player_stat(user, 'brawlers', 10, substat="Shelly", sub_index="level")
+        await self.update_player_stat(user, 'brawlers', 0, substat="Shelly", sub_index="powerpoints")
+        await self.update_player_stat(user, 'brawlers', True, substat="Shelly", sub_index="sp1")
+        await self.update_player_stat(user, 'brawlers', False, substat="Shelly", sub_index="sp2")
     
     def cog_unload(self):
         self.bank_update_task.cancel()
