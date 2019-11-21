@@ -19,7 +19,7 @@ from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactio
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
 from .brawlers import emojis, brawler_emojis, rank_emojis, Brawler, Shelly, Nita, Colt
-from .utils import Box
+from .utils import Box, default_stats
 
 
 BaseCog = getattr(commands, "Cog", object)
@@ -28,18 +28,6 @@ log = logging.getLogger("red.brawlcord")
 
 __version__ = "1.0.0"
 __author__ = "Snowsee"
-
-default_stats = {
-    "trophies": 0,
-    "pb": 0,
-    "rank": 1,
-    "level": 1,
-    "powerpoints": 0,
-    "total_powerpoints": 0,
-    "skins": ["Default"],
-    "sp1": False,
-    "sp2": False
-}
 
 default_user = {
     "xp": 0,
@@ -574,8 +562,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         brawlers = self.BRAWLERS
 
-        # for users who input 'el-primo' or 'el_primo'
-        brawler_name = brawler_name.replace("-", " ")
+        # for users who input 'el_primo'
         brawler_name = brawler_name.replace("_", " ")
 
         brawler_name = brawler_name.title()
@@ -679,8 +666,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user_owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
 
-        # for users who input 'el-primo' or 'el_primo'
-        brawler_name = brawler_name.replace("-", " ")
+        # for users who input 'el_primo'
         brawler_name = brawler_name.replace("_", " ")
 
         brawler_name = brawler_name.title()
@@ -1152,8 +1138,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             pred = await self.bot.wait_for("message", check=MessagePredicate.same_context(ctx))
             
             brawler = pred.content
-            # for users who input 'el-primo' or 'el_primo'
-            brawler = brawler.replace("-", " ")
+            # for users who input 'el_primo'
             brawler = brawler.replace("_", " ")
             
             brawler = brawler.title()
@@ -1490,6 +1475,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             user = ctx.author
         
         await self.update_player_stat(user, 'tokens', 1000)
+        
+        async with self.config.user(user).brawlers() as brawlers:
+            brawlers.pop('Rico', None)
+            brawlers.pop('El Primo', None)
+            brawlers.pop('Barley', None)
     
     def cog_unload(self):
         self.bank_update_task.cancel()
