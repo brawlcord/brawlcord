@@ -118,9 +118,9 @@
             "reload": 1.6,
             "projectiles": 5
         },
-        "speed": 720,
+        "speed": 770,
         "rarity": "Trophy Road",
-        "unlockTrp": 0,
+        "unlockTrp": 250,
         "ult": {
             "name": "Bulldozer",
             "damage": 800,
@@ -139,6 +139,44 @@
             "Viking": 80,
             "Touchdown": 80,
             "Linebacker": -1
+        }
+    },
+    "Jessie": {
+        "desc": "Jessie's Shock Rifle shoots energy orbs that bounce between enemies. Her Super deploys a cute but deadly gun turret!",
+        "health": 3200,
+        "attack": {
+            "name": "Shock Rifle",
+            "damage": 840,
+            "desc": "Jessie fires off an energy orb. After hitting a target, the orb bounces at the next target in range, hitting up to three enemies.",
+            "range": 9,
+            "reload": 1.8,
+            "projectiles": 1
+        },
+        "speed": 720,
+        "rarity": "Trophy Road",
+        "unlockTrp": 500,
+        "ult": {
+            "name": "Scrappy!",
+            "desc": "Jessie deploys a gun turret that automatically shoots at enemies. It's made of 100% recycled materials!",
+            "scrappy": {
+                "health": 2800,
+                "damage": 260,
+                "range": 4.67,
+                "speed": 0
+            }
+        },
+        "sp1": {
+            "name": "Energize",
+            "desc": "Jessie can repair her gun turret for 800 of its missing health by zapping it with her attack."
+        },
+        "sp2": {
+            "name": "Shocky",
+            "desc": "Scrappy the Turret now shoots energy orbs that bounce between enemies."
+        },
+        "skins": {
+            "Summer": 30,
+            "Dragon Knight": 150,
+            "Shadow Knight": -1
         }
     },
     "Rico": {
