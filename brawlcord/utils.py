@@ -183,7 +183,7 @@ class Box:
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
-        embed = discord.Embed(color=0xFFA232, title=f"{emojis['brawlbox']} Brawl Box")
+        embed = discord.Embed(color=0xFFA232, title="Brawl Box")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         if pp_str:
@@ -219,7 +219,7 @@ class Box:
                 old_gems = await conf.gems()
             except:
                 print("error with gems")
-            gems = random.randint(2, 5)
+            gems = random.randint(3, 12)
             await conf.gems.set(gems + old_gems)
             embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
         elif chance <= self.tickets:
@@ -229,202 +229,6 @@ class Box:
         
         return embed
 
-    async def bigbox(self, conf, user):
-        """Function to handle brawl box openings."""
-    
-        gold = self.weighted_random(36, 210, 63) 
-        
-        rarities = []
-        starpowers = 0
-        stacks = 0
-        
-        selected = random.choices(population=self.pop, weights=self.weights, k=5)
-
-        for i in selected:
-            if i == "Power Points":
-                stacks += 1
-            elif i == "Star Power":
-                starpowers += 1
-            else:
-                rarities.append(i)
-
-        if len(self.can_get_pp) == 0:
-            gold *= 3
-            stacks = 0
-        elif len(self.can_get_pp) == 1:
-            gold *= 2
-            stacks = 1
-        elif len(self.can_get_pp) < stacks:
-            stacks = len(self.can_get_pp)
-            self.tickets *= 1.5
-            self.gems *= 1.5
-            self.td *= 1.5
-        
-        powerpoints = int(self.weighted_random(27, 75, 46))
-
-        pieces = self.split_in_integers(powerpoints, stacks)
-        
-        pp_str = ""
-        
-        if pieces:
-            for piece in pieces:
-                items = list(self.can_get_pp.items())
-                random.shuffle(items)
-                for brawler, threshold in items:
-                    if piece <= threshold:
-                        async with conf.brawlers() as brawlers:
-                            brawlers[brawler]['powerpoints'] += piece
-                            brawlers[brawler]['total_powerpoints'] += piece
-                            pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
-                    else:
-                        continue
-                    break
-        
-        old_gold = await conf.gold()
-        await conf.gold.set(old_gold + gold)
-
-        embed = discord.Embed(color=0xFFA232, title=f"Big Box {emojis['bigbox']}")
-        embed.set_author(name=user.name, icon_url=user.avatar_url)
-        embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        if pp_str:
-            embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
-
-        if rarities:
-            for rarity in rarities:
-                rarity = self.check_rarity(rarity)
-                if rarity:
-                    embed = await self.unlock_brawler(rarity, conf, embed)
-                else:
-                    self.tickets *= 2
-                    self.gems *= 2
-                    self.td *= 2
-        
-        # star power
-        for _ in range(starpowers):
-            if self.can_get_sp:
-                embed = await self.get_starpower(conf, embed)
-            else:
-                self.tickets *= 2
-                self.gems *= 2
-                self.td *= 2
-        
-        chance = random.randint(1, 100)
-        
-        if chance <= self.td:
-            old_td = await conf.token_doubler()
-            await conf.token_doubler.set(200 + old_td)
-            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} 200")
-        elif chance <= self.gems:
-            old_gems = await conf.gems()
-            gems = random.randint(6, 15) 
-            await conf.gems.set(gems + old_gems)
-            embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
-        elif chance <= self.tickets:
-            old_tickets = await conf.tickets()
-            await conf.tickets.set(4 + old_tickets)
-            embed.add_field(name="Tickets", value=f"{emojis['ticket']} 4")
-        
-        return embed
-    
-    async def megabox(self, conf, user):
-        """Function to handle mega box openings."""
-    
-        gold = self.weighted_random(36, 210, 63) 
-        
-        rarities = []
-        starpowers = 0
-        stacks = 0
-        
-        selected = random.choices(population=self.pop, weights=self.weights, k=9)
-
-        for i in selected:
-            if i == "Power Points":
-                stacks += 1
-            elif i == "Star Power":
-                starpowers += 1
-            else:
-                rarities.append(i)
-
-        if len(self.can_get_pp) == 0:
-            gold *= 3
-            stacks = 0
-        elif len(self.can_get_pp) == 1:
-            gold *= 2
-            stacks = 1
-        elif len(self.can_get_pp) < stacks:
-            stacks = len(self.can_get_pp)
-            self.tickets *= 2
-            self.gems *= 2
-            self.td *= 2
-        
-        powerpoints = int(self.weighted_random(81, 225, 132))
-
-        pieces = self.split_in_integers(powerpoints, stacks)
-        pp_str = ""
-        
-        if pieces:
-            for piece in pieces:
-                items = list(self.can_get_pp.items())
-                random.shuffle(items)
-                for brawler, threshold in items:
-                    if piece <= threshold:
-                        async with conf.brawlers() as brawlers:
-                            brawlers[brawler]['powerpoints'] += piece
-                            brawlers[brawler]['total_powerpoints'] += piece
-                            pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
-                    else:
-                        continue
-                    break
-        
-        old_gold = await conf.gold()
-        await conf.gold.set(old_gold + gold)
-        
-        embed = discord.Embed(color=0xFFA232, title=f"Mega Box {emojis['megabox']}")
-        embed.set_author(name=user.name, icon_url=user.avatar_url)
-        embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        if pp_str:
-            embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
-
-        if rarities:
-            for rarity in rarities:
-                rarity = self.check_rarity(rarity)
-                if rarity:
-                    embed = await self.unlock_brawler(rarity, conf, embed)
-                else:
-                    self.tickets *= 2
-                    self.gems *= 2
-                    self.td *= 2
-        
-        # star power
-        for _ in range(starpowers):
-            if self.can_get_sp:
-                embed = await self.get_starpower(conf, embed)
-            else:
-                self.tickets *= 2
-                self.gems *= 2
-                self.td *= 2
-        
-        chance = random.randint(1, 100)
-        
-        if chance <= self.td:
-            old_td = await conf.token_doubler()
-            await conf.token_doubler.set(200 + old_td)
-            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} 200")
-        elif chance <= self.gems:
-            try:
-                old_gems = await conf.gems()
-            except:
-                print("error with gems")
-            gems = random.randint(18, 45) 
-            await conf.gems.set(gems + old_gems)
-            embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
-        elif chance <= self.tickets:
-            old_tickets = await conf.tickets()
-            await conf.tickets.set(12 + old_tickets)
-            embed.add_field(name="Tickets", value=f"{emojis['ticket']} 12")
-        
-        return embed
-    
     async def unlock_brawler(self, rarity, conf, embed):
         brawler = random.choice(self.can_unlock[rarity])
         async with conf.brawlers() as brawlers:
