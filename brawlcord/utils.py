@@ -4,50 +4,52 @@ import discord
 
 from brawlcord.brawlers import emojis, brawler_emojis
 
-# class GameSession:
-#     """A class to represent and hold current game sessions per server."""
-
-#     timer: int
-#     guild: discord.Guild
-#     message_id: int
-#     reacted: bool = False
-#     teamred: Set[discord.Member] = set()
-#     teamblue: Set[discord.Member] = set()
-
-#     def __init__(self, **kwargs):
-#         self.guild: dict = kwargs.pop("guild")
-#         self.timer: int = kwargs.pop("timer")
-#         self.reacted = False
-#         self.message_id = 0
-#         teamred: Set[discord.Member] = set()
-#         teamblue: Set[discord.Member] = set()
+default_stats = {
+    "trophies": 0,
+    "pb": 0,
+    "rank": 1,
+    "level": 1,
+    "powerpoints": 0,
+    "total_powerpoints": 0,
+    "skins": ["Default"],
+    "sp1": False,
+    "sp2": False
+}
 
 
 class Box:
     """A class to represent Boxes."""
     
     # odds
-    resources_1: int
-    rarees = 2.7103,
+    rares = 2.7103,
     superrares = 1.2218,
     epic = 0.5527
     mythic = 0.2521
     legendary = 0.1115
     starpower: int
 
-    # variables to store possibilities data
-    can_get_pp = {}
-    can_get_sp = {}
-
     # number of powerpoints required to max
     max_pp = 1410
     
     def __init__(self, all_brawlers, brawler_data):        
+        # variables to store possibilities data
+        self.can_unlock = {
+            "Rare": [],
+            "Super Rare": [],
+            "Epic": [],
+            "Mythic": [],
+            "Legendary": []
+        }
+        self.can_get_pp = {}
+        self.can_get_sp = {}
+        
+        for brawler in all_brawlers:
+            rarity = all_brawlers[brawler]["rarity"]
+            if rarity != "Trophy Road":
+                if brawler not in brawler_data:
+                    self.can_unlock[rarity].append(brawler)
+        
         for brawler in brawler_data:
-            # if all_brawlers[brawler]["unlockTrp"] >= 0:
-            #     # it is a trophy road brawler 
-            #     continue
-
             # self.owned.append(brawler)
             total_powerpoints = brawler_data[brawler]['total_powerpoints']
             if total_powerpoints < self.max_pp:
@@ -127,7 +129,7 @@ class Box:
         elif len(self.can_get_pp) == 1:
             gold *= 2
             stacks = 1
-
+        
         powerpoints = int(self.weighted_random(9, 25, 16))
 
         pieces = self.split_in_integers(powerpoints, stacks)
@@ -159,7 +161,52 @@ class Box:
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
 
-        return embed
+        rarity = self.brawler_rarity()
         
+        embed = await self.unlock_brawler(rarity, conf, embed)
+        
+        return embed
+
+    async def unlock_brawler(self, rarity, conf, embed):
+        brawler = random.choice(self.can_unlock[rarity])
+        async with conf.brawlers() as brawlers:
+            brawlers[brawler] = default_stats
+        embed.add_field(name=f"{rarity} Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
+        
+        return embed
+
+    def brawler_rarity(self):
+        """
+        Return rarity by generating a random number, calculating odds and checking 
+        the rarities from which user can unlock a brawler.
+        """
+        # odds calculation below
+
+        # testing
+        # rarity = random.choice(list(self.can_unlock.keys()))
+        rarity = "Legendary"
+
+        def lower_rarity(rarity):
+            if rarity == "Legendary":
+                return "Mythic"
+            elif rarity == "Mythic":
+                return "Epic"
+            elif rarity == "Epic":
+                return "Super Rare"
+            elif rarity == "Super Rare":
+                return "Rare"
+            else:
+                return False
+
+        while True:
+            if not self.can_unlock[rarity]:
+                rarity = lower_rarity(rarity)
+                if not rarity:
+                    break
+            else:
+                break
+
+        return rarity
+
 class GameModes:
     """A class to represent game modes."""
