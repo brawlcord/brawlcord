@@ -196,8 +196,6 @@ class Brawler:
 
         for stat in stats:
             upgrader = stats[stat]/20
-            print(upgrader)
-            print(level)
             stats[stat] += int(upgrader * (level - 1))
             # upd_stats[stat] = stats[stat]
             # upd_stats.append(stat)
