@@ -26,7 +26,8 @@ emojis = {
     "ticket": "<:bsticket:645337313131495434>",
     "tokendoubler": "<:token_doubler:646308736130088961>",
     "bsstar": "<:bs_icon_ready:646310961241653253>",
-    "superhealth": "<:super_health:646723200436404285>"
+    "superhealth": "<:super_health:646723200436404285>",
+    "gem": "<:bsgem:645337311852232714>"
 }
 
 sp_icons = {
