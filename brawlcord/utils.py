@@ -254,7 +254,7 @@ class Box:
             try:
                 old_gems = await conf.gems()
             except:
-                print("error with gems")
+                old_gems = 0
             gems = random.randint(2, 5)
             await conf.gems.set(gems + old_gems)
             embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
@@ -351,7 +351,10 @@ class Box:
             await conf.token_doubler.set(200 + old_td)
             embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} 200")
         elif chance <= self.gems:
-            old_gems = await conf.gems()
+            try:
+                old_gems = await conf.gems()
+            except:
+                old_gems = 0
             gems = random.randint(6, 15) 
             await conf.gems.set(gems + old_gems)
             embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
@@ -450,7 +453,7 @@ class Box:
             try:
                 old_gems = await conf.gems()
             except:
-                print("error with gems")
+                old_gems = 0
             gems = random.randint(18, 45) 
             await conf.gems.set(gems + old_gems)
             embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
@@ -498,7 +501,6 @@ class Box:
 
     async def get_starpower(self, conf, embed):  
         sp_brawler = random.choice(list(self.can_get_sp.keys()))
-        print(self.can_get_sp)
         sp = random.choice(self.can_get_sp[sp_brawler])
 
         self.can_get_sp[sp_brawler].remove(sp)
@@ -642,132 +644,35 @@ class GameModes:
         second_gems = 0
         
         while True:
-            if self.second_player != self.guild.me:
-                try:
-                    await self.second_player.send("Waiting for opponent to pick a move...")
-                except:
-                    return await ctx.send(f"{self.first_player.mention} {self.second_player.mention} Brawl cancelled."
-                    f" Reason: Unable to DM {self.second_player.name}. DMs are required to brawl!")
-                
+            await self.send_waiting_message(ctx, self.first_player, self.second_player) 
+            
             if self.first_attacks >= 6:
                 first_can_super = True
                 end = 4
             else:
                 first_can_super = False
                 end = 3
+            
             if self.second_spawn:
                 end += 1
 
-        
             if self.first_player != self.guild.me:
-                desc = "Pick a move by typing the corresponding move number below."
-                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {self.second_player.name}")
-                embed.set_author(name=self.first_player.name, icon_url=self.first_player.avatar_url)
-
-                embed.add_field(name="Your Brawler", 
-                            value=f"{brawler_emojis[self.first_brawler]} {self.first_brawler}")
-                embed.add_field(name="Your Health", 
-                            value=f"{emojis['health']} {int(self.first_health)}")
-                embed.add_field(name="Your Gems", 
-                            value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
-                
-                if self.first_spawn:
-                    embed.add_field(name=f"Your {self.first_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(self.first_spawn)}", inline=False)
-                
-                embed.add_field(name="Opponent's Brawler", 
-                            value=f"{brawler_emojis[self.second_brawler]} {self.second_brawler}")
-                embed.add_field(name="Opponent's Health", 
-                            value=f"{emojis['health']} {int(self.second_health)}")
-                embed.add_field(name="Opponent's Gems", 
-                            value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
-
-                if self.second_spawn:
-                    embed.add_field(name=f"Opponent's {self.second_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(self.second_spawn)}", inline=False)
-                
-                moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
-                            f"\n{'4. Use Super' if first_can_super else ''}").strip()
-                
-                if first_can_super and not self.second_spawn:
-                    moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
-                elif first_can_super and self.second_spawn:
-                    moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
-                        f"\n4. Use Super\n5. Attack {self.second_spawn_str}")
-                elif not first_can_super and self.second_spawn:
-                    moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
-                        f"\n4. Attack enemy {self.second_spawn_str}")
-                else:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
-
-                embed.add_field(name="Available Moves", value=moves, inline=False)
-
-                try:
-                    msg = await self.first_player.send(embed=embed)
-
-                    react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
-                    start_adding_reactions(msg, react_emojis)
-
-                    pred = ReactionPredicate.with_emojis(react_emojis, msg)
-                    await ctx.bot.wait_for("reaction_add", check=pred)
-
-                    # pred.result is  the index of the letter in `emojis`
-
-                    choice = pred.result + 1
-                except:
-                    return await ctx.send(f"{self.first_player.mention} {self.second_player.mention}" 
-                            f"Reason: Unable to DM {self.first_player.name}. DMs are required to brawl!")
-
+                embed = await self.set_embed(ctx, first_can_super, first_gems, second_gems)
+                choice = await self.user_move(ctx, embed, end, self.first_player, self.second_player)
             else:
                 # develop bot logic
                 choice = random.randint(1, end)
             
-            if choice == 1:
-                damage = self.first._attack(self.fp_brawler_level)
-                if not self.second_invincibility:
-                    self.second_health -= damage
-                    self.first_attacks += 1
-                else:
-                    self.second_invincibility = False
-            elif choice == 2:
-                first_gems += 1
-                if self.second_invincibility:
-                    self.second_invincibility = False
-            elif choice == 3:
-                self.first_invincibility = True
-                if self.second_invincibility:
-                    self.second_invincibility = False
-            elif choice == 4:
-                if first_can_super:
-                    damage, self.first_spawn = self.first._ult(self.fp_brawler_level)
-                    self.first_attacks = 0
-                    if not self.second_invincibility:
-                        self.second_health -= damage
-                    else:
-                        self.second_health -= damage * 0.5
-                        self.second_invincibility = False
-                else:
-                    self.second_spawn -= self.first._attack(self.fp_brawler_level)
-            elif choice == 5:
-                self.second_spawn -= self.first._attack(self.fp_brawler_level)
-            
-            if self.first_spawn:
-                damage = self.first._spawn(self.fp_brawler_level)
-                if not self.second_invincibility:
-                    self.second_health -= damage
-                    self.first_attacks += 1
-                else:
-                    self.second_invincibility = False
+            first_gems = await self.user_and_spawn_moves(choice, first_can_super, first_gems=first_gems)
 
             winner, loser = self.check_if_win(first_gems, second_gems)
-            
+
             if winner == False:
                 pass
             else:
                 break
             
-            if self.first_player != self.guild.me:
-                await self.first_player.send("Waiting for opponent to pick a move...")
+            await self.send_waiting_message(ctx, self.second_player, self.first_player)
             
             if self.second_attacks >= 6:
                 second_can_super = True
@@ -777,97 +682,15 @@ class GameModes:
                 end = 3
 
             if self.second_player != self.guild.me:
-                desc = "Pick a move by typing the corresponding move number below."
-                embed = discord.Embed(color=0xFFA232, title=f"Brawl against {self.first_player.name}")
-                embed.set_author(name=self.second_player.name, icon_url=self.second_player.avatar_url)
-                
-                embed.add_field(name="Your Brawler",
-                            value=f"{brawler_emojis[self.second_brawler]} {self.second_brawler}")
-                embed.add_field(name="Your Health", 
-                            value=f"{emojis['health']} {int(self.second_health)}")
-                embed.add_field(name="Your Gems", 
-                            value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
-                
-                if self.second_spawn:
-                    embed.add_field(name=f"Your {self.second_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(self.second_spawn)}", inline=False)
-                
-                embed.add_field(name="Opponent's Brawler", 
-                            value=f"{brawler_emojis[self.first_brawler]} {self.first_brawler}")
-                embed.add_field(name="Opponent's Health", 
-                            value=f"{emojis['health']} {int(self.first_health)}")
-                embed.add_field(name="Opponent's Gems", 
-                            value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
-                
-                if self.first_spawn:
-                    embed.add_field(name=f"Opponent's {self.first_spawn_str}'s Health", 
-                            value=f"{emojis['health']} {int(self.first_spawn)}", inline=False)
-                
-                if second_can_super and not self.first_spawn:
-                    moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
-                elif second_can_super and self.first_spawn:
-                    moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
-                        f"\n4. Use Super\n5. Attack {self.first_spawn_str}")
-                elif not second_can_super and self.first_spawn:
-                    moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
-                        f"\n4. Attack enemy {self.first_spawn_str}")
-                else:
-                    moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
-                
-                embed.add_field(name="Available Moves", value=moves, inline=False)
-
-                msg = await self.second_player.send(embed=embed)
-
-                react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
-                start_adding_reactions(msg, react_emojis)
-
-                pred = ReactionPredicate.with_emojis(react_emojis, msg)
-                await ctx.bot.wait_for("reaction_add", check=pred)
-
-                # pred.result is  the index of the letter in `emojis`
-
-                choice = pred.result + 1
-
+                embed = await self.set_embed(ctx, second_can_super, first_gems=second_gems, 
+                    second_gems=first_gems, reverse=True)
+                choice = await self.user_move(ctx, embed, end, self.second_player, self.first_player)
             else:
                 # develop bot logic
                 choice = random.randint(1, end)
 
-            if choice == 1:
-                damage = self.second._attack(self.sp_brawler_level)
-                if not self.first_invincibility:
-                    self.first_health -= damage
-                    self.second_attacks += 1
-                else:
-                    self.first_invincibility = False
-            elif choice == 2:
-                second_gems += 1
-                if self.first_invincibility:
-                    self.first_invincibility = False
-            elif choice == 3:
-                self.second_invincibility = True
-                if self.first_invincibility:
-                    self.first_invincibility = False
-            elif choice == 4:
-                if second_can_super:
-                    damage, self.second_spawn = self.second._ult(self.sp_brawler_level)
-                    self.second_attacks = 0
-                    if not self.first_invincibility:
-                        self.first_health -= damage
-                    else:
-                        self.first_health -= damage * 0.5
-                        self.first_invincibility = False
-                else:
-                    self.first_spawn -= self.second._attack(self.sp_brawler_level)
-            elif choice == 5:
-                self.first_spawn -= self.second._attack(self.sp_brawler_level)
-
-            if self.second_spawn:
-                damage = self.second._spawn(self.sp_brawler_level)
-                if not self.first_invincibility:
-                    self.first_health -= damage
-                    self.second_attacks += 1
-                else:
-                    self.second_invincibility = False
+            second_gems = await self.user_and_spawn_moves(choice, second_can_super, 
+                first_gems=second_gems, reverse=True)
             
             winner, loser = self.check_if_win(first_gems, second_gems)
             
@@ -923,10 +746,211 @@ class GameModes:
 
         return opp_brawler, opp_brawler_level, opp_brawler_sp
 
-    async def message_second_user(self, ctx):
-        if self.second_player != self.guild.me:
+    async def send_waiting_message(self, ctx, first_player, second_player):
+        if second_player != self.guild.me:
                 try:
-                    await self.second_player.send("Waiting for opponent to pick a move...")
+                    await second_player.send("Waiting for opponent to pick a move...")
                 except:
-                    return await ctx.send(f"{self.first_player.mention} {self.second_player.mention} Brawl cancelled."
-                    f" Reason: Unable to DM {self.second_player.name}. DMs are required to brawl!")
+                    return await ctx.send(f"{first_player.mention} {second_player.mention} Brawl cancelled."
+                    f" Reason: Unable to DM {second_player.name}. DMs are required to brawl!")
+
+    async def set_embed(
+        self,
+        ctx, 
+        can_super, 
+        first_gems = None, 
+        second_gems = None, 
+        reverse = False
+    ):
+        
+        if not reverse:
+            first_player = self.first_player
+            first_brawler = self.first_brawler
+            first_health = self.first_health
+            first_spawn = self.first_spawn
+            first_spawn_str = self.first_spawn_str
+            second_player = self.second_player
+            second_brawler = self.second_brawler
+            second_health = self.second_health
+            second_spawn = self.second_spawn
+            second_spawn_str = self.second_spawn_str
+
+            first_can_super = can_super
+        else:
+            second_player = self.first_player
+            second_brawler = self.first_brawler
+            second_health = self.first_health
+            second_spawn = self.first_spawn
+            second_spawn_str = self.first_spawn_str
+            first_player = self.second_player
+            first_brawler = self.second_brawler
+            first_health = self.second_health
+            first_spawn = self.second_spawn
+            first_spawn_str = self.second_spawn_str
+
+            second_can_super = can_super
+
+        desc = "Pick a move by typing the corresponding move number below."
+        embed = discord.Embed(color=0xFFA232, title=f"Brawl against {second_player.name}")
+        embed.set_author(name=first_player.name, icon_url=first_player.avatar_url)
+
+        embed.add_field(name="Your Brawler", 
+                    value=f"{brawler_emojis[first_brawler]} {first_brawler}")
+        embed.add_field(name="Your Health", 
+                    value=f"{emojis['health']} {int(first_health)}")
+        if first_gems is not None:
+            embed.add_field(name="Your Gems", 
+                        value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
+        
+        if first_spawn:
+            embed.add_field(name=f"Your {first_spawn_str}'s Health", 
+                    value=f"{emojis['health']} {int(first_spawn)}", inline=False)
+    
+        embed.add_field(name="Opponent's Brawler", 
+                    value=f"{brawler_emojis[second_brawler]} {second_brawler}")
+        embed.add_field(name="Opponent's Health", 
+                    value=f"{emojis['health']} {int(second_health)}")
+        if second_gems is not None:
+            embed.add_field(name="Opponent's Gems", 
+                        value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
+
+        if second_spawn:
+            embed.add_field(name=f"Opponent's {second_spawn_str}'s Health", 
+                    value=f"{emojis['health']} {int(second_spawn)}", inline=False)
+    
+                
+        moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
+                    f"\n{'4. Use Super' if first_can_super else ''}").strip()
+        
+        if first_can_super and not second_spawn:
+            moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
+        elif first_can_super and second_spawn:
+            moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
+                f"\n4. Use Super\n5. Attack {second_spawn_str}")
+        elif not first_can_super and second_spawn:
+            moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
+                f"\n4. Attack enemy {second_spawn_str}")
+        else:
+            moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
+
+        embed.add_field(name="Available Moves", value=moves, inline=False)
+
+        return embed
+
+    async def user_move(self, ctx, embed, end, first_player, second_player):
+        try:
+            msg = await first_player.send(embed=embed)
+
+            react_emojis = ReactionPredicate.NUMBER_EMOJIS[1:end+1]
+            start_adding_reactions(msg, react_emojis)
+
+            pred = ReactionPredicate.with_emojis(react_emojis, msg)
+            await ctx.bot.wait_for("reaction_add", check=pred)
+
+            # pred.result is  the index of the letter in `emojis`
+            return pred.result + 1
+        except:
+            return await ctx.send(f"{first_player.mention} {second_player.mention}" 
+                    f"Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+
+    async def user_and_spawn_moves(self, choice, first_can_super, first_gems = None, reverse = False):             
+        if not reverse:
+            first = self.first
+            first_player = self.first_player
+            first_brawler = self.first_brawler
+            fp_brawler_level = self.fp_brawler_level
+            first_health = self.first_health
+            first_spawn = self.first_spawn
+            first_spawn_str = self.first_spawn_str
+            first_invincibility = self.first_invincibility
+            first_attacks = self.first_attacks
+            second = self.second
+            second_player = self.second_player
+            second_brawler = self.second_brawler
+            sp_brawler_level = self.sp_brawler_level
+            second_health = self.second_health
+            second_spawn = self.second_spawn
+            second_spawn_str = self.second_spawn_str
+            second_invincibility = self.second_invincibility
+            second_attacks = self.second_attacks
+        else:
+            second = self.first
+            second_player = self.first_player
+            second_brawler = self.first_brawler
+            sp_brawler_level = self.fp_brawler_level
+            second_health = self.first_health
+            second_spawn = self.first_spawn
+            second_spawn_str = self.first_spawn_str
+            second_invincibility = self.first_invincibility
+            second_attacks = self.first_attacks
+            first = self.second
+            first_player = self.second_player
+            first_brawler = self.second_brawler
+            fp_brawler_level = self.sp_brawler_level
+            first_health = self.second_health
+            first_spawn = self.second_spawn
+            first_spawn_str = self.second_spawn_str
+            first_spawn_str = self.second_spawn_str
+            first_invincibility = self.second_invincibility
+            first_attacks = self.second_attacks
+
+            
+        if choice == 1:
+            damage = first._attack(fp_brawler_level)
+            if not second_invincibility:
+                second_health -= damage
+                first_attacks += 1
+            else:
+                second_invincibility = False
+        elif choice == 2:
+            if first_gems is not None:
+                first_gems += 1
+                if second_invincibility:
+                    second_invincibility = False
+        elif choice == 3:
+            first_invincibility = True
+            if second_invincibility:
+                second_invincibility = False
+        elif choice == 4:
+            if first_can_super:
+                damage, first_spawn = first._ult(fp_brawler_level)
+                first_attacks = 0
+                if not second_invincibility:
+                    second_health -= damage
+                else:
+                    second_health -= damage * 0.5
+                    second_invincibility = False
+            else:
+                second_spawn -= first._attack(fp_brawler_level)
+        elif choice == 5:
+            second_spawn -= first._attack(fp_brawler_level)
+        
+        if first_spawn:
+            damage = first._spawn(fp_brawler_level)
+            if not second_invincibility:
+                second_health -= damage
+                first_attacks += 1
+            else:
+                second_invincibility = False
+
+        if not reverse:
+            self.first_health = first_health
+            self.first_spawn = first_spawn
+            self.first_invincibility = first_invincibility
+            self.first_attacks = first_attacks
+            self.second_health = second_health
+            self.second_spawn = second_spawn
+            self.second_invincibility = second_invincibility
+            self.second_attacks = second_attacks
+        else:
+            self.second_health = first_health
+            self.second_spawn = first_spawn
+            self.second_invincibility = first_invincibility
+            self.second_attacks = first_attacks
+            self.first_health = second_health
+            self.first_spawn = second_spawn
+            self.first_invincibility = second_invincibility
+            self.first_attacks = second_attacks
+
+        if first_gems is not None:
+            return first_gems
