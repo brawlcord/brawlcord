@@ -22,11 +22,11 @@
         },
         "sp1": {
             "name": "Shell Shock",
-            "desc": "Shelly's Super shells slow down enemies for 3.0 seconds!"
+            "desc": "Shelly's Super shells slow down enemies for **3.0** seconds!"
         },
         "sp2": {
             "name": "Band-Aid",
-            "desc": "When Shelly falls below 40% health, she instantly heals for 1800 health. Band-Aid recharges in 20.0 seconds."
+            "desc": "When Shelly falls below **40%** health, she instantly heals for **1800** health. Band-Aid recharges in **20.0** seconds."
         },
         "skins": {
             "Bandita": 80,
@@ -60,11 +60,11 @@
         },
         "sp1": {
             "name": "Bear with Me",
-            "desc": "Nita recovers 500 health whenever her bear hits an enemy. When Nita deals damage, her bear regains 500 health."
+            "desc": "Nita recovers **500** health whenever her bear hits an enemy. When Nita deals damage, her bear regains **500** health."
         },
         "sp2": {
             "name": "Happy Bear",
-            "desc": "Nita's bear attacks faster. Time between swipes is reduced by 60%."
+            "desc": "Nita's bear attacks faster. Time between swipes is reduced by **60%**."
         },
         "skins": {
             "Panda": 30,
@@ -95,11 +95,11 @@
         },
         "sp1": {
             "name": "Slick Boots",
-            "desc": "Colt's movement speed is increased by 10%."
+            "desc": "Colt's movement speed is increased by **10%**."
         },
         "sp2": {
             "name": "Magnum Special",
-            "desc": "Colt's attack range and bullet speed are increased by 11%."
+            "desc": "Colt's attack range and bullet speed are increased by **11%**."
         },
         "skins": {
             "Rockstar": 80,
@@ -129,11 +129,11 @@
         },
         "sp1": {
             "name": "Berserker",
-            "desc": "When Bull falls below 40% health, his reload speed doubles!"
+            "desc": "When Bull falls below **40%** health, his reload speed doubles!"
         },
         "sp2": {
             "name": "Tough Guy",
-            "desc": "When Bull falls below 40% health, he gains a shield that reduces all damage he takes by 30%."
+            "desc": "When Bull falls below **40%** health, he gains a shield that reduces all damage he takes by **30%**."
         },
         "skins": {
             "Viking": 80,
@@ -167,28 +167,16 @@
         },
         "sp1": {
             "name": "Energize",
-            "desc": "Jessie can repair her gun turret for 800 of its missing health by zapping it with her attack."
+            "desc": "Jessie can repair her gun turret for **800** of its missing health by zapping it with her attack."
         },
         "sp2": {
             "name": "Shocky",
-            "desc": "Scrappy the Turret now shoots energy orbs that bounce between enemies."
+            "desc": "Scrappy the Turret now shoots energy orbs that bounce between enemies. The orbs' range after a bounce is **51%** of normal range."
         },
         "skins": {
             "Summer": 30,
             "Dragon Knight": 150,
             "Shadow Knight": -1
         }
-    },
-    "Rico": {
-        "rarity": "Rare",
-        "unlockTrp": -1
-    },
-    "Barley": {
-        "rarity": "Super Rare",
-        "unlockTrp": -1
-    },
-    "El Primo": {
-        "rarity": "Mythic",
-        "unlockTrp": -1
     }
 }
