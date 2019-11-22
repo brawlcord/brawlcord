@@ -111,6 +111,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         self.XP_LEVELS: dict = None
         self.RANKS: dict = None
         self.TROPHY_ROAD: dict = None
+        self.LEVEL_UPS: dict = None
 
         def error_callback(fut):
             try:
@@ -130,6 +131,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         xp_levels_fp = bundled_data_path(self) / "xp_levels.json"
         ranks_fp = bundled_data_path(self) / "ranks.json"
         trophy_road_fp = bundled_data_path(self) / "trophy_road.json"
+        level_ups_fp = bundled_data_path(self) / "level_ups.json"
 
         with brawlers_fp.open("r") as f:
             self.BRAWLERS = json.load(f)
@@ -141,6 +143,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             self.RANKS = json.load(f)
         with trophy_road_fp.open("r") as f:
             self.TROPHY_ROAD = json.load(f)
+        with level_ups_fp.open("r") as f:
+            self.LEVEL_UPS = json.load(f)
 
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -319,10 +323,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if owned:
             brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
             pp = brawler_data['powerpoints']
-            next_level_pp = 20
             trophies = brawler_data['trophies']
             rank = brawler_data['rank']
             level = brawler_data['level']
+            next_level_pp = self.LEVEL_UPS[str(level)]["Progress"]
             pb = brawler_data['pb']
             sp1 = brawler_data['sp1']
             sp2 = brawler_data['sp2']
@@ -561,6 +565,49 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await ctx.send(embed=embed)
 
         await self.update_player_stat(user, 'startokens', -10, add_self=True)
+    
+    @commands.command(name="upgrade", aliases=['up'])
+    async def upgrade_brawlers(self, ctx: Context, *, brawler: str):
+        """Upgrade a Brawler."""
+        user = ctx.author
+        
+        user_owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        # for users who input 'el_primo'
+        brawler = brawler.replace("_", " ")
+
+        brawler = brawler.title()
+
+        if brawler not in user_owned:
+            return await ctx.send(f"You do not own {brawler}!")
+        
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+        level = brawler_data['level']
+        if level == 9:
+            return await ctx.send("Brawler is already at level 9. Open boxes to collect Star Powers!")
+        elif level == 10:
+            return await ctx.send("Brawler is already at level 10. If you are missing a Star Power, then open boxes to collect it!")
+
+        powerpoints = brawler_data['powerpoints']
+
+        required_powerpoints = self.LEVEL_UPS[str(level)]["Progress"]
+
+        if powerpoints < required_powerpoints:
+            return await ctx.send(f"You do not have enough powerpoints! ({powerpoints}/{required_powerpoints})")
+        
+        gold = await self.get_player_stat(user, 'gold', is_iter=False)
+
+        required_gold = self.LEVEL_UPS[str(level)]["RequiredCurrency"]
+
+        if gold < required_gold:
+            return await ctx.send(f"You do not have enough gold! ({gold}/{required_gold})")
+        
+        await self.update_player_stat(user, 'brawlers', level+1, substat=brawler, sub_index='level')
+        await self.update_player_stat(user, 'brawlers', powerpoints-required_powerpoints, 
+                substat=brawler, sub_index='powerpoints')
+        await self.update_player_stat(user, 'gold', gold-required_gold)
+
+        await ctx.send(f"Upgraded {brawler} to power {level+1}!")
     
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
