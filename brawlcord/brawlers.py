@@ -237,8 +237,11 @@ class Brawler:
         if level:
             embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
             embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
-            embed.add_field(name="PERSONAL BEST", value=f"{rank_emojis['br'+str(rank)]} {pb}")
-            embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
+            embed.add_field(name="PERSONAL BEST", value=f"{rank_emojis['br'+str(rank)]} {pb} [Rank {rank}]")
+            if pp > 0:
+                embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
+            else:
+                embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} Maxed")
         else:
             embed.add_field(name="POWER", value=f"{emojis['xp']} 1")
         return embed

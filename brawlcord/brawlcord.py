@@ -326,7 +326,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             trophies = brawler_data['trophies']
             rank = brawler_data['rank']
             level = brawler_data['level']
-            next_level_pp = self.LEVEL_UPS[str(level)]["Progress"]
+            if level < 9:
+                next_level_pp = self.LEVEL_UPS[str(level)]["Progress"]
+            else:
+                next_level_pp = 0
+                pp = 0
             pb = brawler_data['pb']
             sp1 = brawler_data['sp1']
             sp2 = brawler_data['sp2']
@@ -724,7 +728,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="Tokens", value=f"{emojis['token']} {reward_tokens}")
         embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
 
-        if token_doubler:
+        if token_doubler > 0:
             embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} {upd_td} left!")
 
         rank_up = await self.handle_rank_ups(user, selected_brawler)
