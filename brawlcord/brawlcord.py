@@ -18,8 +18,9 @@ from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
-from .brawlers import emojis, brawler_emojis, rank_emojis, Brawler, Shelly, Nita, Colt
-from .utils import Box, default_stats
+from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler
+
+from .utils import Box, default_stats, gamemode_emotes, spawn_text, brawlers_map, GameModes
 
 
 BaseCog = getattr(commands, "Cog", object)
@@ -69,32 +70,10 @@ default_user = {
     }
 }
 
-brawlers_map = {
-    "Shelly": Shelly,
-    "Nita": Nita,
-    "Colt": Colt
-}
-
 # tutorial_trophies = 10
 
 imgur_links = {
     "shelly_tut": "https://i.imgur.com/QfKYzso.png"
-}
-
-gamemode_emotes = {
-    "Big Game": "<:big_game:645925169344282624>",
-    "Bounty": "<:bounty:645925169252270081>",
-    "Boss Fight": "<:bossfight:645925170397052929>",
-    "Brawl Ball": "<:brawlball:645925169650466816>",
-    "Gem Grab": "<:gemgrab:645925169730289664>",
-    "Duo Showdown": "<:duo_showdown:645925169805656076>",
-    "Heist": "<:heist:645925170195988491>",
-    "raid": "<:raid:645925170397052929>",
-    "Siege": "<:siege:645925170481201163>",
-    "Solo Showdown": "<:solo_showdown:645925170539921428>",
-    "Robo Rumble": "<:roborumble:645925170594316288>",
-    "Lone Star": "<:lonestar:645925170610962452>",
-    "Takedown": "<:takedown:645925171034587146>",
 }
 
 reward_types = {
@@ -109,13 +88,6 @@ reward_types = {
     14: ["Big Box", emojis["bigbox"]]
 }
 
-spawn_text = {
-    "Nita": "Bear",
-    "Penny": "Cannon",
-    "Jessie": "Turrent",
-    "Pam": "Healing Station",
-    "8-Bit": "Turret"
-}
 
 class Brawlcord(BaseCog, name="Brawlcord"):
     """Simulate Brawl Stars."""
@@ -170,260 +142,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         with trophy_road_fp.open("r") as f:
             self.TROPHY_ROAD = json.load(f)
 
-    # @commands.command(name="brawl", aliases=["b"])
-    # @commands.guild_only()
-    # # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
-    async def brawl(
-        self,
-        ctx: Context,
-        teammate1: discord.Member = None,
-        teammate2: discord.Member = None
-    ):
-        """Brawl against others!"""
-
-        # author = ctx.author
-        # guild = ctx.guild
-
-        # tutorial_finished = await self.get_player_stat(author, "tutorial_finished")
-
-        # if not tutorial_finished:
-        #     return await ctx.send(f"{author.mention} You have not finished tutorial yet."
-        #                           "Use  `-tutorial` to start tutorial.")
-
-        # teammates = [teammate1, teammate2]
-
-        # players = [author]
-
-        # for teammate in teammates:
-        #     if teammate:
-        #         if teammate == author:
-        #             return await ctx.send("You can't play with yourself!")
-        #         elif teammate == guild.me:
-        #             return await ctx.send("I can't play!")
-        #         players.append(teammate)
-
-        # # await ctx.send(teammates)
-
-        # results = {}
-
-        # for player in players:
-        #     selected_brawler = (await self.get_player_stat(player, "selected"))["brawler"]
-
-        #     user_brawler_level = (await self.get_player_stat(player, "brawlers"))[selected_brawler]["level"]
-
-        #     opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(
-        #         user_brawler_level)
-
-        #     user1: Brawler = brawlers_map[selected_brawler](
-        #         self.BRAWLERS, selected_brawler)
-        #     # opp1: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
-        #     opp1 = Shelly(self.BRAWLERS, "Shelly")
-
-        #     # await ctx.send(embed=user1.brawler_info("Shelly", 10, 10, 5, 0, 200))
-
-        #     user_health = user1._health(user_brawler_level)
-        #     opp_health = opp1._health(opp_brawler_level)
-
-        #     opp_health -= user1._attack(user_brawler_level)
-
-        #     user_counter = 0
-        #     opp_counter = 0
-
-        #     winner = "Computer"
-        #     margin = 0
-
-        #     while True:
-        #         # print(f"You before attack: {user_health}")
-        #         # print(f"Computer before attack: {opp_health}")
-        #         if user_counter > 0 and user_counter % 5 == 0:
-        #             res = user1._ult(user_brawler_level)
-        #             opp_health -= res
-        #             if res > 0:
-        #                 user_counter += 1
-        #         if opp_counter > 0 and opp_counter % 5 == 0:
-        #             res = opp1._ult(opp_brawler_level)
-        #             user_health -= res
-        #             if res > 0:
-        #                 opp_counter += 1
-
-        #         else:
-        #             res_u = user1._attack(user_brawler_level)
-        #             res_o = opp1._attack(opp_brawler_level)
-
-        #             if res_u > 0:
-        #                 user_counter += 1
-        #             if res_o > 0:
-        #                 opp_counter += 1
-
-        #             user_health -= res_o
-        #             opp_health -= res_u
-
-        #         # print(f"You after attack: {user_health}")
-        #         # print(f"Computer after attack: {opp_health}")
-
-        #         margin = abs(user_health-opp_health)
-
-        #         if user_health <= 0 and opp_health > 0:
-        #             break
-        #         if opp_health <= 0 and user_health > 0:
-        #             winner = "User"
-        #             break
-        #         if opp_health <= 0 and user_health <= 0:
-        #             winner = "Draw"
-        #             break
-        #         else:
-        #             continue
-
-        #     if winner == "Computer":
-        #         results[player] = {
-        #             "brawl_res": -1,
-        #             "margin": margin
-        #         }
-        #     elif winner == "User":
-        #         results[player] = {
-        #             "brawl_res": 1,
-        #             "margin": margin
-        #         }
-        #     else:
-        #         results[player] = {
-        #             "brawl_res": 0,
-        #             "margin": margin
-        #         }
-
-        # points = 0
-        # for result in results:
-        #     if results[result]['brawl_res'] == 1:
-        #         points += 1
-        #     elif results[result]['brawl_res'] == -1:
-        #         points -= 1
-        #     else:
-        #         points += 0
-
-        # starplayer = guild.me
-
-        # player_mentions = ' '.join([player.mention for player in players])
-        
-        # if points > 0:
-        #     # max_margin = 0
-        #     # for result in results.keys():
-        #     #     if results[result]['margin'] > max_margin:
-        #     #         max_margin = results[result]['margin']
-        #     #         starplayer = result
-        #     #         if len(results) > 3:
-        #     starplayer = random.choice([result for result in results])
-        #     await ctx.send(f"{player_mentions} You won! Star Player: {starplayer}.")
-        # elif points < 1:
-        #     await ctx.send(f"{player_mentions} You lost! Star Player: {starplayer}.")
-        # else:
-        #     chance = random.randint(1, 2)
-        #     if chance == 1:
-        #         starplayer = random.choice([result for result in results])
-        #     await ctx.send(f"The match ended in a draw! Star Player: {starplayer}.")
-
-        # count = 0
-        # for user in results:
-        #     if user == starplayer:
-        #         is_starplayer = True
-        #     else:
-        #         is_starplayer = False
-        #     brawl_rewards, rank_up_rewards, trophy_road_reward = await self.brawl_rewards(user, points, is_starplayer)
-            
-        #     count += 1
-        #     if count == 1:
-        #         await ctx.send("Direct messaging rewards!")
-        #     level_up = await self.xp_handler(user)
-        #     try:
-        #         await user.send(embed=brawl_rewards)
-        #         if level_up:
-        #             await user.send(f"{level_up[0]}\n{level_up[1]}")
-        #         if rank_up_rewards:
-        #             await user.send(embed=rank_up_rewards)
-        #         if trophy_road_reward:
-        #             await user.send(embed=trophy_road_reward)
-        #     except:
-        #         await ctx.send(f"Cannot direct message {user.mention}")
-        #         await ctx.send(embed=brawl_rewards)
-        #         if level_up:
-        #             await ctx.send(f"{user.mention} {level_up[0]}\n{level_up[1]}")
-        #             await ctx.send()
-        #         if rank_up_rewards:
-        #             await ctx.send(embed=rank_up_rewards)
-        #         if trophy_road_reward:
-        #             await ctx.send(embed=trophy_road_reward)
-
-        pass
-
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     async def _brawl(self, ctx: Context, opponent: discord.User = None):
-        """Brawl against others!"""
-
         guild = ctx.guild
         user = ctx.author
 
-        user_brawler = await self.get_player_stat(user, "selected", is_iter=True, substat="brawler")
-        brawler_data = await self.get_player_stat(user, "brawlers", is_iter=True, substat=user_brawler)
-        user_brawler_level = brawler_data['level']
-
-        gamemode = await self.get_player_stat(user, "selected", is_iter=True, substat="gamemode")
-
-        ub: Brawler = brawlers_map[user_brawler](self.BRAWLERS, user_brawler)
-
-        if opponent:
-            opp_brawler = await self.get_player_stat(opponent, "selected", is_iter=True, substat="brawler")
-            opp_data = await self.get_player_stat(opponent, "brawlers", is_iter=True, substat=opp_brawler)
-            opp_brawler_level = brawler_data['level']
-
-            # ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
-
-        else:
-            opponent = guild.me
-            opp_brawler, opp_brawler_level, opp_brawler_sp = self.matchmaking(user_brawler_level)
-
-        ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
-        
-        if opponent != guild.me:
-            try:
-                msg = await opponent.send(f"{user.mention} has challenged you for a brawl."
-                    f" Game Mode: **{gamemode}**. Accept?")
-                start_adding_reactions(msg, ReactionPredicate.YES_OR_NO_EMOJIS)
-
-                pred = ReactionPredicate.yes_or_no(msg, opponent)
-                await ctx.bot.wait_for("reaction_add", check=pred)
-                if pred.result is True:
-                    # User responded with tick
-                    pass
-                else:
-                    # User responded with cross
-                    return await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled."
-                    f" Reason: {opponent.name} rejected the challenge.")    
-            except:
-                return await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled." 
-                    f" Reason: Unable to DM {opponent.name}. DMs are required to brawl!")
-            
-        first_move_chance = random.randint(1, 2)
-
-        if first_move_chance == 1:
-            first = ub
-            second = ob
-            first_player = user
-            second_player = opponent
-            first_brawler = user_brawler
-            second_brawler = opp_brawler
-            fp_brawler_level = user_brawler_level
-            sp_brawler_level = opp_brawler_level
-        else:
-            first = ob
-            second = ub
-            first_player = opponent
-            second_player = user
-            first_brawler = opp_brawler
-            second_brawler = user_brawler
-            sp_brawler_level = user_brawler_level
-            fp_brawler_level = opp_brawler_level
-        
-        winner, loser = await self.gemgrab(ctx, first, second, first_player, second_player, 
-                            first_brawler, second_brawler, fp_brawler_level, sp_brawler_level)
+        g: GameModes = GameModes(ctx, user, opponent, self.config.user, self.BRAWLERS)
+        first_player, second_player, winner, loser = await g.initialize(ctx)
         
         players = [first_player, second_player]
         
@@ -466,7 +192,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 await player.send(embed=rank_up_rewards)
             if trophy_road_reward:
                 await player.send(embed=trophy_road_reward)
-
+    
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
     # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
@@ -545,12 +271,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         selected = await self.get_player_stat(user, 'selected', is_iter=True)
         brawler = selected['brawler']
+        sp = selected['starpower']
         skin = selected['brawler_skin']
         gamemode = selected['gamemode']
 
         embed.add_field(name="Brawler", 
-                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}")
-        embed.add_field(name="Game Mode", value=f"{gamemode_emotes[gamemode]} {gamemode}")
+                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}"
+                        f'''{f" - {emojis['spblank']} {sp}" if sp else ''}''', inline=False)
+        embed.add_field(name="Game Mode", 
+                value=f"{gamemode_emotes[gamemode]} {gamemode}", inline=False)
 
         await ctx.send(embed=embed)
     
@@ -601,6 +330,51 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(embed=embed)
  
+    @commands.command(name="brawlers")
+    async def all_brawlers(self, ctx: Context):
+        """Show all the Brawlers you own or not with their rarity and Star Power status."""
+
+        user = ctx.author
+        
+        owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
+
+        print(owned)
+        
+        embed = discord.Embed(color=0xFFA232, title="Brawlers")
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+
+        rarities = ["Trophy Road", "Rare", "Super Rare", "Epic", "Mythic", "Legendary"]
+        for rarity in rarities:
+            brawler_str = ""
+            for brawler in self.BRAWLERS:
+                if rarity != self.BRAWLERS[brawler]['rarity']:
+                    continue
+                brawler_str += f"\n{brawler_emojis[brawler]} **{brawler}**"
+                if brawler in owned:
+                    level = owned[brawler]["level"]
+
+                    brawler_str += f" [Power {level}]"
+                    if level >= 9:
+                        sp1 = owned[brawler]["sp1"]
+                        sp2 = owned[brawler]["sp2"]
+
+                        if sp1:
+                            sp_name, sp_icon = self.get_sp_info(brawler, "sp1")
+                            brawler_str += f" {sp_icon}"
+                        else:
+                            brawler_str += f" {emojis['spgrey']}"
+                        if sp2:
+                            sp_name, sp_icon = self.get_sp_info(brawler, "sp1")
+                            brawler_str += f"{sp_icon}"
+                        else:
+                            brawler_str += f"{emojis['spgrey']}"
+                else:
+                    brawler_str += " [Not owned]"
+            if brawler_str:
+                embed.add_field(name=rarity, value=brawler_str)        
+
+        await ctx.send(embed=embed)  
+
     @commands.group(name="rewards", autohelp=False)
     async def _rewards(self, ctx: Context):
         """View and claim collected trophy road rewards!"""
@@ -676,7 +450,17 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return await ctx.send(f"You do not own {brawler_name}!")
         
         await self.update_player_stat(ctx.author, 'selected', brawler_name, substat='brawler')
+        
+        brawler_data = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True, substat=brawler_name)
 
+        sps = [f"sp{ind}" for ind, sp in enumerate([brawler_data["sp1"], brawler_data["sp2"]], start=1) if sp]
+        sps = [self.BRAWLERS[brawler_name][sp]["name"] for sp in sps]
+        
+        if sps:
+            await self.update_player_stat(ctx.author, 'selected',  random.choice(sps), substat='starpower')
+        else:
+            await self.update_player_stat(ctx.author, 'selected',  None, substat='starpower')
+        
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
     @_select.command(name="gamemode", aliases=['gm'])
@@ -811,23 +595,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             else:
                 old_val = await self.get_player_stat(user, stat)
             await stat_attr.set(value+old_val)
-
-    def matchmaking(self, brawler_level: int):
-        """Get an opponent!"""
-
-        opp_brawler = random.choice(list(self.BRAWLERS))
-
-        opp_brawler_level = random.randint(brawler_level-1, brawler_level+1)
-        opp_brawler_sp = None
-
-        if opp_brawler_level > 10:
-            opp_brawler_level = 10
-            opp_brawler_sp = random.randint(1, 2)
-
-        if opp_brawler_level < 1:
-            opp_brawler_level = 1
-
-        return opp_brawler, opp_brawler_level, opp_brawler_sp
 
     async def get_trophies(self, user: discord.User, pb = False, brawler_name: str = None):
         """Get total trophies or trophies of a specified Brawler of an user.
@@ -1488,6 +1255,17 @@ class Brawlcord(BaseCog, name="Brawlcord"):
          
         return winner, loser
     
+    def get_sp_info(self, brawler_name: str, sp: str):
+        """Return name and emoji of the Star Power."""
+
+        for brawler in self.BRAWLERS:
+            if brawler == brawler_name:
+                sp_name = self.BRAWLERS[brawler][sp]
+                sp_ind = int(sp[2]) - 1
+                sp_icon = sp_icons[brawler][sp_ind]
+        
+        return sp_name, sp_icon
+    
     @commands.command(name="tokens")
     @checks.is_owner()
     async def tokens(self, ctx: Context, user: discord.User = None):
@@ -1496,6 +1274,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         await self.update_player_stat(user, 'tokens', 1000)
         await self.update_player_stat(user, 'startokens', 1000)
+        
+        await self.update_player_stat(user, 'gold', 3494)
+
+        await self.update_player_stat(user, 'selected', "Shell Shock", substat="starpower")
         
         async with self.config.user(user).brawlers() as brawlers:
             brawlers.pop('Rico', None)
