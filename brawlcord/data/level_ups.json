@@ -1,0 +1,42 @@
+{
+    "1": {
+        "ProgressStart": 0,
+        "Progress": 20,
+        "RequiredCurrency": 20
+    },
+    "2": {
+        "ProgressStart": 20,
+        "Progress": 30,
+        "RequiredCurrency": 35
+    },
+    "3": {
+        "ProgressStart": 50,
+        "Progress": 50,
+        "RequiredCurrency": 75
+    },
+    "4": {
+        "ProgressStart": 100,
+        "Progress": 80,
+        "RequiredCurrency": 140
+    },
+    "5": {
+        "ProgressStart": 180,
+        "Progress": 130,
+        "RequiredCurrency": 290
+    },
+    "6": {
+        "ProgressStart": 310,
+        "Progress": 210,
+        "RequiredCurrency": 480
+    },
+    "7": {
+        "ProgressStart": 520,
+        "Progress": 340,
+        "RequiredCurrency": 800
+    },
+    "8": {
+        "ProgressStart": 860,
+        "Progress": 550,
+        "RequiredCurrency": 1250
+    }
+}
