@@ -196,7 +196,7 @@ class Box:
             gold *= 2
             stacks = 1
         
-        powerpoints = int(self.weighted_random(9, 25, 16))
+        powerpoints = int(self.weighted_random(7, 25, 14))
 
         pieces = self.split_in_integers(powerpoints, stacks)
         
