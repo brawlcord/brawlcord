@@ -27,7 +27,9 @@ emojis = {
     "tokendoubler": "<:token_doubler:646308736130088961>",
     "bsstar": "<:bs_icon_ready:646310961241653253>",
     "superhealth": "<:super_health:646723200436404285>",
-    "gem": "<:bsgem:645337311852232714>"
+    "gem": "<:bsgem:645337311852232714>",
+    "spblank": "<:sp_blank:647382632006680606>",
+    "spgrey": "<:sp_greyed_out:647382542109900804>"
 }
 
 sp_icons = {
@@ -234,10 +236,9 @@ class Brawler:
         embed.set_thumbnail(url=brawler_thumb.format(brawler_name.title()))
         if level:
             embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
-            embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
             embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
             embed.add_field(name="PERSONAL BEST", value=f"{rank_emojis['br'+str(rank)]} {pb}")
-        # embed.set_author(name=f"Power {level} - {pp}/{next_level_pp}", icon_url=image_urls['powerpoint'])
+            embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
         else:
             embed.add_field(name="POWER", value=f"{emojis['xp']} 1")
         return embed
@@ -791,7 +792,7 @@ class Jessie(Brawler):
     def buff_stats(self, level: int):
         stats = {
             "health": self.health,
-            "att_damage": self.attack["scrappy"],
+            "att_damage": self.attack["damage"],
             "scrappy_damage": self.ult["scrappy"]["damage"],
             "scrappy_health": self.ult["scrappy"]["health"]
         }
@@ -852,8 +853,8 @@ class Jessie(Brawler):
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + (f"\n{emojis['super']} Bear Damage: {stats['scrappy_damage']}"
-                    f"\n{emojis['superhealth']} Bear Health: {stats['scrappy_health']}")
+        super_str = super_desc + (f"\n{emojis['super']} Scrappy Damage: {stats['scrappy_damage']}"
+                    f"\n{emojis['superhealth']} Scrappy Health: {stats['scrappy_health']}")
                     
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
