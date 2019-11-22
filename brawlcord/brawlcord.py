@@ -156,8 +156,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         try:
             first_player, second_player, winner, loser = await g.initialize(ctx)
-        except:
-            return
+        except Exception as exc:
+            return await ctx.send(f"Error: {exc} with brawl. Please notify bot owner by using `-report` command!") 
         
         players = [first_player, second_player]
         
@@ -679,7 +679,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if is_starplayer:
             reward_xp += 10
 
-        tokens = await self.get_player_stat(user, 'tokens')
         tokens_in_bank = await self.get_player_stat(user, 'tokens_in_bank')
 
         if reward_tokens > tokens_in_bank:
@@ -695,17 +694,23 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         reward_trophies = self.trophies_to_reward_mapping(
             trophies, '3v3', position)
 
-        xp = await self.get_player_stat(user, 'xp')
-        xp += reward_xp
-
-        tokens += reward_tokens
         trophies += reward_trophies
+        
+        token_doubler = await self.get_player_stat(user, 'token_doubler')
+        
+        upd_td = token_doubler - reward_tokens
 
-        await self.update_player_stat(user, 'tokens', tokens)
+        if token_doubler > reward_tokens:
+            reward_tokens *= 2
+        else:
+            reward_tokens += token_doubler
+        
+        await self.update_player_stat(user, 'tokens', reward_tokens, add_self=True)
         await self.update_player_stat(user, 'tokens_in_bank', tokens_in_bank)
-        await self.update_player_stat(user, 'xp', xp)
+        await self.update_player_stat(user, 'xp', reward_xp, add_self=True)
         await self.update_player_stat(user, 'brawlers', trophies,
                                       substat=selected_brawler, sub_index='trophies')
+        await self.update_player_stat(user, 'token_doubler', upd_td)
         await self.handle_pb(user, selected_brawler)
 
         user_avatar = user.avatar_url
@@ -718,6 +723,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="Trophies", value=f"{emojis['trophies']} {reward_trophies}")
         embed.add_field(name="Tokens", value=f"{emojis['token']} {reward_tokens}")
         embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
+
+        if token_doubler:
+            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} {upd_td} left!")
 
         rank_up = await self.handle_rank_ups(user, selected_brawler)
         trophy_road_reward = await self.handle_trophy_road(user)
