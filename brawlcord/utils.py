@@ -691,7 +691,7 @@ class GameModes:
 
             second_gems = await self.user_and_spawn_moves(choice, second_can_super, 
                 first_gems=second_gems, reverse=True)
-            
+
             winner, loser = self.check_if_win(first_gems, second_gems)
             
             if winner == False:
@@ -757,7 +757,7 @@ class GameModes:
     async def set_embed(
         self,
         ctx, 
-        can_super, 
+        first_can_super, 
         first_gems = None, 
         second_gems = None, 
         reverse = False
@@ -775,7 +775,6 @@ class GameModes:
             second_spawn = self.second_spawn
             second_spawn_str = self.second_spawn_str
 
-            first_can_super = can_super
         else:
             second_player = self.first_player
             second_brawler = self.first_brawler
@@ -787,8 +786,6 @@ class GameModes:
             first_health = self.second_health
             first_spawn = self.second_spawn
             first_spawn_str = self.second_spawn_str
-
-            second_can_super = can_super
 
         desc = "Pick a move by typing the corresponding move number below."
         embed = discord.Embed(color=0xFFA232, title=f"Brawl against {second_player.name}")
@@ -918,7 +915,7 @@ class GameModes:
                 if not second_invincibility:
                     second_health -= damage
                 else:
-                    second_health -= damage * 0.5
+                    second_health -= (damage * 0.5)
                     second_invincibility = False
             else:
                 second_spawn -= first._attack(fp_brawler_level)
