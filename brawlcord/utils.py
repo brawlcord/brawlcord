@@ -629,9 +629,11 @@ class GameModes:
         except:
             self.second_spawn_str = ""
     
-        winner, loser = await self.gemgrab(ctx)
-
-        return self.first_player, self.second_player, winner, loser
+        try:
+            winner, loser = await self.gemgrab(ctx)
+            return self.first_player, self.second_player, winner, loser
+        except:
+            error = await self.gemgrab(ctx)
     
     async def gemgrab(self, ctx):
         """Function to play Gem Grab!"""
@@ -920,3 +922,11 @@ class GameModes:
             opp_brawler_level = 1
 
         return opp_brawler, opp_brawler_level, opp_brawler_sp
+
+    async def message_second_user(self, ctx):
+        if self.second_player != self.guild.me:
+                try:
+                    await self.second_player.send("Waiting for opponent to pick a move...")
+                except:
+                    return await ctx.send(f"{self.first_player.mention} {self.second_player.mention} Brawl cancelled."
+                    f" Reason: Unable to DM {self.second_player.name}. DMs are required to brawl!")

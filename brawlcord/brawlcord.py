@@ -149,7 +149,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         user = ctx.author
 
         g: GameModes = GameModes(ctx, user, opponent, self.config.user, self.BRAWLERS)
-        first_player, second_player, winner, loser = await g.initialize(ctx)
+        
+        try:
+            first_player, second_player, winner, loser = await g.initialize(ctx)
+        except:
+            return
         
         players = [first_player, second_player]
         
