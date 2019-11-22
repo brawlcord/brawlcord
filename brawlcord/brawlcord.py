@@ -341,8 +341,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         user = ctx.author
         
         owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
-
-        print(owned)
         
         embed = discord.Embed(color=0xFFA232, title="Brawlers")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
