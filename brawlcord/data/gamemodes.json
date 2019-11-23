@@ -1,0 +1,50 @@
+{
+    "Gem Grab": {
+        "desc": "Collect Gems that pop out of the Gem Mine in the middle of the map. Hold ten gems for the duration of a countdown to win the game!",
+        "event_type": "Team Event"
+    },
+    "Solo Showdown": {
+        "desc": "Go alone or with a partner to fight in the Showdown Arena! Whoever's still standing at the end wins.\\n\\nCollect Power Cubes to increase your Health and Attack damage. There are poison clouds closing in, so keep moving!",
+        "event_type": "Solo Event"
+    },
+    "Duo Showdown": {
+        "desc": "Go alone or with a partner to fight in the Showdown Arena! Whoever's still standing at the end wins.\\n\\nCollect Power Cubes to increase your Health and Attack damage. There are poison clouds closing in, so keep moving!",
+        "event_type": "Duo Event"
+    },
+    "Brawl Ball": {
+        "desc": "Take the ball to the opposing team's goal to score! Match ends when one team scores two goals, or at full time.",
+        "event_type": "Team Event"
+    },
+    "Robo Rumble": {
+        "desc": "Defend the safe from greedy Robo Bandits! The longer you defend, the better your reward!\\n\\nRobots will be coming for the safe from all sides, and in ever-increasing numbers. Do your best to defend as long as you can!",
+        "event_type": "Ticket Event"
+    },
+    "Big Game": {
+        "desc": "Five players attempt to defeat one player's BIG BRAWLER.\\n\\nAs the BIG BRAWLER, you'll have a massive power advantage, and a huge amount of health that drains slowly. Defy the hunters and stay in the game as long as you can!\\n\\nAs one of the five hunters, you'll need to work together with your team to take down the BIG BRAWLER as fast as possible!",
+        "event_type": "Ticket Event"
+    },
+    "Boss Fight": {
+        "desc": "Can you beat the formidable Boss Robot? Join forces with two teammates and take down this monster. You can get back in the fight as long as at least one of your teammates is standing. If everyone falls, it's game over!\\n\\nBoss Fights increase in Challenge, from Normal all the way to Insane, every time you manage to beat the Boss.",
+        "event_type": "Ticket Event"
+    },
+    "Heist": {
+        "desc": "Protect your team's valuable safe, while trying to break open the enemy team's safe at the same time! Whichever team busts open the enemy safe first wins.\\n\\nIf time runs out, the team that caused more damage to the enemy team's safe is declared winner.",
+        "event_type": "Team Event"
+    },
+    "Bounty": {
+        "desc": "Collect Stars for your team by defeating players on the enemy team. Every time you defeat an enemy, the bounty on your head increases by one Star, up to seven Stars. Don't give them to the enemy!\\n\\nThe team that has more Stars when the clock runs out wins.",
+        "event_type": "Team Event"
+    },
+    "Siege": {
+        "desc": "Siege and destroy the enemy's IKE assembly turret! Your team also has an IKE: feed it bolts, and it will assemble a powerful Siege Robot to fight for you. Bolts appear randomly around the middle of the map. Grab a bolt and hold it for a few seconds to feed it to your IKE.\\n\\nThere are up to three Sieges during each match. The team that has more bolts at the start of each Siege builds a Siege Robot. The more bolts, the stronger the robot.\\nWatch out, IKEs have powerful ballistic defenses - don't get too close to the enemy base without a Siege Robot to help you!",
+        "event_type": "Team Event"
+    },
+    "Takedown": {
+        "desc": "Deal more damage to the Boss than the other players. The more damage you deal, the higher you will rank in the match.\\n\\nCollect Power Cubes to increase your Health and Attack damage. Power Cubes will randomly spawn on the map during the battle!",
+        "event_type": "Solo Event"
+    },
+    "Lone Star": {
+        "desc": "Collect Stars by defeating enemy players. Every time you defeat an enemy, the bounty on your head increases by one Star, up to seven Stars.\\n\\nThe one with the most Stars when the clock runs out wins.",
+        "event_type": "Solo Event"
+    }
+}
