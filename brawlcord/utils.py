@@ -29,12 +29,11 @@ gamemode_emotes = {
     "Gem Grab": "<:gemgrab:645925169730289664>",
     "Duo Showdown": "<:duo_showdown:645925169805656076>",
     "Heist": "<:heist:645925170195988491>",
-    "raid": "<:raid:645925170397052929>",
     "Siege": "<:siege:645925170481201163>",
     "Solo Showdown": "<:solo_showdown:645925170539921428>",
     "Robo Rumble": "<:roborumble:645925170594316288>",
     "Lone Star": "<:lonestar:645925170610962452>",
-    "Takedown": "<:takedown:645925171034587146>",
+    "Takedown": "<:takedown:645925171034587146>"
 }
 
 spawn_text = {
@@ -129,8 +128,6 @@ class Box:
         
         p_high = (avg - avg_low) / (avg_high - avg_low)
 
-        # return p_high
-
         chance = random.random() 
 
         if chance < p_high:
@@ -145,8 +142,6 @@ class Box:
         breaks = ([-1] + sorted(
             random.sample(range(N - m * base + m - 1), m - 1)
         ) + [N - m * base + m - 1])
-        print(range((N - m) * base + m - 1))
-        print(breaks)
         buckets = [base] * m
         for idx in range(m):
             buckets[idx] += (breaks[idx + 1] - breaks[idx] - 1)
