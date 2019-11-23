@@ -138,37 +138,20 @@ class Box:
         else:
             return random.randint(lower, avg)
     
-    def split_in_integers(self, number, num_of_pieces):
-        """Split a number into number of integers."""
-        def accel_asc(n):
-            a = [0 for i in range(n + 1)]
-            k = 1
-            y = n - 1
-            while k != 0:
-                x = a[k - 1] + 1
-                k -= 1
-                while 2 * x <= y:
-                    a[k] = x
-                    y -= x
-                    k += 1
-                l = k + 1
-                while x <= y:
-                    a[k] = x
-                    a[l] = y
-                    yield a[:k + 2]
-                    x += 1
-                    y -= 1
-                a[k] = x + y
-                y = x + y - 1
-                yield a[:k + 1]
-        
-        pieces = list(accel_asc(number))
-        random.shuffle(pieces)
-        
-        for piece in pieces:
-            if len(piece) == num_of_pieces:
-                return piece
+    def split_in_integers(self, N, m, base=1):
+        """Returns a list after splitting a number N into m number of integers >= base."""
 
+        assert m * base <= N
+        breaks = ([-1] + sorted(
+            random.sample(range(N - m * base + m - 1), m - 1)
+        ) + [N - m * base + m - 1])
+        print(range((N - m) * base + m - 1))
+        print(breaks)
+        buckets = [base] * m
+        for idx in range(m):
+            buckets[idx] += (breaks[idx + 1] - breaks[idx] - 1)
+        return buckets
+        
     async def brawlbox(self, conf, user):
         """Function to handle brawl box openings."""
     
@@ -699,6 +682,8 @@ class GameModes:
             else:
                 break
          
+        await self.update_stats(winner, loser)
+        
         return winner, loser
 
     def check_if_win(self, first_gems, second_gems):
@@ -951,3 +936,15 @@ class GameModes:
 
         if first_gems is not None:
             return first_gems
+
+    async def update_stats(self, winner: discord.User, loser: discord.User, game_type="3v3"):
+        """Update wins/loss stats of both players."""
+        if not winner and not loser:
+            # in case of draws, winner and loser are "None"
+            return
+                
+        async with self.conf(winner).brawl_stats as brawl_stats:
+            brawl_stats[game_type][0] += 1
+
+        async with self.conf(loser).brawl_stats as brawl_stats:
+            brawl_stats[game_type][1] += 1
