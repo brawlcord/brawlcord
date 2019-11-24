@@ -738,6 +738,70 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await self.config.report_channel.set(channel.id)
         await ctx.send(f"Report channel set to {channel.mention}.")
     
+    @commands.group(name="leaderboard", aliases=['lb'], autohelp=False)
+    async def _leaderboard(self, ctx: Context):
+        """Display the leaderboard"""
+
+        if ctx.invoked_subcommand:
+            return
+        
+        all_users = await self.config.all_users()
+        users = []
+        for guild in self.bot.guilds:
+            for user_id in all_users:
+                try:
+                    user = guild.get_member(user_id)
+                    trophies = await self.get_trophies(user)
+                    users.append((user, trophies))
+                except:
+                    pass
+        
+        # remove duplicates 
+        users = list(set(users))
+        users = sorted(users, key=lambda k: k[1], reverse=True)
+        
+        embed_desc = ""
+        add_user = True
+        # return first 10 (or fewer) members
+        for i in range(10):
+            try:    
+                trophies = users[i][1]
+                user = users[i][0]
+                if user == ctx.author:
+                    embed_desc += f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}` {user.mention} - {user}**"
+                    add_user = False
+                else:
+                    embed_desc += f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}` {user.mention} - {user}"
+            except:
+                pass
+
+        embed = discord.Embed(color=0xFFA232, description=embed_desc)
+        embed.set_author(name="Brawlcord Leaderboard", icon_url=ctx.guild.me.avatar_url)
+        # embed.set_thumbnail(
+        #     url="https://www.rushstats.com/assets/league/Elite.png")
+        
+        # add rank of user
+        if add_user:
+            for idx, user in enumerate(users):
+                if ctx.author == user['name']:
+                    val_str = ""
+                    for j in range(-1, 4):
+                        if idx + j >= 0:
+                            try:
+                                trophies = users[idx+j][1]
+                                user = users[idx+j][0]
+                                if user == ctx.author:
+                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                        f"`{trophies:>5}` {user}**")
+                                else:
+                                    val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                        f"`{trophies:>5}` {user}")
+                            except:
+                                pass
+            embed.add_field(name=f"Your position", value=val_str)
+
+        await ctx.send(embed=embed)
+    
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
