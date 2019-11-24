@@ -30,6 +30,10 @@ log = logging.getLogger("red.brawlcord")
 __version__ = "1.0.0"
 __author__ = "Snowsee"
 
+default = {
+    "report_channel": None
+}
+
 default_user = {
     "xp": 0,
     "gold": 0,
@@ -104,6 +108,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         self.path = bundled_data_path(self)
 
+        self.config.register_global(**default)
         self.config.register_user(**default_user)
 
         self.BRAWLERS: dict = None
@@ -150,9 +155,16 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         with gamemodes_fp.open("r") as f:
             self.GAMEMODES = json.load(f)
 
+    @commands.command(name="brawlcord")
+    async def _brawlcord(self, ctx: Context):
+        """Show info about the bot"""
+        embed = discord.Embed(color=0xFFA232)
+        embed.add_field(name="Author")
+
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     async def _brawl(self, ctx: Context, opponent: discord.User = None):
+        """Brawl against other players"""
         guild = ctx.guild
         user = ctx.author
 
@@ -161,7 +173,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             first_player, second_player, winner, loser = await g.initialize(ctx)
         except Exception as exc:
-            return await ctx.send(f"Error: {exc} with brawl. Please notify bot owner by using `-report` command!") 
+            return await ctx.send(f"Error: '{exc}' with brawl. Please notify bot owner by using `-report` command!") 
         
         players = [first_player, second_player]
         
@@ -209,7 +221,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.guild_only()
     # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
     async def _tutorial(self, ctx: Context):
-        """Begin the tutorial."""
+        """Begin the tutorial"""
 
         author = ctx.author
         guild = ctx.guild
@@ -227,7 +239,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " Don't worry Brawler, it will only take a minute!")
 
         embed = discord.Embed(
-            colour=0x9D4D4F, title="Tutorial", description=desc)
+            colour=0xFFA232, title="Tutorial", description=desc)
         # embed.set_author(name=author, icon_url=author_avatar)
         embed.set_thumbnail(url=imgur_links["shelly_tut"])
 
@@ -252,7 +264,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
     @commands.command(name="stats", aliases=["s", "stat"])
     async def _stats(self, ctx: Context):
-        """Display your resource statistics!"""
+        """Display your resource statistics"""
 
         user = ctx.author
         
@@ -305,7 +317,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="profile", aliases=["p", "pro"])
     async def _profile(self, ctx: Context, user: discord.User = None):
-        """Display your or specific user's profile!"""
+        """Display your or specific user's profile"""
 
         if not user:
             user = ctx.author
@@ -339,7 +351,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="brawler", aliases=['binfo'])
     async def _brawler(self, ctx: Context, *, brawler_name: str):
-        """Get stats of a Brawler."""
+        """Show stats of a particular Brawler"""
 
         user = ctx.author
         
@@ -390,56 +402,44 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await ctx.send(embed=embed)
  
     @commands.command(name="brawlers")
-    async def all_brawlers(self, ctx: Context, user: discord.User):
-        """Show details of all the Brawlers."""
+    async def all_brawlers(self, ctx: Context, user: discord.User = None):
+        """Show details of all the Brawlers"""
         if not user:
             user = ctx.author
 
         owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
         
-        embed = discord.Embed(color=0xFFA232, title="Brawlers")
+        embed = discord.Embed(color=0xFFA232)
         embed.set_author(name=user.name, icon_url=user.avatar_url)
 
-        rarities = ["Trophy Road", "Rare", "Super Rare", "Epic", "Mythic", "Legendary"]
-        for rarity in rarities:
-            brawler_str = ""
-            for brawler in self.BRAWLERS:
-                if rarity != self.BRAWLERS[brawler]['rarity']:
-                    continue
-                brawler_str += f"\n{brawler_emojis[brawler]} **{brawler}**"
-                if brawler in owned:
-                    level = owned[brawler]["level"]
+        # below code is to sort brawlers by their trophies 
+        brawlers = {}
+        for brawler in owned:
+            brawlers[brawler] = owned[brawler]["trophies"]
+        
+        sorted_brawlers = dict(sorted(brawlers.items(), key=lambda x: x[1], reverse=True))
 
-                    brawler_str += f" [Power {level}]"
-                    if level >= 9:
-                        sp1 = owned[brawler]["sp1"]
-                        sp2 = owned[brawler]["sp2"]
+        for brawler in sorted_brawlers:
+            level = owned[brawler]["level"]
+            trophies = owned[brawler]["trophies"]
+            pb = owned[brawler]["pb"]
+            rank = owned[brawler]["rank"]
 
-                        if sp1:
-                            sp_name, sp_icon = self.get_sp_info(brawler, "sp1")
-                            brawler_str += f" {sp_icon}"
-                        else:
-                            brawler_str += f" {emojis['spgrey']}"
-                        if sp2:
-                            sp_name, sp_icon = self.get_sp_info(brawler, "sp1")
-                            brawler_str += f"{sp_icon}"
-                        else:
-                            brawler_str += f"{emojis['spgrey']}"
-                else:
-                    brawler_str += " [Not owned]"
-            if brawler_str:
-                embed.add_field(name=rarity, value=brawler_str)        
-
+            embed.add_field(name=f"{brawler_emojis[brawler]} {brawler}", 
+                value=(f"{emojis['spgrey']}`{trophies:>4}`{emojis['wintrophy']} |" 
+                    f" {rank_emojis['br'+str(rank)]}`{pb:>4}`{emojis['powerplay']}PB"),
+                inline=False)
+        
         await ctx.send(embed=embed)  
 
     @commands.group(name="rewards", autohelp=False)
     async def _rewards(self, ctx: Context):
-        """View and claim collected trophy road rewards!"""
+        """View and claim collected trophy road rewards"""
         pass            
     
     @_rewards.command(name="list")
     async def rewards_list(self, ctx: Context):
-        """View collected trophy road rewards."""
+        """View collected trophy road rewards"""
 
         user = ctx.author
         
@@ -463,7 +463,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
     @_rewards.command(name="claim")
     async def rewards_claim(self, ctx: Context, reward_number: str):
-        """Claim collected trophy road reward."""
+        """Claim collected trophy road reward"""
 
         user = ctx.author
         
@@ -478,6 +478,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
     @_rewards.command(name="claimall")
     async def rewards_claim_all(self, ctx: Context):
+        """Claim all collected trophy road rewards"""
         user = ctx.author
 
         tpstored = await self.get_player_stat(user, 'tpstored')
@@ -489,12 +490,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.group(name="select", autohelp=False)
     async def _select(self, ctx: Context):
-        """Select Brawler or game mode!"""
+        """Change selected Brawler or game mode"""
         pass
     
     @_select.command(name="brawler", aliases=['b'])
     async def select_brawler(self, ctx: Context, *, brawler_name: str):
-        """Select Brawler to brawl with!"""
+        """Change selected Brawler"""
 
         user_owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
 
@@ -522,7 +523,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
     @_select.command(name="gamemode", aliases=['gm'])
     async def select_gamemode(self, ctx: Context, *, gamemode: str):
-        """Select a game mode to brawl!"""
+        """Change selected game mode"""
 
         return await ctx.send("The game only supports **Gem Grab** at the moment." 
                 " More game modes will be added soon!")
@@ -568,7 +569,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="emojis")
     @checks.is_owner()
     async def get_all_emotes(self, ctx: Context):
-        """Get all emojis of the server."""
+        """Get all emojis of the server"""
 
         guild = ctx.guild
 
@@ -581,7 +582,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="box")
     async def open_brawl_box(self, ctx: Context):
-        """Open a Brawl Box!"""
+        """Open a Brawl Box"""
         user = ctx.author
         
         tokens = await self.get_player_stat(user, 'tokens')
@@ -595,8 +596,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             embed = await box.brawlbox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error {exc} while opening a Brawl Box. Please notify bot creator"
-                " using `-notify` command.")
+            return await ctx.send(f"Error '{exc}'' while opening a Brawl Box. Please notify bot creator"
+                " using `-report` command.")
 
         await ctx.send(embed=embed)
 
@@ -604,7 +605,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="bigbox", aliases=['big'])
     async def open_big_box(self, ctx: Context):
-        """Open a Big Box!"""
+        """Open a Big Box"""
         user = ctx.author
         
         startokens = await self.get_player_stat(user, 'startokens')
@@ -627,7 +628,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="upgrade", aliases=['up'])
     async def upgrade_brawlers(self, ctx: Context, *, brawler: str):
-        """Upgrade a Brawler."""
+        """Upgrade a Brawler"""
         user = ctx.author
         
         user_owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
@@ -683,7 +684,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="gamemodes", aliases=['gm', 'events'])
     async def _gamemodes(self, ctx: Context):
-        """Show details of all the Game Modes."""
+        """Show details of all the game modes"""
 
         user = ctx.author
         
@@ -705,6 +706,38 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(embed=embed)
 
+    @commands.command(name="report")
+    @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
+    async def _report(self, ctx: Context, *, msg: str):
+        """Send a report to the bot owner"""
+        channel_id = await self.config.report_channel()
+        
+        report_str = (f"`{datetime.utcnow().replace(microsecond=0)}` {ctx.author}"
+                    f" (`{ctx.author.id}`) reported from `{ctx.guild}`: **{msg}**")
+        
+        if channel_id:
+            for guild in self.bot.guilds:
+                try:
+                    channel = discord.utils.get(guild.text_channels, id=channel_id)
+                    break
+                except:
+                    pass
+            await channel.send(report_str)
+        else:
+            owner = self.bot.get_user(self.bot.owner_id)
+            await owner.send(report_str)
+        
+        await ctx.send("Thank you for sending a report. Your issue will be resolved as soon as possible.")
+    
+    @commands.command(name="rchannel")
+    @checks.is_owner()
+    async def report_channel(self, ctx: Context, channel: discord.TextChannel = None):
+        """Set reports channel"""
+        if not channel:
+            channel = ctx.channel()
+        await self.config.report_channel.set(channel.id)
+        await ctx.send(f"Report channel set to {channel.mention}.")
+    
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
