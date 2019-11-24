@@ -30,7 +30,9 @@ emojis = {
     "gem": "<:bsgem:645337311852232714>",
     "spblank": "<:sp_blank:647382632006680606>",
     "spgrey": "<:sp_greyed_out:647382542109900804>",
-    "startoken": "<:startoken:645694989417840670>"
+    "startoken": "<:startoken:645694989417840670>",
+    "wintrophy": "<:fwin_trophy:648085703795933194>",
+    "powerplay": "<:powerplay:645341012646035459>"
 }
 
 sp_icons = {
