@@ -1,6 +1,9 @@
+import asyncio
 import random
 
 import discord
+
+from math import ceil
 
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.commands.context import Context
@@ -51,6 +54,7 @@ brawlers_map = {
     "Bull": Bull,
     "Jessie": Jessie
 }
+
 
 class Box:
     """A class to represent Boxes."""
@@ -526,6 +530,9 @@ class GameModes:
         self.first_invincibility = False
         self.second_invincibility = False
 
+        self.first_respawning = -1
+        self.second_respawning = -1
+
         self.first_spawn = None
         self.second_spawn = None
 
@@ -612,37 +619,73 @@ class GameModes:
         try:
             winner, loser = await self.gemgrab(ctx)
             return self.first_player, self.second_player, winner, loser
-        except:
-            error = await self.gemgrab(ctx)
+        except asyncio.TimeoutError:
+            raise asyncio.TimeoutError
     
-    async def gemgrab(self, ctx):
+    async def gemgrab(self, ctx: Context):
         """Function to play Gem Grab!"""
                 
         first_gems = 0
         second_gems = 0
+
+        fd_gems = 0
+        sd_gems = 0
         
-        while True:
-            await self.send_waiting_message(ctx, self.first_player, self.second_player) 
-            
-            if self.first_attacks >= 6:
-                first_can_super = True
-                end = 4
+        for i in range(100):
+            # player one             
+            if self.first_respawning == i:
+                try:
+                    await self.first_player.send("You are respawning!")
+                except:
+                    pass
+                # await self.second_player.send("Opponent is respawning!")
             else:
-                first_can_super = False
-                end = 3
-            
-            if self.second_spawn:
-                end += 1
+                await self.send_waiting_message(ctx, self.first_player, self.second_player) 
+                
+                if self.second_respawning != i:
+                    second_respawning = False
+                    if self.first_attacks >= 6:
+                        first_can_super = True
+                        end = 4
+                    else:
+                        first_can_super = False
+                        end = 3
+                else:
+                    second_respawning = True
+                    end = 3
+                
+                if self.second_spawn:
+                    end += 1
 
-            if self.first_player != self.guild.me:
-                embed = await self.set_embed(ctx, first_can_super, first_gems, second_gems)
-                choice = await self.user_move(ctx, embed, end, self.first_player, self.second_player)
-            else:
-                # develop bot logic
-                choice = random.randint(1, end)
-            
-            first_gems = await self.user_and_spawn_moves(choice, first_can_super, first_gems=first_gems)
+                if self.first_player != self.guild.me:
+                    embed = await self.set_embed(ctx, first_can_super, first_gems=first_gems, 
+                        second_gems=second_gems, respawning=second_respawning)
+                    try:
+                        choice = await self.user_move(ctx, embed, end, self.first_player, self.second_player)
+                    except asyncio.TimeoutError:
+                        return self.second_player, self.first_player
+                else:
+                    # develop bot logic
+                    choice = random.randint(1, end)
+                
+                first_gems, sd_gems = await self.user_and_spawn_moves(choice, first_can_super, 
+                        first_gems=first_gems, dropped_gems=sd_gems, respawning=second_respawning)
 
+                if self.second_health <= 0:
+                    self.respawning(self.second_player, i)
+                    sd_gems = ceil(second_gems * 0.5)
+                    second_gems -= sd_gems
+                    try:
+                        await self.first_player.send("Opponent defeated! Respawning next round.")
+                    except:
+                        # bot user
+                        pass                    
+                    try:
+                        await self.second_player.send("You are defeated! Respawning next round.")
+                    except:
+                        # bot user
+                        pass
+            
             winner, loser = self.check_if_win(first_gems, second_gems)
 
             if winner == False:
@@ -650,25 +693,59 @@ class GameModes:
             else:
                 break
             
-            await self.send_waiting_message(ctx, self.second_player, self.first_player)
-            
-            if self.second_attacks >= 6:
-                second_can_super = True
-                end = 4
+            # player two  
+            if self.second_respawning == i:
+                try:
+                    await self.second_player.send("You are respawning!")
+                except:
+                    pass
             else:
-                second_can_super = False
-                end = 3
+                await self.send_waiting_message(ctx, self.second_player, self.first_player)
+                
+                if self.first_respawning != i:
+                    first_respawning = False
+                    if self.second_attacks >= 6:
+                        second_can_super = True
+                        end = 4
+                    else:
+                        second_can_super = False
+                        end = 3
+                else:
+                    first_respawning = True
+                    end = 3
 
-            if self.second_player != self.guild.me:
-                embed = await self.set_embed(ctx, second_can_super, first_gems=second_gems, 
-                    second_gems=first_gems, reverse=True)
-                choice = await self.user_move(ctx, embed, end, self.second_player, self.first_player)
-            else:
-                # develop bot logic
-                choice = random.randint(1, end)
+                if self.first_spawn:
+                    end += 1
 
-            second_gems = await self.user_and_spawn_moves(choice, second_can_super, 
-                first_gems=second_gems, reverse=True)
+                if self.second_player != self.guild.me:
+                    embed = await self.set_embed(ctx, second_can_super, first_gems=second_gems, 
+                        second_gems=first_gems, respawning=first_respawning, reverse=True)
+                    try:
+                        choice = await self.user_move(ctx, embed, end, self.second_player, self.first_player)
+                    except asyncio.TimeoutError:
+                        return self.first_player, self.second_player
+                else:
+                    # develop bot logic
+                    choice = random.randint(1, end)
+
+                second_gems, fd_gems = await self.user_and_spawn_moves(choice, second_can_super, 
+                    first_gems=second_gems, dropped_gems = fd_gems, respawning=first_respawning, 
+                    reverse=True)
+
+                if self.first_health <= 0:
+                    self.respawning(self.first_player, i)
+                    fd_gems = ceil(first_gems * 0.5)
+                    first_gems -= fd_gems
+                    try:
+                        await self.first_player.send("You are defeated! Respawning next round.")
+                    except:
+                        # bot user
+                        pass                    
+                    try:
+                        await self.second_player.send("Opponent defeated! Respawning next round.")
+                    except:
+                        # bot user
+                        pass
 
             winner, loser = self.check_if_win(first_gems, second_gems)
             
@@ -677,18 +754,25 @@ class GameModes:
             else:
                 break
          
+        # time up
+        if winner == False:
+            winner = None
+            loser = None
+            await self.first_player.send(f"Time's up. Match ended in a draw.")
+            await self.second_player.send(f"Time's up. Match ended in a draw.")
+        
         await self.update_stats(winner, loser)
         
         return winner, loser
 
     def check_if_win(self, first_gems, second_gems):
-        if (self.second_health <= 0 and self.first_health > 0) or (first_gems >= 10 and second_gems < 10):
+        if first_gems >= 10 and second_gems < 10:
             winner = self.first_player
             loser = self.second_player
-        elif (self.first_health <= 0 and self.second_health > 0) or (second_gems >= 10 and first_gems < 10):
+        elif second_gems >= 10 and first_gems < 10:
             winner = self.second_player
             loser = self.first_player
-        elif (self.first_health <= 0 and self.second_health <= 0) or (second_gems >= 10 and first_gems >= 10):
+        elif second_gems >= 10 and first_gems >= 10:
             winner = None
             loser = None
         else:
@@ -740,7 +824,8 @@ class GameModes:
         first_can_super, 
         first_gems = None, 
         second_gems = None, 
-        reverse = False
+        reverse = False,
+         respawning=False
     ):
         
         if not reverse:
@@ -795,26 +880,29 @@ class GameModes:
             embed.add_field(name=f"Opponent's {second_spawn_str}'s Health", 
                     value=f"{emojis['health']} {int(second_spawn)}", inline=False)
     
-                
-        moves = (f"1. Attack\n2. Collect gem\n3. Dodge next move"
-                    f"\n{'4. Use Super' if first_can_super else ''}").strip()
-        
-        if first_can_super and not second_spawn:
-            moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
-        elif first_can_super and second_spawn:
-            moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
-                f"\n4. Use Super\n5. Attack {second_spawn_str}")
-        elif not first_can_super and second_spawn:
-            moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
-                f"\n4. Attack enemy {second_spawn_str}")
+        if not respawning:
+            if first_can_super and not second_spawn:
+                moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
+            elif first_can_super and second_spawn:
+                moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
+                    f"\n4. Use Super\n5. Attack {second_spawn_str}")
+            elif not first_can_super and second_spawn:
+                moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
+                    f"\n4. Attack enemy {second_spawn_str}")
+            else:
+                moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
         else:
-            moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
+            if not second_spawn:
+                moves = "1. Collect gem\n2. Dodge next move\n3. Collect dropped gems"
+            else:
+                moves = ("1. Collect gem\n2. Dodge next move\n3. Collect dropped gems"
+                    f"\n4. Attack enemy {second_spawn_str}")
 
         embed.add_field(name="Available Moves", value=moves, inline=False)
 
         return embed
 
-    async def user_move(self, ctx, embed, end, first_player, second_player):
+    async def user_move(self, ctx: Context, embed, end, first_player, second_player):
         try:
             msg = await first_player.send(embed=embed)
 
@@ -822,15 +910,21 @@ class GameModes:
             start_adding_reactions(msg, react_emojis)
 
             pred = ReactionPredicate.with_emojis(react_emojis, msg)
-            await ctx.bot.wait_for("reaction_add", check=pred)
+            await ctx.bot.wait_for("reaction_add", check=pred, timeout=30)
 
             # pred.result is  the index of the letter in `emojis`
             return pred.result + 1
+        except asyncio.TimeoutError:
+            await ctx.send(f"{first_player.name} took too long to respond.")
+            raise asyncio.TimeoutError
         except:
             return await ctx.send(f"{first_player.mention} {second_player.mention}" 
-                    f"Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+                    f" Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+        
 
-    async def user_and_spawn_moves(self, choice, first_can_super, first_gems = None, reverse = False):             
+    async def user_and_spawn_moves(self, choice, first_can_super, first_gems = None, 
+        dropped_gems = 0, respawning = False, reverse = False):             
+        
         if not reverse:
             first = self.first
             first_player = self.first_player
@@ -871,45 +965,72 @@ class GameModes:
             first_invincibility = self.second_invincibility
             first_attacks = self.second_attacks
 
-            
-        if choice == 1:
-            damage = first._attack(fp_brawler_level)
-            if not second_invincibility:
-                second_health -= damage
-                first_attacks += 1
-            else:
-                second_invincibility = False
-        elif choice == 2:
-            if first_gems is not None:
-                first_gems += 1
-                if second_invincibility:
-                    second_invincibility = False
-        elif choice == 3:
-            first_invincibility = True
-            if second_invincibility:
-                second_invincibility = False
-        elif choice == 4:
-            if first_can_super:
-                damage, first_spawn = first._ult(fp_brawler_level)
-                first_attacks = 0
+        if not respawning:
+            if choice == 1:
+                damage = first._attack(fp_brawler_level)
                 if not second_invincibility:
                     second_health -= damage
+                    first_attacks += 1
                 else:
-                    second_health -= (damage * 0.5)
                     second_invincibility = False
-            else:
+            elif choice == 2:
+                if first_gems is not None:
+                    collected_gem = random.randint(0, 1)
+                    first_gems += collected_gem
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 3:
+                first_invincibility = True
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 4:
+                if first_can_super:
+                    damage, first_spawn = first._ult(fp_brawler_level)
+                    first_attacks = 0
+                    if not second_invincibility:
+                        second_health -= damage
+                    else:
+                        second_health -= (damage * 0.5)
+                        second_invincibility = False
+                else:
+                    second_spawn -= first._attack(fp_brawler_level)
+            elif choice == 5:
                 second_spawn -= first._attack(fp_brawler_level)
-        elif choice == 5:
-            second_spawn -= first._attack(fp_brawler_level)
+            
+            if first_spawn:
+                damage = first._spawn(fp_brawler_level)
+                if not second_invincibility:
+                    second_health -= damage
+                    first_attacks += 1
+                else:
+                    second_invincibility = False
         
-        if first_spawn:
-            damage = first._spawn(fp_brawler_level)
-            if not second_invincibility:
-                second_health -= damage
-                first_attacks += 1
-            else:
-                second_invincibility = False
-
+        else:
+            if choice == 1:
+                if first_gems is not None:
+                    first_gems += 1
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 2:
+                first_invincibility = True
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 3:
+                if first_gems is not None:
+                    collected = random.randint(0, dropped_gems)
+                    first_gems += collected
+                if second_invincibility:
+                    second_invincibility = False
+            elif choice == 4:
+                second_spawn -= first._attack(fp_brawler_level)
+            if first_spawn:
+                damage = first._spawn(fp_brawler_level)
+                if not second_invincibility:
+                    second_health -= damage
+                    first_attacks += 1
+                else:
+                    second_invincibility = False
+    
         if not reverse:
             self.first_health = first_health
             self.first_spawn = first_spawn
@@ -930,7 +1051,8 @@ class GameModes:
             self.first_attacks = second_attacks
 
         if first_gems is not None:
-            return first_gems
+            # dropped gems = 0 always 
+            return first_gems, 0
 
     async def update_stats(self, winner: discord.User, loser: discord.User, game_type="3v3"):
         """Update wins/loss stats of both players."""
@@ -943,3 +1065,11 @@ class GameModes:
 
         async with self.conf(loser).brawl_stats as brawl_stats:
             brawl_stats[game_type][1] += 1
+
+    def respawning(self, user: discord.User, current_round: int):
+        if user == self.first_player:
+            self.first_respawning = current_round + 1
+            self.first_health = self.sfh
+        elif user == self.second_player:
+            self.second_respawning = current_round + 1
+            self.second_health = self.ssh
