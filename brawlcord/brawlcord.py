@@ -22,6 +22,8 @@ from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler
 
 from .utils import Box, default_stats, gamemode_emotes, spawn_text, brawlers_map, GameModes
 
+from .brawlhelp import BrawlcordHelp, EMBED_COLOR
+
 
 BaseCog = getattr(commands, "Cog", object)
 
@@ -31,7 +33,8 @@ __version__ = "1.0.0"
 __author__ = "Snowsee"
 
 default = {
-    "report_channel": None
+    "report_channel": None,
+    "custom_help": True
 }
 
 default_user = {
@@ -94,7 +97,7 @@ reward_types = {
 
 
 class Brawlcord(BaseCog, name="Brawlcord"):
-    """Simulate Brawl Stars."""
+    """Play a simple version of Brawl Stars on Discord."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -155,11 +158,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         with gamemodes_fp.open("r") as f:
             self.GAMEMODES = json.load(f)
 
-    @commands.command(name="brawlcord")
-    async def _brawlcord(self, ctx: Context):
-        """Show info about the bot"""
-        embed = discord.Embed(color=0xFFA232)
-        embed.add_field(name="Author")
+        custom_help = await self.config.custom_help()
+        if custom_help:
+            self.bot._help_formatter = BrawlcordHelp(self.bot)
+
+    # @commands.command(name="brawlcord")
+    # async def _brawlcord(self, ctx: Context):
+    #     """Show info about the bot"""
+    #     embed = discord.Embed(color=EMBED_COLOR)
+    #     embed.add_field(name="Author")
 
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -239,7 +246,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " Don't worry Brawler, it will only take a minute!")
 
         embed = discord.Embed(
-            colour=0xFFA232, title="Tutorial", description=desc)
+            color=EMBED_COLOR, title="Tutorial", description=desc)
         # embed.set_author(name=author, icon_url=author_avatar)
         embed.set_thumbnail(url=imgur_links["shelly_tut"])
 
@@ -268,7 +275,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user = ctx.author
         
-        embed = discord.Embed(colour=0xFFA232)
+        embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=f"{user.name}'s Resource Stats", icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
@@ -322,7 +329,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if not user:
             user = ctx.author
         
-        embed = discord.Embed(colour=0xFFA232)
+        embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=f"{user.name}'s Profile", icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
@@ -409,7 +416,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
         
-        embed = discord.Embed(color=0xFFA232)
+        embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=user.name, icon_url=user.avatar_url)
 
         # below code is to sort brawlers by their trophies 
@@ -446,7 +453,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         tpstored = await self.get_player_stat(user, 'tpstored')
 
         desc = "Use `-rewards claim <reward_number>` or `-rewards claimall` to claim rewards!"
-        embed = discord.Embed(color=0xFFA232, title="Rewards List", description=desc)
+        embed = discord.Embed(color=EMBED_COLOR, title="Rewards List", description=desc)
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         
         embed_str = ""
@@ -580,7 +587,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
         print("}")
     
-    @commands.command(name="box")
+    @commands.command(name="brawlbox")
     async def open_brawl_box(self, ctx: Context):
         """Open a Brawl Box"""
         user = ctx.author
@@ -690,7 +697,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         user_owned = await self.get_player_stat(user, 'gamemodes', is_iter=True)
         
-        embed = discord.Embed(color=0xFFA232, title="Game Modes")
+        embed = discord.Embed(color=EMBED_COLOR, title="Game Modes")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         
         for event_type in ["Team Event", "Solo Event", "Duo Event", "Ticket Event"]:
@@ -768,14 +775,16 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 trophies = users[i][1]
                 user = users[i][0]
                 if user == ctx.author:
-                    embed_desc += f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}` {user.mention} - {user}**"
+                    embed_desc += (f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
+                        f" {user.mention} - {user}**")
                     add_user = False
                 else:
-                    embed_desc += f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}` {user.mention} - {user}"
+                    embed_desc += (f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
+                        f" {user.mention} - {user}")
             except:
                 pass
 
-        embed = discord.Embed(color=0xFFA232, description=embed_desc)
+        embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
         embed.set_author(name="Brawlcord Leaderboard", icon_url=ctx.guild.me.avatar_url)
         # embed.set_thumbnail(
         #     url="https://www.rushstats.com/assets/league/Elite.png")
@@ -792,15 +801,84 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                                 user = users[idx+j][0]
                                 if user == ctx.author:
                                     val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
-                                        f"`{trophies:>5}` {user}**")
+                                        f"`{trophies:>5}` {user.mention} - {user}**")
                                 else:
                                     val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
-                                        f"`{trophies:>5}` {user}")
+                                        f"`{trophies:>5}` {user.mention} - {user}")
                             except:
                                 pass
             embed.add_field(name=f"Your position", value=val_str)
 
         await ctx.send(embed=embed)
+    
+    @_leaderboard.command(name="pb")
+    async def pb_leaderboard(self, ctx: Context):
+        """Display the personal best leaderboard"""
+
+        all_users = await self.config.all_users()
+        users = []
+        for guild in self.bot.guilds:
+            for user_id in all_users:
+                try:
+                    user = guild.get_member(user_id)
+                    trophies = await self.get_trophies(user, pb=True)
+                    users.append((user, trophies))
+                except:
+                    pass
+        
+        # remove duplicates 
+        users = list(set(users))
+        users = sorted(users, key=lambda k: k[1], reverse=True)
+        
+        embed_desc = ""
+        add_user = True
+        # return first 10 (or fewer) members
+        for i in range(10):
+            try:    
+                trophies = users[i][1]
+                user = users[i][0]
+                if user == ctx.author:
+                    embed_desc += (f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
+                        f" {user.mention} - {user}**")
+                    add_user = False
+                else:
+                    embed_desc += (f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
+                        f" {user.mention} - {user}")
+            except:
+                pass
+
+        embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
+        embed.set_author(name="Brawlcord Leaderboard - Highest Trophies", 
+            icon_url=ctx.guild.me.avatar_url)
+        # embed.set_thumbnail(
+        #     url="https://www.rushstats.com/assets/league/Elite.png")
+        
+        # add rank of user
+        if add_user:
+            for idx, user in enumerate(users):
+                if ctx.author == user['name']:
+                    val_str = ""
+                    for j in range(-1, 4):
+                        if idx + j >= 0:
+                            try:
+                                trophies = users[idx+j][1]
+                                user = users[idx+j][0]
+                                if user == ctx.author:
+                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                        f"`{trophies:>5}` {user.mention} - {user}**")
+                                else:
+                                    val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                        f"`{trophies:>5}` {user.mention} - {user}")
+                            except:
+                                pass
+            embed.add_field(name=f"Your position", value=val_str)
+
+        await ctx.send(embed=embed)
+    
+    # @commands.command(name="help")
+    # async def _help(self, ctx: Context):
+    #     c = BrawlcordHelp()
+    #     await c.default_help(ctx, self.bot)
     
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
@@ -908,7 +986,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user_avatar = user.avatar_url
 
-        embed = discord.Embed(colour=0xFFA232, title="Rewards")
+        embed = discord.Embed(color=EMBED_COLOR, title="Rewards")
         embed.set_author(name=user.name, icon_url=user_avatar)
 
         reward_xp_str = f"{f'{reward_xp} (Star Player)' if is_starplayer else f'{reward_xp}'}"
@@ -1070,7 +1148,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await self.update_player_stat(user, 'tokens', rank_up_tokens, add_self=True)
             await self.update_player_stat(user, 'starpoints', rank_up_starpoints, add_self=True)
 
-            embed = discord.Embed(color=0xFFA232, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
+            embed = discord.Embed(color=EMBED_COLOR, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
             embed.set_author(name=user.name, icon_url=user.avatar_url)
             embed.add_field(name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
             embed.add_field(name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
@@ -1101,7 +1179,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 reward_name, reward_emoji, reward_str = self.tp_reward_strings(self.TROPHY_ROAD[tier], tier)
                 
                 desc = "Claim the reward by using the `-rewards` command!"
-                embed = discord.Embed(color=0xFFA232, title="Trophy Road Reward", description=desc)
+                embed = discord.Embed(color=EMBED_COLOR, title="Trophy Road Reward", description=desc)
                 embed.set_author(name=user.name, icon_url=user.avatar_url)
                 embed.add_field(name=reward_name, value=f"{reward_emoji} {reward_str}")
 
