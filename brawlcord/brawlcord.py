@@ -24,6 +24,7 @@ from .utils import Box, default_stats, gamemode_emotes, spawn_text, brawlers_map
 
 from .brawlhelp import BrawlcordHelp, EMBED_COLOR
 
+from .errors import UserRejected
 
 BaseCog = getattr(commands, "Cog", object)
 
@@ -193,8 +194,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         try:
             first_player, second_player, winner, loser = await g.initialize(ctx)
-        except Exception as exc:
-            return await ctx.send(f"Error: '{exc}' with brawl. Please notify bot owner by using `-report` command!") 
+        except asyncio.TimeoutError:
+            return
+        except UserRejected:
+            return
+        except discord.Forbidden:
+            return
+        # except Exception as exc:
+        #     return await ctx.send(f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command.") 
         
         players = [first_player, second_player]
         
