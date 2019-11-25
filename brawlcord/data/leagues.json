@@ -1,0 +1,152 @@
+{
+    "1": {
+        "League": "No League",
+        "ProgressStart": 0,
+        "Progress": 500
+    },
+    "2": {
+        "League": "Wood I",
+        "ProgressStart": 500,
+        "Progress": 150
+    },
+    "3": {
+        "League": "Wood II",
+        "ProgressStart": 650,
+        "Progress": 150
+    },
+    "4": {
+        "League": "Wood III",
+        "ProgressStart": 800,
+        "Progress": 200
+    },
+    "5": {
+        "League": "Bronze I",
+        "ProgressStart": 1000,
+        "Progress": 300
+    },
+    "6": {
+        "League": "Bronze II",
+        "ProgressStart": 1300,
+        "Progress": 300
+    },
+    "7": {
+        "League": "Bronze III",
+        "ProgressStart": 1600,
+        "Progress": 400
+    },
+    "8": {
+        "League": "Silver I",
+        "ProgressStart": 2000,
+        "Progress": 300
+    },
+    "9": {
+        "League": "Silver II",
+        "ProgressStart": 2300,
+        "Progress": 300
+    },
+    "10": {
+        "League": "Silver III",
+        "ProgressStart": 2600,
+        "Progress": 400
+    },
+    "11": {
+        "League": "Gold I",
+        "ProgressStart": 3000,
+        "Progress": 300
+    },
+    "12": {
+        "League": "Gold II",
+        "ProgressStart": 3300,
+        "Progress": 300
+    },
+    "13": {
+        "League": "Gold III",
+        "ProgressStart": 3600,
+        "Progress": 400
+    },
+    "14": {
+        "League": "Diamond I",
+        "ProgressStart": 4000,
+        "Progress": 500
+    },
+    "15": {
+        "League": "Diamond II",
+        "ProgressStart": 4500,
+        "Progress": 500
+    },
+    "16": {
+        "League": "Diamond III",
+        "ProgressStart": 5000,
+        "Progress": 500
+    },
+    "17": {
+        "League": "Diamond IV",
+        "ProgressStart": 5500,
+        "Progress": 500
+    },
+    "18": {
+        "League": "Crystal I",
+        "ProgressStart": 6000,
+        "Progress": 500
+    },
+    "19": {
+        "League": "Crystal II",
+        "ProgressStart": 6500,
+        "Progress": 500
+    },
+    "20": {
+        "League": "Crystal III",
+        "ProgressStart": 7000,
+        "Progress": 500
+    },
+    "21": {
+        "League": "Crystal IV",
+        "ProgressStart": 7500,
+        "Progress": 500
+    },
+    "22": {
+        "League": "Master I",
+        "ProgressStart": 8000,
+        "Progress": 500
+    },
+    "23": {
+        "League": "Master II",
+        "ProgressStart": 8500,
+        "Progress": 500
+    },
+    "24": {
+        "League": "Master III",
+        "ProgressStart": 9000,
+        "Progress": 500
+    },
+    "25": {
+        "League": "Master IV",
+        "ProgressStart": 9500,
+        "Progress": 500
+    },
+    "26": {
+        "League": "Star I",
+        "ProgressStart": 10000,
+        "Progress": 1000
+    },
+    "27": {
+        "League": "Star II",
+        "ProgressStart": 11000,
+        "Progress": 1000
+    },
+    "28": {
+        "League": "Star III",
+        "ProgressStart": 12000,
+        "Progress": 1000
+    },
+    "29": {
+        "League": "Star IV",
+        "ProgressStart": 13000,
+        "Progress": 1000
+    },
+    "30": {
+        "League": "Star V",
+        "ProgressStart": 14000,
+        "Progress": 0
+    }
+}

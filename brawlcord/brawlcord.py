@@ -93,6 +93,18 @@ reward_types = {
     14: ["Big Box", emojis["bigbox"]]
 }
 
+league_emojis = {
+    "No League": "<:l0:645337383537082418>",
+    "Wood": "<:l1:645337384782921801>",
+    "Bronze": "<:l2:645337384447377409>",
+    "Silver": "<:l3:645337384657092638>",
+    "Gold": "<:l4:645337384174616577>",
+    "Crystal": "<:l5:645337385500016640>",
+    "Diamond": "<:l6:645337387152441375>",
+    "Master": "<:l7:645337387089657889>",
+    "Star": "<:l8:645337387349835779>"
+}
+
 
 class Brawlcord(BaseCog, name="Brawlcord"):
     """Play a simple version of Brawl Stars on Discord."""
@@ -119,6 +131,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         self.TROPHY_ROAD: dict = None
         self.LEVEL_UPS: dict = None
         self.GAMEMODES: dict = None
+        self.LEAGUES: dict = None
 
         def error_callback(fut):
             try:
@@ -140,6 +153,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         trophy_road_fp = bundled_data_path(self) / "trophy_road.json"
         level_ups_fp = bundled_data_path(self) / "level_ups.json"
         gamemodes_fp = bundled_data_path(self) / "gamemodes.json"
+        leagues_fp = bundled_data_path(self) / "leagues.json"
 
         with brawlers_fp.open("r") as f:
             self.BRAWLERS = json.load(f)
@@ -155,6 +169,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             self.LEVEL_UPS = json.load(f)
         with gamemodes_fp.open("r") as f:
             self.GAMEMODES = json.load(f)
+        with leagues_fp.open("r") as f:
+            self.LEAGUES = json.load(f)
 
         custom_help = await self.config.custom_help()
         if custom_help:
@@ -331,7 +347,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.set_author(name=f"{user.name}'s Profile", icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
-        embed.add_field(name="Trophies", value=f"{emojis['trophies']} {trophies:,}")
+        league_number, league_emoji = await self.get_league_data(trophies)
+        if league_number:
+            extra = f"`{league_number}`"
+        else:
+            extra = ""
+        embed.add_field(name="Trophies", value=f"{league_emoji}{extra} {trophies:,}")
 
         pb = await self.get_trophies(user=user, pb=True)
         embed.add_field(name="Highest Trophies", value=f"{emojis['pb']} {pb:,}")
@@ -747,14 +768,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     async def _leaderboard(self, ctx: Context):
         """Display the leaderboard"""
 
-        if ctx.invoked_subcommand:
-            return
-        
-        title = "Brawlcord Leaderboard - Highest Trophies"
+        if not ctx.invoked_subcommand:
+            
+            title = "Brawlcord Leaderboard - Highest Trophies"
 
-        url = "https://www.starlist.pro/assets/icon/trophy.png"
-        
-        await self.leaderboard_handler(ctx, title, url, 5)
+            url = "https://www.starlist.pro/assets/icon/trophy.png"
+            
+            await self.leaderboard_handler(ctx, title, url, 5)
     
     @_leaderboard.command(name="pb")
     async def pb_leaderboard(self, ctx: Context):
@@ -1258,12 +1278,16 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             try:    
                 trophies = users[i][1]
                 user = users[i][0]
+                if brawler_name:
+                    emoji = await self.get_rank_emoji(user, brawler_name)
+                else:
+                    num, emoji = await self.get_league_data(trophies)
                 if user == ctx.author:
-                    embed_desc += (f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>{padding}}`"
+                    embed_desc += (f"\n**`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
                         f" {user.mention} - {user}**")
                     add_user = False
                 else:
-                    embed_desc += (f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>{padding}}`"
+                    embed_desc += (f"\n`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
                         f" {user.mention} - {user}")
             except:
                 pass
@@ -1275,18 +1299,22 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         # add rank of user
         if add_user:
             for idx, user in enumerate(users):
-                if ctx.author == user['name']:
+                if ctx.author == user:
                     val_str = ""
                     for j in range(-1, 4):
                         if idx + j >= 0:
                             try:
                                 trophies = users[idx+j][1]
                                 user = users[idx+j][0]
+                                if brawler_name:
+                                    emoji = await self.get_rank_emoji(user, brawler_name)
+                                else:
+                                    num, emoji = await self.get_league_data(trophies)
                                 if user == ctx.author:
-                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emoji}"
                                         f"`{trophies:>{padding}}` {user.mention} - {user}**")
                                 else:
-                                    val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                    val_str += (f"\n`{(idx+j+1):02d}.` {emoji}"
                                         f"`{trophies:>{padding}}` {user.mention} - {user}")
                             except:
                                 pass
@@ -1300,6 +1328,36 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 pass
 
         await ctx.send(embed=embed)
+    
+    async def get_league_data(self, trophies: int):
+        """Return league number and emoji."""
+        for league in self.LEAGUES:
+            name = self.LEAGUES[league]["League"]
+            start = self.LEAGUES[league]["ProgressStart"]
+            end = start + self.LEAGUES[league]["Progress"]
+
+            # end = 14000 for Star V
+            if end != 14000:
+                if trophies in range(start, end+1):
+                    break
+            else:
+                if trophies >= 14000:
+                    name = "Star V"
+        
+        if name == "No League":
+            return False, league_emojis[name]
+        
+        league_name = name.split(" ")[0]
+        league_number = name.split(" ")[1]
+
+        return league_number, league_emojis[league_name]
+    
+    async def get_rank_emoji(self, user: discord.User, brawler: str):
+
+        data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+        rank = self.get_rank(data['pb'])
+
+        return rank_emojis['br'+str(rank)]
     
     @commands.command(name="tokens")
     @checks.is_owner()
@@ -1340,6 +1398,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="solo")
         await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="3v3")
         await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="duo")
+      
+    @commands.command(name="trophyset")
+    @checks.is_owner()
+    async def set_trophies(self, ctx: Context, value: int, user: discord.User = None):
+        if not user:
+            user = ctx.author
+        
+        await self.update_player_stat(user, 'brawlers', value, substat="Shelly", sub_index="trophies")
     
     def cog_unload(self):
         self.bank_update_task.cancel()
