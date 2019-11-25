@@ -18,7 +18,7 @@ from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
-from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler
+from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler, brawler_thumb
 
 from .utils import Box, default_stats, gamemode_emotes, spawn_text, brawlers_map, GameModes
 
@@ -76,8 +76,6 @@ default_user = {
         "mega": 0
     }
 }
-
-# tutorial_trophies = 10
 
 imgur_links = {
     "shelly_tut": "https://i.imgur.com/QfKYzso.png"
@@ -752,134 +750,37 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if ctx.invoked_subcommand:
             return
         
-        all_users = await self.config.all_users()
-        users = []
-        for guild in self.bot.guilds:
-            for user_id in all_users:
-                try:
-                    user = guild.get_member(user_id)
-                    trophies = await self.get_trophies(user)
-                    users.append((user, trophies))
-                except:
-                    pass
-        
-        # remove duplicates 
-        users = list(set(users))
-        users = sorted(users, key=lambda k: k[1], reverse=True)
-        
-        embed_desc = ""
-        add_user = True
-        # return first 10 (or fewer) members
-        for i in range(10):
-            try:    
-                trophies = users[i][1]
-                user = users[i][0]
-                if user == ctx.author:
-                    embed_desc += (f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
-                        f" {user.mention} - {user}**")
-                    add_user = False
-                else:
-                    embed_desc += (f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
-                        f" {user.mention} - {user}")
-            except:
-                pass
+        title = "Brawlcord Leaderboard - Highest Trophies"
 
-        embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
-        embed.set_author(name="Brawlcord Leaderboard", icon_url=ctx.guild.me.avatar_url)
-        # embed.set_thumbnail(
-        #     url="https://www.rushstats.com/assets/league/Elite.png")
+        url = "https://www.starlist.pro/assets/icon/trophy.png"
         
-        # add rank of user
-        if add_user:
-            for idx, user in enumerate(users):
-                if ctx.author == user['name']:
-                    val_str = ""
-                    for j in range(-1, 4):
-                        if idx + j >= 0:
-                            try:
-                                trophies = users[idx+j][1]
-                                user = users[idx+j][0]
-                                if user == ctx.author:
-                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
-                                        f"`{trophies:>5}` {user.mention} - {user}**")
-                                else:
-                                    val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
-                                        f"`{trophies:>5}` {user.mention} - {user}")
-                            except:
-                                pass
-            embed.add_field(name=f"Your position", value=val_str)
-
-        await ctx.send(embed=embed)
+        await self.leaderboard_handler(ctx, title, url, 5)
     
     @_leaderboard.command(name="pb")
     async def pb_leaderboard(self, ctx: Context):
         """Display the personal best leaderboard"""
 
-        all_users = await self.config.all_users()
-        users = []
-        for guild in self.bot.guilds:
-            for user_id in all_users:
-                try:
-                    user = guild.get_member(user_id)
-                    trophies = await self.get_trophies(user, pb=True)
-                    users.append((user, trophies))
-                except:
-                    pass
-        
-        # remove duplicates 
-        users = list(set(users))
-        users = sorted(users, key=lambda k: k[1], reverse=True)
-        
-        embed_desc = ""
-        add_user = True
-        # return first 10 (or fewer) members
-        for i in range(10):
-            try:    
-                trophies = users[i][1]
-                user = users[i][0]
-                if user == ctx.author:
-                    embed_desc += (f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
-                        f" {user.mention} - {user}**")
-                    add_user = False
-                else:
-                    embed_desc += (f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>5}`"
-                        f" {user.mention} - {user}")
-            except:
-                pass
+        title = "Brawlcord Leaderboard - Highest Trophies"
 
-        embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
-        embed.set_author(name="Brawlcord Leaderboard - Highest Trophies", 
-            icon_url=ctx.guild.me.avatar_url)
-        # embed.set_thumbnail(
-        #     url="https://www.rushstats.com/assets/league/Elite.png")
+        url = "https://www.starlist.pro/assets/icon/trophy.png"
         
-        # add rank of user
-        if add_user:
-            for idx, user in enumerate(users):
-                if ctx.author == user['name']:
-                    val_str = ""
-                    for j in range(-1, 4):
-                        if idx + j >= 0:
-                            try:
-                                trophies = users[idx+j][1]
-                                user = users[idx+j][0]
-                                if user == ctx.author:
-                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
-                                        f"`{trophies:>5}` {user.mention} - {user}**")
-                                else:
-                                    val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
-                                        f"`{trophies:>5}` {user.mention} - {user}")
-                            except:
-                                pass
-            embed.add_field(name=f"Your position", value=val_str)
+        await self.leaderboard_handler(ctx, title, url, 5, pb=True)
+    
+    @_leaderboard.command(name="brawler")
+    async def brawler_leaderboard(self, ctx: Context, *, brawler_name: str):
+        """Display the specified brawler's leaderboard"""
 
-        await ctx.send(embed=embed)
-    
-    # @commands.command(name="help")
-    # async def _help(self, ctx: Context):
-    #     c = BrawlcordHelp()
-    #     await c.default_help(ctx, self.bot)
-    
+        brawler_name = self.parse_brawler_name(brawler_name)
+        
+        if not brawler_name:
+            return await ctx.send(f"{brawler_name} does not exist!")
+        
+        title = f"Brawlcord {brawler_name} Leaderboard"
+        
+        url=f"{brawler_thumb.format(brawler_name)}"
+
+        await self.leaderboard_handler(ctx, title, url, 4, brawler_name=brawler_name)
+  
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -1318,6 +1219,87 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 sp_icon = sp_icons[brawler][sp_ind]
         
         return sp_name, sp_icon
+    
+    def parse_brawler_name(self, brawler_name: str):
+        """Parse brawler name."""
+        # for users who input 'el_primo'
+        brawler_name = brawler_name.replace("_", " ")
+
+        brawler_name = brawler_name.title()
+
+        if brawler_name not in self.BRAWLERS:
+            return False
+        
+        return brawler_name
+    
+    async def leaderboard_handler(self, ctx: Context, title: str, thumb_url: str, padding: int, 
+            pb=False, brawler_name=None):
+        """Handler for all leaderboards."""
+
+        all_users = await self.config.all_users()
+        users = []
+        for guild in self.bot.guilds:
+            for user_id in all_users:
+                try:
+                    user = guild.get_member(user_id)
+                    trophies = await self.get_trophies(user, pb=pb, brawler_name=brawler_name)
+                    users.append((user, trophies))
+                except:
+                    pass
+        
+        # remove duplicates 
+        users = list(set(users))
+        users = sorted(users, key=lambda k: k[1], reverse=True)
+        
+        embed_desc = ""
+        add_user = True
+        # return first 10 (or fewer) members
+        for i in range(10):
+            try:    
+                trophies = users[i][1]
+                user = users[i][0]
+                if user == ctx.author:
+                    embed_desc += (f"\n**`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>{padding}}`"
+                        f" {user.mention} - {user}**")
+                    add_user = False
+                else:
+                    embed_desc += (f"\n`{(i+1):02d}.`{emojis['wintrophy']}`{trophies:>{padding}}`"
+                        f" {user.mention} - {user}")
+            except:
+                pass
+
+        embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
+        embed.set_author(name=title, icon_url=ctx.guild.me.avatar_url)
+        embed.set_thumbnail(url=thumb_url)
+        
+        # add rank of user
+        if add_user:
+            for idx, user in enumerate(users):
+                if ctx.author == user['name']:
+                    val_str = ""
+                    for j in range(-1, 4):
+                        if idx + j >= 0:
+                            try:
+                                trophies = users[idx+j][1]
+                                user = users[idx+j][0]
+                                if user == ctx.author:
+                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                        f"`{trophies:>{padding}}` {user.mention} - {user}**")
+                                else:
+                                    val_str += (f"\n`{(idx+j+1):02d}.` {emojis['wintrophy']}"
+                                        f"`{trophies:>{padding}}` {user.mention} - {user}")
+                            except:
+                                pass
+            try:
+                embed.add_field(name="Your position", value=val_str)
+            except UnboundLocalError:
+                # happens only in case of brawlers 
+                embed.add_field(name=f"\u200bNo one owns {brawler_name}!", 
+                    value="Open boxes to unlock new Brawlers.")
+            except:
+                pass
+
+        await ctx.send(embed=embed)
     
     @commands.command(name="tokens")
     @checks.is_owner()
