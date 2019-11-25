@@ -1,17 +1,15 @@
 import asyncio
 import random
-
-import discord
-
 from math import ceil
 
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
+import discord
 from redbot.core.commands.context import Context
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
 from .brawlers import *
 from .brawlhelp import EMBED_COLOR
-
+from .errors import UserRejected
 
 default_stats = {
     "trophies": 0,
@@ -566,20 +564,29 @@ class GameModes:
             try:
                 msg = await opponent.send(f"{user.mention} has challenged you for a brawl."
                     f" Game Mode: **{gamemode}**. Accept?")
-                start_adding_reactions(msg, ReactionPredicate.YES_OR_NO_EMOJIS)
-
-                pred = ReactionPredicate.yes_or_no(msg, opponent)
-                await ctx.bot.wait_for("reaction_add", check=pred)
-                if pred.result is True:
-                    # User responded with tick
-                    pass
-                else:
-                    # User responded with cross
-                    return await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled."
-                    f" Reason: {opponent.name} rejected the challenge.")    
-            except:
-                return await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled." 
+            except discord.Forbidden:
+                await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled." 
                     f" Reason: Unable to DM {opponent.name}. DMs are required to brawl!")
+                raise
+                
+            start_adding_reactions(msg, ReactionPredicate.YES_OR_NO_EMOJIS)
+        
+            pred = ReactionPredicate.yes_or_no(msg, opponent)
+            try:
+                await ctx.bot.wait_for("reaction_add", check=pred, timeout=30)
+            except asyncio.TimeoutError:
+                await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled."
+                    f" Reason: {opponent.name} did not accept the challenge.")    
+                raise asyncio.TimeoutError
+            
+            if pred.result is True:
+                # User responded with tick
+                pass
+            else:
+                # User responded with cross
+                await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled."
+                f" Reason: {opponent.name} rejected the challenge.")  
+                raise UserRejected
           
         first_move_chance = random.randint(1, 2)
         if first_move_chance == 1:
@@ -620,8 +627,8 @@ class GameModes:
         try:
             winner, loser = await self.gemgrab(ctx)
             return self.first_player, self.second_player, winner, loser
-        except asyncio.TimeoutError:
-            raise asyncio.TimeoutError
+        except Exception:
+            raise
     
     async def gemgrab(self, ctx: Context):
         """Function to play Gem Grab!"""
@@ -641,8 +648,11 @@ class GameModes:
                     pass
                 # await self.second_player.send("Opponent is respawning!")
             else:
-                await self.send_waiting_message(ctx, self.first_player, self.second_player) 
-                
+                try:
+                    await self.send_waiting_message(ctx, self.first_player, self.second_player) 
+                except discord.Forbidden:
+                    raise
+
                 if self.second_respawning != i:
                     second_respawning = False
                     if self.first_attacks >= 6:
@@ -664,7 +674,8 @@ class GameModes:
                     try:
                         choice = await self.user_move(ctx, embed, end, self.first_player, self.second_player)
                     except asyncio.TimeoutError:
-                        return self.second_player, self.first_player
+                        winner, loser =  self.second_player, self.first_player
+                        break
                 else:
                     # develop bot logic
                     choice = random.randint(1, end)
@@ -701,8 +712,11 @@ class GameModes:
                 except:
                     pass
             else:
-                await self.send_waiting_message(ctx, self.second_player, self.first_player)
-                
+                try:
+                    await self.send_waiting_message(ctx, self.second_player, self.first_player)
+                except discord.Forbidden:
+                    raise
+
                 if self.first_respawning != i:
                     first_respawning = False
                     if self.second_attacks >= 6:
@@ -724,7 +738,8 @@ class GameModes:
                     try:
                         choice = await self.user_move(ctx, embed, end, self.second_player, self.first_player)
                     except asyncio.TimeoutError:
-                        return self.first_player, self.second_player
+                        winner, loser = self.first_player, self.second_player
+                        break
                 else:
                     # develop bot logic
                     choice = random.randint(1, end)
@@ -815,9 +830,10 @@ class GameModes:
         if second_player != self.guild.me:
                 try:
                     await second_player.send("Waiting for opponent to pick a move...")
-                except:
-                    return await ctx.send(f"{first_player.mention} {second_player.mention} Brawl cancelled."
-                    f" Reason: Unable to DM {second_player.name}. DMs are required to brawl!")
+                except discord.Forbidden:
+                    await ctx.send(f"{first_player.mention} {second_player.mention} Brawl cancelled."
+                        f" Reason: Unable to DM {second_player.name}. DMs are required to brawl!")
+                    raise
 
     async def set_embed(
         self,
@@ -918,11 +934,11 @@ class GameModes:
         except asyncio.TimeoutError:
             await ctx.send(f"{first_player.name} took too long to respond.")
             raise asyncio.TimeoutError
-        except:
-            return await ctx.send(f"{first_player.mention} {second_player.mention}" 
-                    f" Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+        except discord.Forbidden:
+            await ctx.send(f"{first_player.mention} {second_player.mention}" 
+                f" Reason: Unable to DM {first_player.name}. DMs are required to brawl!")
+            raise
         
-
     async def user_and_spawn_moves(self, choice, first_can_super, first_gems = None, 
         dropped_gems = 0, respawning = False, reverse = False):             
         
@@ -1061,10 +1077,10 @@ class GameModes:
             # in case of draws, winner and loser are "None"
             return
                 
-        async with self.conf(winner).brawl_stats as brawl_stats:
+        async with self.conf(winner).brawl_stats() as brawl_stats:
             brawl_stats[game_type][0] += 1
 
-        async with self.conf(loser).brawl_stats as brawl_stats:
+        async with self.conf(loser).brawl_stats() as brawl_stats:
             brawl_stats[game_type][1] += 1
 
     def respawning(self, user: discord.User, current_round: int):
