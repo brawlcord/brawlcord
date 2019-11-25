@@ -9,7 +9,8 @@ from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactio
 from redbot.core.commands.context import Context
 from redbot.core.utils.predicates import ReactionPredicate
 
-from brawlcord.brawlers import *
+from .brawlers import *
+from .brawlhelp import EMBED_COLOR
 
 
 default_stats = {
@@ -201,7 +202,7 @@ class Box:
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
-        embed = discord.Embed(color=0xFFA232, title=f"{emojis['brawlbox']} Brawl Box")
+        embed = discord.Embed(color=EMBED_COLOR, title=f"{emojis['brawlbox']} Brawl Box")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         if pp_str:
@@ -301,7 +302,7 @@ class Box:
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
-        embed = discord.Embed(color=0xFFA232, title=f"Big Box {emojis['bigbox']}")
+        embed = discord.Embed(color=EMBED_COLOR, title=f"Big Box {emojis['bigbox']}")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         if pp_str:
@@ -400,7 +401,7 @@ class Box:
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
         
-        embed = discord.Embed(color=0xFFA232, title=f"Mega Box {emojis['megabox']}")
+        embed = discord.Embed(color=EMBED_COLOR, title=f"Mega Box {emojis['megabox']}")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         if pp_str:
@@ -853,7 +854,7 @@ class GameModes:
             first_spawn_str = self.second_spawn_str
 
         desc = "Pick a move by typing the corresponding move number below."
-        embed = discord.Embed(color=0xFFA232, title=f"Brawl against {second_player.name}")
+        embed = discord.Embed(color=EMBED_COLOR, title=f"Brawl against {second_player.name}")
         embed.set_author(name=first_player.name, icon_url=first_player.avatar_url)
 
         embed.add_field(name="Your Brawler", 
