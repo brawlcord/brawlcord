@@ -3,6 +3,7 @@ import random
 
 import discord
 
+
 # credits to Star List, developed by Henry
 brawler_url = "https://www.starlist.pro/brawlers/detail/{}"
 brawler_thumb = "https://www.starlist.pro/assets/brawler/{}.png"
@@ -128,6 +129,7 @@ rank_emojis = {
 }
 
 # average_range = 7.23
+
 
 class Brawler:
     """Class to represent a Brawler."""
