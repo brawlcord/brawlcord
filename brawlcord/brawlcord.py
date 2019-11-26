@@ -20,9 +20,10 @@ from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
 from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler, brawler_thumb
 
-from .utils import Box, default_stats, gamemode_emotes, spawn_text, brawlers_map, GameModes
+from .utils import (Box, default_stats, gamemode_emotes, 
+    spawn_text, brawlers_map, GameModes, level_emotes)
 
-from .brawlhelp import BrawlcordHelp, EMBED_COLOR, GITHUB_LINK
+from .brawlhelp import BrawlcordHelp, EMBED_COLOR, GITHUB_LINK, REDDIT_LINK, INVITE_URL
 
 from .errors import UserRejected
 
@@ -108,6 +109,8 @@ league_emojis = {
 
 old_invite = None
 
+BRAWLSTARS = "https://blog.brawlstars.com/index.html"
+
 
 class Brawlcord(BaseCog, name="Brawlcord"):
     """Play a simple version of Brawl Stars on Discord."""
@@ -179,6 +182,35 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
 
+    @commands.command(name="brawlcord")
+    async def _brawlcord(self, ctx: Context):
+        """Shows info about Brawlcord"""
+        
+        info = (
+            "Brawlcord is a Discord bot which allows users to simulate a simple version of"
+            f" [Brawl Stars]({BRAWLSTARS}), a mobile game developed by Supercell. \n\nBrawlcord has"
+            " features such as interactive 1v1 Brawls, diverse Brawlers and leaderboards! You can"
+            " suggest more features in the community server (link below)!"
+        )
+
+        embed = discord.Embed(color=EMBED_COLOR)
+
+        # embed.set_author(name=ctx.me.name, icon_url=ctx.me.avatar_url)
+
+        embed.add_field(name="About Brawlcord", value=info, inline=False)
+
+        embed.add_field(name="Creator", value=f"[Snowsee]({REDDIT_LINK})")
+
+        embed.add_field(name="Version", value=__version__)
+
+        embed.add_field(name="Invite Link", value=f"[Click here]({INVITE_URL})")
+
+        embed.add_field(name="Feedback", value=f"You can give feedback to" 
+            f" improve Brawlcord in the [Brawlcord community server]({GITHUB_LINK}).", 
+            inline=False)
+
+        await ctx.send(embed=embed)
+    
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     async def _brawl(self, ctx: Context, opponent: discord.User = None):
@@ -472,7 +504,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
         
         embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        embed.set_author(name=f"{user.name}'s Brawlers")
 
         # below code is to sort brawlers by their trophies 
         brawlers = {}
@@ -488,15 +520,20 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             rank = owned[brawler]["rank"]
             sp1 = owned[brawler]["sp1"]
             sp2 = owned[brawler]["sp2"]
+            skin = owned[brawler]["selected_skin"]
 
-            if sp1 or sp2:
-                emote = emojis['spblank']
+            if skin == "Default":
+                skin = ""
             else:
-                emote = emojis['spgrey']
+                skin += " "
 
-            embed.add_field(name=f"{brawler_emojis[brawler]} {brawler}", 
-                value=(f"`{level}`{emote}`{trophies:>4}`{emojis['wintrophy']} |" 
-                        f" {rank_emojis['br'+str(rank)]}`{pb:>4}`{emojis['powerplay']}PB"), 
+            emote = level_emotes["level_"+str(level)]
+            
+            value = (f"{emote}`{trophies:>4}` {rank_emojis['br'+str(rank)]} |" 
+                        f" {emojis['powerplay']}`{pb:>4}`")
+            
+            embed.add_field(name=f"{brawler_emojis[brawler]} {skin.upper()}{brawler.upper()}", 
+                value=value, 
                 inline=False)
         
         await ctx.send(embed=embed)  
@@ -590,6 +627,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await self.update_player_stat(ctx.author, 'selected',  random.choice(sps), substat='starpower')
         else:
             await self.update_player_stat(ctx.author, 'selected',  None, substat='starpower')
+
+        skin = brawler_data["selected_skin"]
+        await self.update_player_stat(ctx.author, 'selected',  skin, substat='skin')
         
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
@@ -661,6 +701,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return await ctx.send(f"You don't own {skin} {selected_brawler} skin or it does not exist.")
         
         await self.update_player_stat(user, 'selected', skin, substat='brawler_skin')
+        await self.update_player_stat(user, 'brawlers', skin, 
+            substat=selected_brawler, sub_index='selected_skin')
         
         await ctx.send(f"Changed selected skin from {cur_skin} to {skin}.")
     
@@ -707,7 +749,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
         print("}")
     
-    @commands.command(name="brawlbox")
+    @commands.command(name="brawlbox", aliases=['box'])
     async def _brawl_box(self, ctx: Context):
         """Open a Brawl Box using Tokens"""
         user = ctx.author
@@ -952,7 +994,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " `-report` command.")
 
         embed = discord.Embed(color=0xFFA232)
-        embed.set_author(name=ctx.me, icon_url=ctx.me.avatar_url)
+        embed.set_author(name=f"Invite {ctx.me.name}", icon_url=ctx.me.avatar_url)
         embed.add_field(name="__**Invite Link:**__", value=value)
 
         await ctx.send(embed=embed)
@@ -1436,7 +1478,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         users = list(set(users))
         users = sorted(users, key=lambda k: k[1], reverse=True)
         
-        embed_desc = ""
+        embed_desc = "Check out who is at the top of the Brawlcord leaderboard!\n\u200b"
         add_user = True
         # return first 10 (or fewer) members
         for i in range(10):
@@ -1448,12 +1490,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 else:
                     num, emoji = await self.get_league_data(trophies)
                 if user == ctx.author:
-                    embed_desc += (f"\n**`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
-                        f" {user.mention} - {user}**")
+                    embed_desc += (f"**\n`{(i+1):02d}.` {user} {emoji}{trophies:>{padding},}**")
                     add_user = False
                 else:
-                    embed_desc += (f"\n`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
-                        f" {user.mention} - {user}")
+                    # embed_desc += (f"\n`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
+                    #     f" {user.mention} - {user}")
+                    embed_desc += (f"\n`{(i+1):02d}.` {user} {emoji}{trophies:>{padding},}")
             except:
                 pass
 
@@ -1466,23 +1508,18 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             for idx, user in enumerate(users):
                 if ctx.author == user:
                     val_str = ""
-                    for j in range(-1, 4):
-                        if idx + j >= 0:
-                            try:
-                                trophies = users[idx+j][1]
-                                user = users[idx+j][0]
-                                if brawler_name:
-                                    emoji = await self.get_rank_emoji(user, brawler_name)
-                                else:
-                                    num, emoji = await self.get_league_data(trophies)
-                                if user == ctx.author:
-                                    val_str += (f"\n**`{(idx+j+1):02d}.` {emoji}"
-                                        f"`{trophies:>{padding}}` {user.mention} - {user}**")
-                                else:
-                                    val_str += (f"\n`{(idx+j+1):02d}.` {emoji}"
-                                        f"`{trophies:>{padding}}` {user.mention} - {user}")
-                            except:
-                                pass
+                    try:
+                        trophies = users[idx][1]
+                        user = users[idx][0]
+                        if brawler_name:
+                            emoji = await self.get_rank_emoji(user, brawler_name)
+                        else:
+                            num, emoji = await self.get_league_data(trophies)
+                        # val_str += (f"\n**`{(idx+1):02d}.` {emoji}"
+                        #     f"`{trophies:>{padding}}` {user.mention} - {user}**")
+                        val_str += (f"**\n`{(idx+1):02d}.` {user} {emoji}{trophies:>{padding},}**")
+                    except:
+                        pass
             try:
                 embed.add_field(name="Your position", value=val_str)
             except UnboundLocalError:
@@ -1560,9 +1597,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if not user:
             user = ctx.author
         
-        await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="solo")
-        await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="3v3")
-        await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="duo")
+        # # await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="solo")
+        # # await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="3v3")
+        # await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="duo")
+        await self.update_player_stat(user, 'brawlers', "Default", substat="Nita", sub_index="selected_skin")
+        await self.update_player_stat(user, 'brawlers', "Default", substat="Bull", sub_index="selected_skin")
+        await self.update_player_stat(user, 'brawlers', "Default", substat="Jessie", sub_index="selected_skin")
+        await self.update_player_stat(user, 'brawlers', "Default", substat="Colt", sub_index="selected_skin")
       
     @commands.command(name="trophyset")
     @checks.is_owner()
