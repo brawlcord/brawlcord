@@ -20,6 +20,7 @@ default_stats = {
     "powerpoints": 0,
     "total_powerpoints": 0,
     "skins": ["Default"],
+    "selected_skin": "Default",
     "sp1": False,
     "sp2": False
 }
@@ -53,6 +54,19 @@ brawlers_map = {
     "Colt": Colt,
     "Bull": Bull,
     "Jessie": Jessie
+}
+
+level_emotes = {
+    "level_10": "<:level_10:648932852699758593>",
+    "level_7": "<:level_7:648932853266251789>",
+    "level_8": "<:level_8:648932853584887819>",
+    "level_5": "<:level_5:648932853714780184>",
+    "level_9": "<:level_9:648932853861711872>",
+    "level_3": "<:level_3:648932854188736512>",
+    "level_4": "<:level_4:648932854230941712>",
+    "level_1": "<:level_1:648932855296032799>",
+    "level_2": "<:level_2:648932855375855627>",
+    "level_6": "<:level_6:648932855413735424>",
 }
 
 
@@ -203,7 +217,7 @@ class Box:
         await conf.gold.set(old_gold + gold)
 
         embed = discord.Embed(color=EMBED_COLOR, title=f"{emojis['brawlbox']} Brawl Box")
-        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        # embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         
         if stacks > 0:
@@ -305,7 +319,7 @@ class Box:
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
-        embed = discord.Embed(color=EMBED_COLOR, title=f"Big Box {emojis['bigbox']}")
+        embed = discord.Embed(color=EMBED_COLOR, title=f" {emojis['bigbox']} Big Box")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         
@@ -407,7 +421,7 @@ class Box:
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
         
-        embed = discord.Embed(color=EMBED_COLOR, title=f"Mega Box {emojis['megabox']}")
+        embed = discord.Embed(color=EMBED_COLOR, title=f" {emojis['megabox']} Mega Box")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
         
