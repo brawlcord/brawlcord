@@ -22,7 +22,7 @@ from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler, br
 
 from .utils import Box, default_stats, gamemode_emotes, spawn_text, brawlers_map, GameModes
 
-from .brawlhelp import BrawlcordHelp, EMBED_COLOR
+from .brawlhelp import BrawlcordHelp, EMBED_COLOR, GITHUB_LINK
 
 from .errors import UserRejected
 
@@ -184,6 +184,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         guild = ctx.guild
         user = ctx.author
 
+        if opponent:
+            if opponent == user:
+                return await ctx.send("You can't brawl against yourself.")
+            elif opponent == guild.me:
+                pass
+            # don't allow brawl if opponent is another bot
+            elif opponent.bot:
+                return await ctx.send(f"{opponent} is a bot account. Can't brawl against bots.")
+        
         g: GameModes = GameModes(ctx, user, opponent, self.config.user, self.BRAWLERS)
         
         try:
@@ -265,23 +274,41 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         # embed.set_author(name=author, icon_url=author_avatar)
         embed.set_thumbnail(url=imgur_links["shelly_tut"])
 
-        useful_commands = (
-            "`-brawl [teammate-1] [teammate-2]` Sends you on a Brawl!"
-            "\n`-tutorial` Begins the tutorial!"
+        # useful_commands = (
+        #     "`-brawl [teammate-1] [teammate-2]` Sends you on a Brawl!"
+        #     "\n`-tutorial` Begins the tutorial!"
+        # )
+
+        # embed.add_field(name="Useful Commands", value=useful_commands)
+
+        tut_str = (
+            f"This {emojis['gem']} is a Gem. The gems are mine! Gotta collect all of them."
+            "\n\nTo collect the gems, you need to take part in the dreaded Brawls! Use `-brawl`"
+            " command after this tutorial ends to brawl!"
+            f"\n\nYou win a brawl by collecting 10 Gems before your opponent. But be cautious!"
+            " If the opponent manages to defeat you, you will lose about half of your gems!"
+            " Remember, you can dodge the opponent's attacks. You can also attack the opponent!"
+            "\n\nYou earn Tokens by participating in a brawl. Use the Tokens to open Brawl Boxes."
+            "  They contain goodies that allow you increase your strength and even other Brawlers!"
+            "\n\nYou can keep a track of your resources by using the `-stats` command. View your"
+            " brawl statistics by using the `-profile` command."
+            "\nYou can always check all the commands again by using the `-help` command."
+            f"\n\nThat's all, {author.mention}. You're a natural Brawler! Now, let's go get 'em!"
         )
 
-        embed.add_field(name="Useful Commands", value=useful_commands)
+        embed.add_field(name="__Introduction:__", value=tut_str, inline=False)
+
+        embed.add_field(name="\u200b\n__Feedback:__", value=f"Give feedback to improve the"
+                f" bot in the [Brawlcord community server]({GITHUB_LINK}).", inline=False)
 
         await ctx.send(embed=embed)
 
         await self.update_player_stat(author, 'tutorial_finished', True)
+
         dt_now = datetime.utcnow()
-
         epoch = datetime(1970, 1, 1)
-
         # get timestamp in UTC 
         timestamp = (dt_now - epoch).total_seconds()
-
         await self.update_player_stat(author, 'bank_update_ts', timestamp)
 
     @commands.command(name="stats", aliases=["s", "stat"])
@@ -451,10 +478,17 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             trophies = owned[brawler]["trophies"]
             pb = owned[brawler]["pb"]
             rank = owned[brawler]["rank"]
+            sp1 = owned[brawler]["sp1"]
+            sp2 = owned[brawler]["sp2"]
+
+            if sp1 or sp2:
+                emote = emojis['spblank']
+            else:
+                emote = emojis['spgrey']
 
             embed.add_field(name=f"{brawler_emojis[brawler]} {brawler}", 
-                value=(f"{emojis['spgrey']}`{trophies:>4}`{emojis['wintrophy']} |" 
-                    f" {rank_emojis['br'+str(rank)]}`{pb:>4}`{emojis['powerplay']}PB"),
+                value=(f"`{level}`{emote}`{trophies:>4}`{emojis['wintrophy']} |" 
+                        f" {rank_emojis['br'+str(rank)]}`{pb:>4}`{emojis['powerplay']}PB"), 
                 inline=False)
         
         await ctx.send(embed=embed)  
