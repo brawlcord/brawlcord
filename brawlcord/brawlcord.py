@@ -177,12 +177,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
 
-    # @commands.command(name="brawlcord")
-    # async def _brawlcord(self, ctx: Context):
-    #     """Show info about the bot"""
-    #     embed = discord.Embed(color=EMBED_COLOR)
-    #     embed.add_field(name="Author")
-
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     async def _brawl(self, ctx: Context, opponent: discord.User = None):
@@ -200,8 +194,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return
         except discord.Forbidden:
             return
-        # except Exception as exc:
-        #     return await ctx.send(f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command.") 
+        except Exception as exc:
+            return await ctx.send(f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command.") 
         
         players = [first_player, second_player]
         
@@ -490,7 +484,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
             embed_str += f"\n**{tier}.** {reward_name}: {reward_emoji} {reward_str}"
         
-        embed.add_field(name="Rewards", value=embed_str.strip())
+        if embed_str:
+            embed.add_field(name="Rewards", value=embed_str.strip())
+        else:
+            embed.add_field(name="Rewards", value="You don't have any rewards.")
 
         await ctx.send(embed=embed)
 
@@ -516,14 +513,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         tpstored = await self.get_player_stat(user, 'tpstored')
 
-        for tier in tpstored:
-            await self.handle_reward_claims(ctx, tier)
+        for tier in range(1, 20):
+            await self.handle_reward_claims(ctx, str(tier))
         
         await ctx.send("Rewards successfully claimed.")    
     
     @commands.group(name="select", autohelp=False)
     async def _select(self, ctx: Context):
-        """Change selected Brawler or game mode"""
+        """Change selected Brawler, skin, star power or game mode"""
         pass
     
     @_select.command(name="brawler", aliases=['b'])
@@ -599,6 +596,61 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(f"Changed selected game mode to {gamemode}!")
     
+    @_select.command(name="skin", aliases=['s'])
+    async def select_skin(self, ctx: Context, *, skin: str):
+        """Change selected skin"""
+
+        user = ctx.author
+
+        skin = skin.title()
+        cur_skin = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler_skin')
+
+        selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
+
+        if skin == cur_skin:
+            return await ctx.send(f"{skin} {selected_brawler} skin is already selected.")
+
+        selected_data = await self.get_player_stat(user, 'brawlers', is_iter=True, 
+            substat=selected_brawler)
+        
+        skins = selected_data['skins']
+
+        if skin not in skins:
+            return await ctx.send(f"You don't own {skin} {selected_brawler} skin or it does not exist.")
+        
+        await self.update_player_stat(user, 'selected', skin, substat='brawler_skin')
+        
+        await ctx.send(f"Changed selected skin from {cur_skin} to {skin}.")
+    
+    @_select.command(name="starpower", aliases=['sp'])
+    async def select_sp(self, ctx: Context, *, starpower_number: int):
+        """Change selected skin"""
+
+        user = ctx.author
+
+        selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
+
+        sp = "sp" + str(starpower_number)
+        sp_name, emote = self.get_sp_info(selected_brawler, sp)
+
+        cur_sp = await self.get_player_stat(user, 'selected', is_iter=True, substat='starpower')
+
+        if sp_name == cur_sp:
+            return await ctx.send(f"{sp_name} is already selected.")
+
+        selected_data = await self.get_player_stat(user, 'brawlers', is_iter=True, 
+            substat=selected_brawler)
+        
+        if starpower_number in [1, 2]:
+            if selected_data[sp]:
+                await self.update_player_stat(user, 'selected', sp_name, substat='starpower')
+            else:
+                return await ctx.send(f"You don't own SP #{starpower_number} of {selected_brawler}.")
+        else:
+            return await ctx.send("You can only choose SP #1 or SP #2.")
+        
+        await ctx.send(f"Changed selected Star Power to {sp_name}.")
+    
     @commands.command(name="emojis")
     @checks.is_owner()
     async def get_all_emotes(self, ctx: Context):
@@ -614,8 +666,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         print("}")
     
     @commands.command(name="brawlbox")
-    async def open_brawl_box(self, ctx: Context):
-        """Open a Brawl Box"""
+    async def _brawl_box(self, ctx: Context):
+        """Open a Brawl Box using Tokens"""
         user = ctx.author
         
         tokens = await self.get_player_stat(user, 'tokens')
@@ -629,7 +681,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             embed = await box.brawlbox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error '{exc}'' while opening a Brawl Box. Please notify bot creator"
+            return await ctx.send(f"Error \"{exc}\" while opening a Brawl Box. Please notify bot creator"
                 " using `-report` command.")
 
         await ctx.send(embed=embed)
@@ -637,8 +689,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await self.update_player_stat(user, 'tokens', -100, add_self=True)
     
     @commands.command(name="bigbox", aliases=['big'])
-    async def open_big_box(self, ctx: Context):
-        """Open a Big Box"""
+    async def _big_box(self, ctx: Context):
+        """Open a Big Box using Star Tokens"""
         user = ctx.author
         
         startokens = await self.get_player_stat(user, 'startokens')
@@ -653,7 +705,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             embed = await box.bigbox(self.config.user(user), user)
         except Exception as exc:
             return await ctx.send(f"Error {exc} while opening a Big Box. Please notify bot creator"
-                " using `-notify` command.")
+                " using `-report` command.")
 
         await ctx.send(embed=embed)
 
@@ -808,6 +860,28 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await self.leaderboard_handler(ctx, title, url, 4, brawler_name=brawler_name)
   
+    @commands.group(name="claim", autohelp=False)
+    async def _claim(self, ctx: Context):
+        """Claim daily/weekly/monthly rewards"""
+        pass
+    
+    @_claim.command(name="daily")
+    @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
+    async def claim_daily(self, ctx: Context):
+        """Claim daily reward"""
+        user = ctx.author
+
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        box = Box(self.BRAWLERS, brawler_data)
+        try:
+            embed = await box.brawlbox(self.config.user(user), user)
+        except Exception as exc:
+            return await ctx.send(f"Error \"{exc}\" while opening a Brawl Box. Please notify bot creator"
+                " using `-report` command.")
+
+        await ctx.send(embed=embed)
+
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -898,6 +972,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         token_doubler = await self.get_player_stat(user, 'token_doubler')
         
         upd_td = token_doubler - reward_tokens
+        if upd_td < 0:
+            upd_td = 0
 
         if token_doubler > reward_tokens:
             reward_tokens *= 2
@@ -1159,8 +1235,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             
             brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
 
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
-
             box = Box(self.BRAWLERS, brawler_data)
             embed = await box.brawlbox(self.config.user(user), user)
 
@@ -1175,6 +1249,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         elif reward_type == 10:
             async with self.config.user(user).boxes() as boxes:
                 boxes['mega'] += reward_count
+
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+            box = Box(self.BRAWLERS, brawler_data)
+            embed = await box.brawlbox(self.config.user(user), user)
+
+            await ctx.send(embed=embed)
         
         elif reward_type == 12:
             await ctx.send("Enter the name of Brawler to add powerpoints to:")
@@ -1188,15 +1269,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
             user_brawlers = await self.get_player_stat(user, 'brawlers', is_iter=True)
             
-            if brawler not in brawlers:
+            if brawler not in user_brawlers:
                 return await ctx.send(f"You do not own {brawler}!")
             
             total_powerpoints = (await self.get_player_stat(user, 'brawlers', 
                         is_iter=True, substat=brawler))['total_powerpoints']
 
-            if total_powerpoints == Box.max_pp:
+            if total_powerpoints == 1410:
                 return await ctx.send(f"{brawler} can not recieve more powerpoints.")
-            elif total_powerpoints + reward_count > Box.max_pp:
+            elif total_powerpoints + reward_count > 1410:
                 return await ctx.send(f"{brawler} can not recieve {reward_count} powerpoints.")
             else:
                 pass
@@ -1205,6 +1286,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                                                 sub_index='powerpoints', add_self=True)
             await self.update_player_stat(user, 'brawlers', reward_count, substat=brawler, 
                                                 sub_index='total_powerpoints', add_self=True)
+
+            await ctx.send(f"Added {reward_count} powerpoints to {brawler}.")
         
         elif reward_type == 13:
             async with self.config.user(user).gamemodes() as gamemodes:
@@ -1233,15 +1316,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             async with self.config.user(user).boxes() as boxes:
                 boxes['big'] += reward_count
 
-        async with self.config.user(user).tpstored() as tpstored:
-            tpstored.remove(reward_number)
+        # async with self.config.user(user).tpstored() as tpstored:
+        #     tpstored.remove(reward_number)
         
     def get_sp_info(self, brawler_name: str, sp: str):
         """Return name and emoji of the Star Power."""
 
         for brawler in self.BRAWLERS:
             if brawler == brawler_name:
-                sp_name = self.BRAWLERS[brawler][sp]
+                sp_name = self.BRAWLERS[brawler][sp]['name']
                 sp_ind = int(sp[2]) - 1
                 sp_icon = sp_icons[brawler][sp_ind]
         
