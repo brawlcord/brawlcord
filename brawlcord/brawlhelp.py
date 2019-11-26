@@ -55,7 +55,7 @@ class BrawlcordHelp(RedHelpFormatter):
             general_cmd = ["brawl", "profile", "brawler", "brawlers", 
                 "stats", "gamemodes", "upgrade"]
             rewards_str = ""
-            rewards_cmd = ["brawlbox", "bigbox", "rewards"]
+            rewards_cmd = ["brawlbox", "bigbox", "claim", "rewards"]
             misc_str = ""
             misc_cmd = ["leaderboard", "tutorial", "select"]
             red_cmd = ["info", "licenseinfo"]
