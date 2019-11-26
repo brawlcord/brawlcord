@@ -912,20 +912,20 @@ class GameModes:
     
         if not respawning:
             if first_can_super and not second_spawn:
-                moves = "1. Attack\n2. Collect gem\n3. Dodge next move\n4. Use Super"
+                moves = "1. Attack\n2. Try to collect gem\n3. Dodge next move\n4. Use Super"
             elif first_can_super and second_spawn:
-                moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
+                moves = ("1. Attack\n2. Try to collect gem\n3. Dodge next move"
                     f"\n4. Use Super\n5. Attack {second_spawn_str}")
             elif not first_can_super and second_spawn:
-                moves = ("1. Attack\n2. Collect gem\n3. Dodge next move"
+                moves = ("1. Attack\n2. Try to collect gem\n3. Dodge next move"
                     f"\n4. Attack enemy {second_spawn_str}")
             else:
-                moves = f"1. Attack\n2. Collect gem\n3. Dodge next move"
+                moves = f"1. Attack\n2. Try to collect gem\n3. Dodge next move"
         else:
             if not second_spawn:
-                moves = "1. Collect gem\n2. Dodge next move\n3. Collect dropped gems"
+                moves = "1. Try to collect gem\n2. Dodge next move\n3. Try to collect dropped gems"
             else:
-                moves = ("1. Collect gem\n2. Dodge next move\n3. Collect dropped gems"
+                moves = ("1. Try to collect gem\n2. Dodge next move\n3. Try to collect dropped gems"
                     f"\n4. Attack enemy {second_spawn_str}")
 
         embed.add_field(name="Available Moves", value=moves, inline=False)
