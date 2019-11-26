@@ -38,7 +38,7 @@ class BrawlcordHelp(RedHelpFormatter):
         """Format the default help message"""
 
         description = "Play a simple version of Brawl Stars on Discord."
-        tagline = self.get_default_tagline(ctx)
+        tagline = f"Type {ctx.clean_prefix}help <command> for more info on a command. "
         
         coms = await self.get_bot_help_mapping(ctx)
         if not coms:
@@ -50,6 +50,7 @@ class BrawlcordHelp(RedHelpFormatter):
             
             # do not change 
             emb["embed"]["title"] = "***Red V3***"
+            emb["footer"]["text"] = tagline
 
             general_str = ""
             general_cmd = ["brawl", "profile", "brawler", "brawlers", 
@@ -57,7 +58,7 @@ class BrawlcordHelp(RedHelpFormatter):
             rewards_str = ""
             rewards_cmd = ["brawlbox", "bigbox", "claim", "rewards"]
             misc_str = ""
-            misc_cmd = ["leaderboard", "tutorial", "select"]
+            misc_cmd = ["leaderboard", "tutorial", "select", "brawlcord"]
             red_cmd = ["info", "licenseinfo"]
 
             # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
@@ -95,27 +96,10 @@ class BrawlcordHelp(RedHelpFormatter):
                             continue
                 
                 for i, page in enumerate(pagify(cog_text, page_length=1000, shorten_by=0)):
-                    if title == "Red":
-                        page += "\n\u200b"
                     title = f"__{title}:__" if i < 1 else f"__{title}:__ (continued)"
                     field = EmbedField(title, page, False)
                     emb["fields"].append(field)
                 
-            name = "Developed By"
-            value = f"[Snowsy]({REDDIT_LINK})"
-            field = EmbedField(name, value, True)
-            emb["fields"].append(field)
-            
-            name = "Invite Link"
-            value = f"[{DISCORD_EMOTE} {ctx.clean_prefix}invite]({INVITE_URL})"
-            field = EmbedField(name, value, True)
-            emb["fields"].append(field)
-            
-            name = "Brawlcord Community"
-            value = f"{SELF_EMOTE} [Resources]({GITHUB_LINK})"
-            field = EmbedField(name, value, True)
-            emb["fields"].append(field)
-            
             await self.make_and_send_embeds(ctx, emb)       
     
         else:
