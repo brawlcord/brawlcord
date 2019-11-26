@@ -106,6 +106,8 @@ league_emojis = {
     "Star": "<:l8:645337387349835779>"
 }
 
+old_invite = None
+
 
 class Brawlcord(BaseCog, name="Brawlcord"):
     """Play a simple version of Brawl Stars on Discord."""
@@ -250,7 +252,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
-    # @commands.cooldown(rate=1, per=60, type=commands.BucketType.guild)
     async def _tutorial(self, ctx: Context):
         """Begin the tutorial"""
 
@@ -260,11 +261,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         finished_tutorial = await self.get_player_stat(author, "tutorial_finished")
 
-        # if finished_tutorial:
-        #     return await ctx.send(
-        #         "You have already finished the tutorial."
-        #         " It's time to test your skills in the real world!"
-        #     )
+        if finished_tutorial:
+            return await ctx.send(
+                "You have already finished the tutorial."
+                " It's time to test your skills in the real world!"
+            )
 
         desc = ("Hi, I'm Shelly! I'll introduce you to the world of Brawlcord."
                 " Don't worry Brawler, it will only take a minute!")
@@ -274,15 +275,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         # embed.set_author(name=author, icon_url=author_avatar)
         embed.set_thumbnail(url=imgur_links["shelly_tut"])
 
-        # useful_commands = (
-        #     "`-brawl [teammate-1] [teammate-2]` Sends you on a Brawl!"
-        #     "\n`-tutorial` Begins the tutorial!"
-        # )
-
-        # embed.add_field(name="Useful Commands", value=useful_commands)
-
         tut_str = (
-            f"This {emojis['gem']} is a Gem. The gems are mine! Gotta collect all of them."
+            f"This {emojis['gem']} is a Gem. All the gems are mine! Gotta collect them all!"
             "\n\nTo collect the gems, you need to take part in the dreaded Brawls! Use `-brawl`"
             " command after this tutorial ends to brawl!"
             f"\n\nYou win a brawl by collecting 10 Gems before your opponent. But be cautious!"
@@ -290,17 +284,31 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             " Remember, you can dodge the opponent's attacks. You can also attack the opponent!"
             "\n\nYou earn Tokens by participating in a brawl. Use the Tokens to open Brawl Boxes."
             "  They contain goodies that allow you increase your strength and even other Brawlers!"
-            "\n\nYou can keep a track of your resources by using the `-stats` command. View your"
+            "\n\nYou can keep a track of your resources by using the `-stats`. You can view your"
             " brawl statistics by using the `-profile` command."
-            "\nYou can always check all the commands again by using the `-help` command."
+            "\n\nYou can always check all the commands again by using the `-help` command."
             f"\n\nThat's all, {author.mention}. You're a natural Brawler! Now, let's go get 'em!"
         )
 
         embed.add_field(name="__Introduction:__", value=tut_str, inline=False)
+        
+        # star shelly skin for beta users
+        # remove this code for global release 
+        async with self.config.user(author).brawlers() as brawlers:
+            if "Star" not in brawlers["Shelly"]["skins"]:
+                brawlers["Shelly"]["skins"].append("Star")
 
-        embed.add_field(name="\u200b\n__Feedback:__", value=f"Give feedback to improve the"
-                f" bot in the [Brawlcord community server]({GITHUB_LINK}).", inline=False)
+        embed.add_field(name="\u200b\n__Exclusive Skin!__", 
+            value=("Being one of the first users of Brawlcord, you get an exclusive" 
+                " **Star Shelly** skin!"), inline=False)
+        
+        embed.add_field(name="\u200b\n__Feedback:__", value=f"You can give feedback to" 
+            f" improve Brawlcord in the [Brawlcord community server]({GITHUB_LINK}).", 
+            inline=False)
 
+        embed.set_footer(text="Thanks for using Brawlcord.", 
+            icon_url=ctx.me.avatar_url)
+        
         await ctx.send(embed=embed)
 
         await self.update_player_stat(author, 'tutorial_finished', True)
@@ -863,7 +871,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         if not ctx.invoked_subcommand:
             
-            title = "Brawlcord Leaderboard - Highest Trophies"
+            title = "Brawlcord Leaderboard"
 
             url = "https://www.starlist.pro/assets/icon/trophy.png"
             
@@ -916,6 +924,39 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(embed=embed)
 
+    @commands.command(name="invite")
+    async def _invite(self, ctx: Context):
+        """Shows Brawlcord's invite url."""
+        # embed_links=True, 
+        # attach_files=True, 
+        # external_emojis=True,
+        # add_reactions=True
+        perms = discord.Permissions(311360)
+
+        try:
+            data = await self.bot.application_info()
+            invite_url = discord.utils.oauth_url(data.id, permissions=perms)
+            value = (
+                f"Add Brawlcord to your server by **[clicking here]({invite_url})**."
+                "\n\nNote: By using the link above, Brawlcord will be able to"
+                " embed links,"
+                " attach files,"
+                " add reactions,"
+                " and use external emojis"
+                " wherever allowed. You can remove the permissions manually, but that may break"
+                " the bot."
+            )
+        except Exception as exc:
+            invite_url = None
+            value = (f"Error \"{exc}\" while generating invite link. Notify bot owner using the" 
+                " `-report` command.")
+
+        embed = discord.Embed(color=0xFFA232)
+        embed.set_author(name=ctx.me, icon_url=ctx.me.avatar_url)
+        embed.add_field(name="__**Invite Link:**__", value=value)
+
+        await ctx.send(embed=embed)
+ 
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -1533,5 +1574,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     def cog_unload(self):
         self.bank_update_task.cancel()
+        if old_invite:
+            try:
+                self.bot.remove_command("invite")
+            except:
+                pass
+            self.bot.add_command(old_invite)
     
     __unload = cog_unload
