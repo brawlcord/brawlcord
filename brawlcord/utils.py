@@ -11,6 +11,7 @@ from .brawlers import *
 from .brawlhelp import EMBED_COLOR
 from .errors import UserRejected
 
+
 default_stats = {
     "trophies": 0,
     "pb": 0,
@@ -177,34 +178,37 @@ class Box:
             gold *= 2
             stacks = 1
         
-        powerpoints = int(self.weighted_random(7, 25, 14))
+        if stacks > 0:
+            powerpoints = int(self.weighted_random(7, 25, 14))
 
-        pieces = self.split_in_integers(powerpoints, stacks)
-        
-        pp_str = ""
-        
-        if pieces:
-            for piece in pieces:
-                items = list(self.can_get_pp.items())
-                random.shuffle(items)
-                for brawler, threshold in items:
-                    if piece <= threshold:
-                        async with conf.brawlers() as brawlers:
-                            brawlers[brawler]['powerpoints'] += piece
-                            brawlers[brawler]['total_powerpoints'] += piece
-                            pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
-                    else:
-                        continue
-                    break
-        
+            pieces = self.split_in_integers(powerpoints, stacks)
+            
+            pp_str = ""
+            
+            if pieces:
+                for piece in pieces:
+                    items = list(self.can_get_pp.items())
+                    random.shuffle(items)
+                    for brawler, threshold in items:
+                        if piece <= threshold:
+                            async with conf.brawlers() as brawlers:
+                                brawlers[brawler]['powerpoints'] += piece
+                                brawlers[brawler]['total_powerpoints'] += piece
+                                pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
+                        else:
+                            continue
+                        break
+            
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
         embed = discord.Embed(color=EMBED_COLOR, title=f"{emojis['brawlbox']} Brawl Box")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        if pp_str:
-            embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
+        
+        if stacks > 0:
+            if pp_str:
+                embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
 
         if rarities:
             for rarity in rarities:
@@ -277,34 +281,37 @@ class Box:
             self.gems *= 1.5
             self.td *= 1.5
         
-        powerpoints = int(self.weighted_random(27, 75, 46))
+        if stacks > 0:
+            powerpoints = int(self.weighted_random(27, 75, 46))
 
-        pieces = self.split_in_integers(powerpoints, stacks)
-        
-        pp_str = ""
-        
-        if pieces:
-            for piece in pieces:
-                items = list(self.can_get_pp.items())
-                random.shuffle(items)
-                for brawler, threshold in items:
-                    if piece <= threshold:
-                        async with conf.brawlers() as brawlers:
-                            brawlers[brawler]['powerpoints'] += piece
-                            brawlers[brawler]['total_powerpoints'] += piece
-                            pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
-                    else:
-                        continue
-                    break
-        
+            pieces = self.split_in_integers(powerpoints, stacks)
+            
+            pp_str = ""
+            
+            if pieces:
+                for piece in pieces:
+                    items = list(self.can_get_pp.items())
+                    random.shuffle(items)
+                    for brawler, threshold in items:
+                        if piece <= threshold:
+                            async with conf.brawlers() as brawlers:
+                                brawlers[brawler]['powerpoints'] += piece
+                                brawlers[brawler]['total_powerpoints'] += piece
+                                pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
+                        else:
+                            continue
+                        break
+            
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
         embed = discord.Embed(color=EMBED_COLOR, title=f"Big Box {emojis['bigbox']}")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        if pp_str:
-            embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
+        
+        if stacks > 0:
+            if pp_str:
+                embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
 
         if rarities:
             for rarity in rarities:
@@ -377,33 +384,36 @@ class Box:
             self.gems *= 2
             self.td *= 2
         
-        powerpoints = int(self.weighted_random(81, 225, 132))
+        if stacks > 0:
+            powerpoints = int(self.weighted_random(81, 225, 132))
 
-        pieces = self.split_in_integers(powerpoints, stacks)
-        pp_str = ""
-        
-        if pieces:
-            for piece in pieces:
-                items = list(self.can_get_pp.items())
-                random.shuffle(items)
-                for brawler, threshold in items:
-                    if piece <= threshold:
-                        async with conf.brawlers() as brawlers:
-                            brawlers[brawler]['powerpoints'] += piece
-                            brawlers[brawler]['total_powerpoints'] += piece
-                            pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
-                    else:
-                        continue
-                    break
-        
+            pieces = self.split_in_integers(powerpoints, stacks)
+            pp_str = ""
+            
+            if pieces:
+                for piece in pieces:
+                    items = list(self.can_get_pp.items())
+                    random.shuffle(items)
+                    for brawler, threshold in items:
+                        if piece <= threshold:
+                            async with conf.brawlers() as brawlers:
+                                brawlers[brawler]['powerpoints'] += piece
+                                brawlers[brawler]['total_powerpoints'] += piece
+                                pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
+                        else:
+                            continue
+                        break
+            
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
         
         embed = discord.Embed(color=EMBED_COLOR, title=f"Mega Box {emojis['megabox']}")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        if pp_str:
-            embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
+        
+        if stacks > 0:
+            if pp_str:
+                embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
 
         if rarities:
             for rarity in rarities:
@@ -529,8 +539,8 @@ class GameModes:
         self.first_invincibility = False
         self.second_invincibility = False
 
-        self.first_respawning = -1
-        self.second_respawning = -1
+        self.first_respawning = None
+        self.second_respawning = None
 
         self.first_spawn = None
         self.second_spawn = None
@@ -639,7 +649,7 @@ class GameModes:
         fd_gems = 0
         sd_gems = 0
         
-        for i in range(100):
+        for i in range(75):
             # player one             
             if self.first_respawning == i:
                 try:
@@ -697,7 +707,8 @@ class GameModes:
                     except:
                         # bot user
                         pass
-            
+                    # go to next loop
+                    continue
             winner, loser = self.check_if_win(first_gems, second_gems)
 
             if winner == False:
@@ -762,6 +773,8 @@ class GameModes:
                     except:
                         # bot user
                         pass
+                    # go to next loop
+                    continue
 
             winner, loser = self.check_if_win(first_gems, second_gems)
             
@@ -992,7 +1005,7 @@ class GameModes:
                     second_invincibility = False
             elif choice == 2:
                 if first_gems is not None:
-                    collected_gem = random.randint(0, 1)
+                    collected_gem = random.choice([0, 1, 1, 1])  # 0.75 of collecting one gem
                     first_gems += collected_gem
                 if second_invincibility:
                     second_invincibility = False
@@ -1088,5 +1101,5 @@ class GameModes:
             self.first_respawning = current_round + 1
             self.first_health = self.sfh
         elif user == self.second_player:
-            self.second_respawning = current_round + 1
+            self.second_respawning = current_round
             self.second_health = self.ssh
