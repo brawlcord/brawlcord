@@ -95,10 +95,27 @@ class BrawlcordHelp(RedHelpFormatter):
                             continue
                 
                 for i, page in enumerate(pagify(cog_text, page_length=1000, shorten_by=0)):
+                    if title == "Red":
+                        page += "\n\u200b"
                     title = f"__{title}:__" if i < 1 else f"__{title}:__ (continued)"
                     field = EmbedField(title, page, False)
                     emb["fields"].append(field)
                 
+            name = "Developed By"
+            value = f"[Snowsy]({REDDIT_LINK})"
+            field = EmbedField(name, value, True)
+            emb["fields"].append(field)
+            
+            name = "Invite Link"
+            value = f"[{DISCORD_EMOTE} {ctx.clean_prefix}invite]({INVITE_URL})"
+            field = EmbedField(name, value, True)
+            emb["fields"].append(field)
+            
+            name = "Brawlcord Community"
+            value = f"{SELF_EMOTE} [Resources]({GITHUB_LINK})"
+            field = EmbedField(name, value, True)
+            emb["fields"].append(field)
+            
             await self.make_and_send_embeds(ctx, emb)       
     
         else:
@@ -133,14 +150,6 @@ class BrawlcordHelp(RedHelpFormatter):
 
             for field in group:
                 embed.add_field(**field._asdict())
-
-            # owner = self.bot.get_user(self.bot.owner_id)
-            
-            embed.add_field(name="\u200b\nDeveloped By", value=f"[Snowsy]({REDDIT_LINK})")
-            embed.add_field(name="\u200b\nInvite Link", 
-                value=f"[{DISCORD_EMOTE} {ctx.clean_prefix}invite]({INVITE_URL})")
-            embed.add_field(name="\u200b\nBrawlcord Community", 
-                value=f"{SELF_EMOTE} [Resources]({GITHUB_LINK})")
 
             embed.set_footer(**embed_dict["footer"])
 
