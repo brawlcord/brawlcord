@@ -11,6 +11,8 @@
 <p align="center">
   <a href="#overview">Overview</a>
   •
+  <a href="#how-to-use">How To Use</a>•
+  •
   <a href="#features">Features</a>
   •
   <a href="#installation">Installation</a>
@@ -24,32 +26,31 @@
 
 # Overview
 
-Rush Wars Cog is a [Red bot](https://github.com/Cog-Creators/Red-DiscordBot) cog to play a simplified version of the game [Rush Wars](https://rushwarsgame.com) (developed by Supercell) on Discord.  
+Brawlcord is a Discord bot, an intance of [Red](https://github.com/Cog-Creators/Red-DiscordBot), which allows users to play a simplified version of the game [Brawl Stars](https://brawlstars.com) (developed by Supercell) on Discord.  
 
-> Ready to kick butt and get mega rich? From the creators of Clash of Clans and Clash Royale comes a heroic combat strategy game full of surprises like a laser firin’ robot dinosaur and exploding arcade machines!
+> Fast-paced multiplayer battles from the makers of Clash of Clans, Clash Royale and Boom Beach.
 
-Rush Wars has everything you love in a strategy game and more: exciting and unexpected new characters, outsmarting the opposition, and competitive team battles. Rush Wars is a casual game for everyone to enjoy but provides the depth and challenge competitive players desire as they rise through the ranks. No hours wasted on designing and changing defensive bases, no long wait times to prepare your troops for battle. So start building your butt kickin’ squad and Rush into battle today!
-
-The game is currently in BETA and available in the following countries (on both iOS and Android):  
-
-- Canada
-- Finland
-- New Zealand
-- Australia
-
-**Edit:** Unfortunately, [Supercell has decided not to continue the Rush Wars beta](https://supercell.com/en/news/rush-wars-closing/7225/). 
+Battle with friends or solo across a variety of game modes in under three minutes. Unlock and upgrade dozens of Brawlers with powerful super abilities. Purchase and collect unique skins to stand out and show off in the arena. Join or start a band to share tactics and fight together.
 
 ---
+
+## How To Use
+
+You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=311360).  
+
+**Note 1:** By using the link above, Brawlcord will be able to embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
+
+**Note 2:** During the beta phase, the bot will not be online most of the times. I plan on hosting the bot on a VPS soon.  
 
 ## Features
 
 The cog replicates the real game in a number of ways while adapting to the text-based form of Discord. It has the following features:
 
-- Battle against players (random or specified) for glory (and rewards)  
-- Construct your ultimate attack squad to raid enemy gold mines and get mega rich
-- Set up defense to protect your riches  
+- Battle against the bot or other players for glory (and rewards)  
+- Unlock and collect new, powerful Brawlers - each with a signature attack and SUPER ability
+- Climb to the top of the leaderboards in global and local rankings
+- Customize Brawlers with unlockable skins
 - See your stats and show off to friends  
-- And of course, KICK BUTT & GET MEGA RICH!!  
 
 ---
 
@@ -61,45 +62,43 @@ Next add my repo using the following command:
 
 > Note: [p] will be your prefix in all of the following commands.  
 
-`[p]repo add rushcog https://github.com/snowsee/rushwars-cog`
+`[p]repo add brawlcord https://github.com/snowsee/brawlcord`
 
 Then, you will have to install cog by using the following command:
 
-`[p]cog install rushcog rushwars`
+`[p]cog install brawlcord brawlcord`
 
 You should see the following message after the installation:
-> Thank you for trying out the Rush Wars cog, based on the game developed by Supercell.
+> Thank you for installing the Brawlcord cog, based on the mobile game Brawl Stars (developed by Supercell).
 
 Load the cog once you see that message using the following command:
-`[p]load rushwars`
+`[p]load brawlcord`
 
-Make sure that you use the `[p]cog update` command to periodically update your cogs. This will ensure that you are getting the latest bug fixes and features. You may also update a specific cog by using `[p]cog update rushwars`.
+Make sure that you use the `[p]cog update` command to periodically update your cogs. This will ensure that you are getting the latest bug fixes and features. You may also update a specific cog by using `[p]cog update brawlcord`.
 
-**Important Note**: The cog uses external Rush Wars emotes. They are stored in the following two Discord servers:
+**Important Note**: The cog uses external Brawl Stars emotes. They are stored in the following four Discord servers:
 
-- [Rush Bot](https://discord.gg/gAxKGac)
-- [Rush Bot Emotes](https://discord.gg/8euG6v8)
+- [Brawlcord Community Server](https://discord.gg/7zJ3PbJ)
+- [Brawlcord Emotes: SP 1](https://discord.gg/hnKktBN)
+- [Brawlcord Emotes: Ranks](https://discord.gg/G4Krvk3)
+- [Brawlcord Emotes: Brawlers and Game Modes](https://discord.gg/ACq3ZrE)
 
 Unfortunately, due to Discord limitations, you can't add your bot to these servers directly. In order to have your bot added to the abovementioned servers, you must send me a direct message with your bot's OAuth invite link. While I know this isn't ideal, this is currently the only working way. I'll work on adding an option to disable emotes in the future.  
 
-My Discord username: Snowsy#0592
+My Discord username: **Snowsy#0592**
 
 ---
 
 ## What's Coming Next
 
-The following features will be added in future:
+The following features are likely to be added in near future:
 
-- [X] HQ and Chopper level ups
-- [X] Commanders
-- [X] Boxes - Needs improvements  
-- [X] Key system  
-- [X] Card level ups
-- [ ] Teams and domination
-- [ ] Better matchmaking
-- [ ] Improved battle system
+- [ ] More Brawlers  
+- [ ] More Game Modes  
+- [ ] Clubs  
+- [ ] Improved battle system  
 
-As Supercell has decided to discontinue the game's development, I'll be not be developing the cog further. You can still use the cog and play Rush Wars on Discord, however, it won't get any new features or optimisations. 
+You can suggest more features in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ).  
 
 ---
 
@@ -107,7 +106,8 @@ As Supercell has decided to discontinue the game's development, I'll be not be d
 
 - [Supercell](https://supercell.com/en/)
 - [Red Bot](https://github.com/Cog-Creators/Red-DiscordBot)
-- [Rush Stats](https://www.rushstats.com) - Huge thanks to Henry for allowing me to use some assets from his site  
+- [Star List](https://www.starlist.pro) - Huge thanks to Henry for allowing me to use some assets from his site!  
+- [Brawl Stats](https://brawlstats.com) - Huge thanks to tryso for allowing me to use his artwork!  
 
 ---
 
