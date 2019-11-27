@@ -2,7 +2,7 @@
   <br>
   <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
   <br>
-  Brawlcord
+  Brawlcord Discord Bot
   <br>
 </h1>
 
