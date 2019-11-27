@@ -27,6 +27,7 @@ from .brawlhelp import BrawlcordHelp, EMBED_COLOR, GITHUB_LINK, REDDIT_LINK, INV
 
 from .errors import UserRejected
 
+
 BaseCog = getattr(commands, "Cog", object)
 
 log = logging.getLogger("red.brawlcord")
@@ -110,6 +111,9 @@ league_emojis = {
 old_invite = None
 
 BRAWLSTARS = "https://blog.brawlstars.com/index.html"
+
+DAY = 86400
+WEEK = 604800
 
 
 class Brawlcord(BaseCog, name="Brawlcord"):
@@ -218,6 +222,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         guild = ctx.guild
         user = ctx.author
 
+        tutorial_finished = await self.get_player_stat(user, 'tutorial_finished')
+
+        if not tutorial_finished:
+            return await ctx.send("You have not finished the tutorial yet." 
+                " Please use the `-tutorial` command to proceed.")
+        
         if opponent:
             if opponent == user:
                 return await ctx.send("You can't brawl against yourself.")
@@ -351,7 +361,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         timestamp = (dt_now - epoch).total_seconds()
         await self.update_player_stat(author, 'bank_update_ts', timestamp)
 
-    @commands.command(name="stats", aliases=["s", "stat"])
+    @commands.command(name="stats", aliases=["stat"])
     async def _stats(self, ctx: Context):
         """Display your resource statistics"""
 
@@ -602,7 +612,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         """Change selected Brawler, skin, star power or game mode"""
         pass
     
-    @_select.command(name="brawler", aliases=['b'])
+    @_select.command(name="brawler")
     async def select_brawler(self, ctx: Context, *, brawler_name: str):
         """Change selected Brawler"""
 
@@ -633,7 +643,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
-    @_select.command(name="gamemode", aliases=['gm'])
+    @_select.command(name="gamemode")
     async def select_gamemode(self, ctx: Context, *, gamemode: str):
         """Change selected game mode"""
 
@@ -678,7 +688,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(f"Changed selected game mode to {gamemode}!")
     
-    @_select.command(name="skin", aliases=['s'])
+    @_select.command(name="skin")
     async def select_skin(self, ctx: Context, *, skin: str):
         """Change selected skin"""
 
@@ -734,20 +744,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return await ctx.send("You can only choose SP #1 or SP #2.")
         
         await ctx.send(f"Changed selected Star Power to {sp_name}.")
-    
-    @commands.command(name="emojis")
-    @checks.is_owner()
-    async def get_all_emotes(self, ctx: Context):
-        """Get all emojis of the server"""
-
-        guild = ctx.guild
-
-        server_emojis = await guild.fetch_emojis()
-
-        print("_emojis = {")
-        for emoji in server_emojis:
-            print(f"    \"{emoji.name}\": \"<:{emoji.name}:{emoji.id}>\",")
-        print("}")
     
     @commands.command(name="brawlbox", aliases=['box'])
     async def _brawl_box(self, ctx: Context):
@@ -950,7 +946,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         pass
     
     @_claim.command(name="daily")
-    @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=DAY, type=commands.BucketType.user)
     async def claim_daily(self, ctx: Context):
         """Claim daily reward"""
         user = ctx.author
@@ -962,6 +958,23 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             embed = await box.brawlbox(self.config.user(user), user)
         except Exception as exc:
             return await ctx.send(f"Error \"{exc}\" while opening a Brawl Box. Please notify bot creator"
+                " using `-report` command.")
+
+        await ctx.send(embed=embed)
+
+    @_claim.command(name="weekly")
+    @commands.cooldown(rate=1, per=WEEK, type=commands.BucketType.user)
+    async def claim_weekly(self, ctx: Context):
+        """Claim daily reward"""
+        user = ctx.author
+
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        box = Box(self.BRAWLERS, brawler_data)
+        try:
+            embed = await box.bigbox(self.config.user(user), user)
+        except Exception as exc:
+            return await ctx.send(f"Error \"{exc}\" while opening a Big Box. Please notify bot creator"
                 " using `-report` command.")
 
         await ctx.send(embed=embed)
@@ -1560,58 +1573,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         rank = self.get_rank(data['pb'])
 
         return rank_emojis['br'+str(rank)]
-    
-    @commands.command(name="tokens")
-    @checks.is_owner()
-    async def tokens(self, ctx: Context, user: discord.User = None):
-        if not user:
-            user = ctx.author
-        
-        await self.update_player_stat(user, 'tokens', 1000)
-        await self.update_player_stat(user, 'startokens', 1000)
-        
-        await self.update_player_stat(user, 'gold', 3494)
-
-        await self.update_player_stat(user, 'selected', "Shell Shock", substat="starpower")
-        
-        async with self.config.user(user).brawlers() as brawlers:
-            brawlers.pop('Rico', None)
-            brawlers.pop('El Primo', None)
-            brawlers.pop('Barley', None)
-    
-    @commands.command(name="max")
-    @checks.is_owner()
-    async def max_shelly(self, ctx: Context, user: discord.User = None):
-        if not user:
-            user = ctx.author
-        
-        await self.update_player_stat(user, 'brawlers', 1410, substat="Shelly", sub_index="total_powerpoints")
-        await self.update_player_stat(user, 'brawlers', 10, substat="Shelly", sub_index="level")
-        await self.update_player_stat(user, 'brawlers', 0, substat="Shelly", sub_index="powerpoints")
-        await self.update_player_stat(user, 'brawlers', True, substat="Shelly", sub_index="sp1")
-        await self.update_player_stat(user, 'brawlers', False, substat="Shelly", sub_index="sp2")
-    
-    @commands.command(name="initstats")
-    @checks.is_owner()
-    async def init_stats(self, ctx: Context, user: discord.User = None):
-        if not user:
-            user = ctx.author
-        
-        # # await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="solo")
-        # # await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="3v3")
-        # await self.update_player_stat(user, 'brawl_stats', [0, 0], substat="duo")
-        await self.update_player_stat(user, 'brawlers', "Default", substat="Nita", sub_index="selected_skin")
-        await self.update_player_stat(user, 'brawlers', "Default", substat="Bull", sub_index="selected_skin")
-        await self.update_player_stat(user, 'brawlers', "Default", substat="Jessie", sub_index="selected_skin")
-        await self.update_player_stat(user, 'brawlers', "Default", substat="Colt", sub_index="selected_skin")
-      
-    @commands.command(name="trophyset")
-    @checks.is_owner()
-    async def set_trophies(self, ctx: Context, value: int, user: discord.User = None):
-        if not user:
-            user = ctx.author
-        
-        await self.update_player_stat(user, 'brawlers', value, substat="Shelly", sub_index="trophies")
     
     def cog_unload(self):
         self.bank_update_task.cancel()
