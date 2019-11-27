@@ -1,17 +1,17 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/6O2HmHt.png" alt="Brawlcord">
+  <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
   <br>
   Brawlcord
   <br>
 </h1>
 
-<h4 align="center"><i>3v3 and Battle Royale!</i></h4>
+<h4 align="center"><i>1v1 Brawls !</i></h4>
 
 <p align="center">
   <a href="#overview">Overview</a>
   •
-  <a href="#how-to-use">How To Use</a>•
+  <a href="#how-to-use">How To Use</a>
   •
   <a href="#features">Features</a>
   •
@@ -24,7 +24,7 @@
   <a href="#disclaimer">Disclaimer</a>
 </p>
 
-# Overview
+## Overview
 
 Brawlcord is a Discord bot, an intance of [Red](https://github.com/Cog-Creators/Red-DiscordBot), which allows users to play a simplified version of the game [Brawl Stars](https://brawlstars.com) (developed by Supercell) on Discord.  
 
