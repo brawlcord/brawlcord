@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center"><i>1v1 Brawls !</i></h4>
+<h4 align="center"><i>1v1 Brawls On Discord!</i></h4>
 
 <p align="center">
   <a href="#overview">Overview</a>
