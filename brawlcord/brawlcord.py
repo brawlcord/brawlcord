@@ -548,7 +548,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         await ctx.send(embed=embed)  
 
-    @commands.group(name="rewards", autohelp=False)
+    @commands.group(name="rewards")
     async def _rewards(self, ctx: Context):
         """View and claim collected trophy road rewards"""
         pass            
@@ -607,7 +607,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         await ctx.send("Rewards successfully claimed.")    
     
-    @commands.group(name="select", autohelp=False)
+    @commands.group(name="select")
     async def _select(self, ctx: Context):
         """Change selected Brawler, skin, star power or game mode"""
         pass
@@ -903,7 +903,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await self.config.report_channel.set(channel.id)
         await ctx.send(f"Report channel set to {channel.mention}.")
     
-    @commands.group(name="leaderboard", aliases=['lb'], autohelp=False)
+    @commands.group(name="leaderboard", aliases=['lb'])
     async def _leaderboard(self, ctx: Context):
         """Display the leaderboard"""
 
@@ -940,7 +940,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await self.leaderboard_handler(ctx, title, url, 4, brawler_name=brawler_name)
   
-    @commands.group(name="claim", autohelp=False)
+    @commands.group(name="claim")
     async def _claim(self, ctx: Context):
         """Claim daily/weekly/monthly rewards"""
         pass
