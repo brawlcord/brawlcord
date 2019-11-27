@@ -40,7 +40,7 @@ You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3P
 
 **Note 1:** By using the link above, Brawlcord will be able to embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
 
-**Note 2:** During the beta phase, the bot will not be online most of the times. I plan on hosting the bot on a VPS soon.  
+**Note 2:** During the beta phase, the bot will not be online most of the time. I plan on hosting the bot on a VPS soon.  
 
 ## Features
 
