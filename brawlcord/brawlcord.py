@@ -23,7 +23,7 @@ from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler, br
 from .utils import (Box, default_stats, gamemode_emotes, 
     spawn_text, brawlers_map, GameModes, level_emotes)
 
-from .brawlhelp import BrawlcordHelp, EMBED_COLOR, GITHUB_LINK, REDDIT_LINK, INVITE_URL
+from .brawlhelp import BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, REDDIT_LINK, INVITE_URL
 
 from .errors import UserRejected
 
@@ -210,7 +210,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="Invite Link", value=f"[Click here]({INVITE_URL})")
 
         embed.add_field(name="Feedback", value=f"You can give feedback to" 
-            f" improve Brawlcord in the [Brawlcord community server]({GITHUB_LINK}).", 
+            f" improve Brawlcord in the [Brawlcord community server]({COMMUNITY_LINK}).", 
             inline=False)
 
         await ctx.send(embed=embed)
@@ -345,7 +345,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " **Star Shelly** skin!"), inline=False)
         
         embed.add_field(name="\u200b\n__Feedback:__", value=f"You can give feedback to" 
-            f" improve Brawlcord in the [Brawlcord community server]({GITHUB_LINK}).", 
+            f" improve Brawlcord in the [Brawlcord community server]({COMMUNITY_LINK}).", 
             inline=False)
 
         embed.set_footer(text="Thanks for using Brawlcord.", 
