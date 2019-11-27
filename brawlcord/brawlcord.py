@@ -400,18 +400,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         starpoints = await self.get_player_stat(user, 'starpoints')
         embed.add_field(name="Star Points", value=f"{emojis['starpoints']} {starpoints}")
 
-        selected = await self.get_player_stat(user, 'selected', is_iter=True)
-        brawler = selected['brawler']
-        sp = selected['starpower']
-        skin = selected['brawler_skin']
-        gamemode = selected['gamemode']
-
-        embed.add_field(name="Selected Brawler", 
-                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}"
-                        f'''{f" - {emojis['spblank']} {sp}" if sp else ''}''', inline=False)
-        embed.add_field(name="Selected Game Mode", 
-                value=f"{gamemode_emotes[gamemode]} {gamemode}", inline=False)
-
         await ctx.send(embed=embed)
     
     @commands.command(name="profile", aliases=["p", "pro"])
@@ -451,6 +439,18 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="Solo Wins", value=f"{gamemode_emotes['Solo Showdown']} {wins_solo}")
         embed.add_field(name="Duo Wins", value=f"{gamemode_emotes['Duo Showdown']} {wins_duo}")
 
+        selected = await self.get_player_stat(user, 'selected', is_iter=True)
+        brawler = selected['brawler']
+        sp = selected['starpower']
+        skin = selected['brawler_skin']
+        gamemode = selected['gamemode']
+
+        embed.add_field(name="Selected Brawler", 
+                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}"
+                        f'''{f" - {emojis['spblank']} {sp}" if sp else ''}''', inline=False)
+        embed.add_field(name="Selected Game Mode", 
+                value=f"{gamemode_emotes[gamemode]} {gamemode}", inline=False)
+        
         await ctx.send(embed=embed)
     
     @commands.command(name="brawler", aliases=['binfo'])
