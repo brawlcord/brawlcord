@@ -1018,7 +1018,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         """Send number of guilds"""
 
         guilds = [guild for guild in self.bot.guilds]
-        await ctx.send(f"Total guilds: {sum(guilds)}")
+        await ctx.send(f"Total guilds: {len(guilds)}")
             
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
