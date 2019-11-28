@@ -113,19 +113,18 @@ class BrawlcordHelp(RedHelpFormatter):
         page_char_limit = await ctx.bot.db.help.page_char_limit()
         field_groups = self.group_embed_fields(embed_dict["fields"], page_char_limit)
 
-        color = await ctx.embed_color()
         page_count = len(field_groups)
 
         author_info = {"name": f"{ctx.me.display_name} Help Menu", "icon_url": ctx.me.avatar_url}
 
         if not field_groups:  # This can happen on single command without a docstring
-            embed = discord.Embed(color=color, **embed_dict["embed"])
+            embed = discord.Embed(color=EMBED_COLOR, **embed_dict["embed"])
             embed.set_author(**author_info)
             embed.set_footer(**embed_dict["footer"])
             pages.append(embed)
 
         for i, group in enumerate(field_groups, 1):
-            embed = discord.Embed(color=color, **embed_dict["embed"])
+            embed = discord.Embed(color=EMBED_COLOR, **embed_dict["embed"])
 
             if page_count > 1:
                 description = f"{embed.description} *Page {i} of {page_count}*"
