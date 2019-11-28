@@ -602,7 +602,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         tpstored = await self.get_player_stat(user, 'tpstored')
 
-        for tier in range(1, 20):
+        for tier in tpstored:
             await self.handle_reward_claims(ctx, str(tier))
         
         await ctx.send("Rewards successfully claimed.")    
