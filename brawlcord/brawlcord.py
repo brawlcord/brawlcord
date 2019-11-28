@@ -903,7 +903,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         await self.config.report_channel.set(channel.id)
         await ctx.send(f"Report channel set to {channel.mention}.")
     
-    @commands.group(name="leaderboard", aliases=['lb'])
+    @commands.group(name="leaderboard", aliases=['lb'], autohelp=False)
     async def _leaderboard(self, ctx: Context):
         """Display the leaderboard"""
 
@@ -1011,14 +1011,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="__**Invite Link:**__", value=value)
 
         await ctx.send(embed=embed)
- 
-    @commands.command(name="allguilds")
-    @checks.is_owner()
-    async def _all_servers(self, ctx: Context):
-        """Send number of guilds"""
-
-        guilds = [guild for guild in self.bot.guilds]
-        await ctx.send(f"Total guilds: {len(guilds)}")
             
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
