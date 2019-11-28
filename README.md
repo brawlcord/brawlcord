@@ -38,9 +38,7 @@ Battle with friends or solo across a variety of game modes in under three minute
 
 You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=311360).  
 
-**Note 1:** By using the link above, Brawlcord will be able to embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
-
-**Note 2:** During the beta phase, the bot will not be online most of the time. I plan on hosting the bot on a VPS soon.  
+**Note:** By using the link above, Brawlcord will be able to embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
 
 ## Features
 
