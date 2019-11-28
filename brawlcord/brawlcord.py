@@ -718,7 +718,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @_select.command(name="starpower", aliases=['sp'])
     async def select_sp(self, ctx: Context, *, starpower_number: int):
-        """Change selected skin"""
+        """Change selected star power"""
 
         user = ctx.author
 
@@ -965,7 +965,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @_claim.command(name="weekly")
     @commands.cooldown(rate=1, per=WEEK, type=commands.BucketType.user)
     async def claim_weekly(self, ctx: Context):
-        """Claim daily reward"""
+        """Claim weekly reward"""
         user = ctx.author
 
         brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
