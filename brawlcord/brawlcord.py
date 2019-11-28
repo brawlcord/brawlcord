@@ -123,7 +123,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         self.bot = bot
 
         # self._brawl_countdown = {}
-        self.sessions = {}
+        self.sessions = []
         self.tasks = {}
         self.locks = {}
 
@@ -237,6 +237,16 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             elif opponent.bot:
                 return await ctx.send(f"{opponent} is a bot account. Can't brawl against bots.")
         
+        if user.id in self.sessions:
+            return await ctx.send("You are already in a brawl!")
+
+        if opponent.id in self.sessions:
+            return await ctx.send(f"{opponent} is already in a brawl!")
+        
+        self.sessions.append(user.id)
+        if opponent != guild.me:
+            self.sessions.append(opponent.id)
+
         g: GameModes = GameModes(ctx, user, opponent, self.config.user, self.BRAWLERS)
         
         try:
@@ -249,6 +259,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return
         except Exception as exc:
             return await ctx.send(f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command.") 
+        finally:
+            self.sessions.remove(user.id)
+            try:
+                self.sessions.remove(opponent.id)
+            except:
+                pass
         
         players = [first_player, second_player]
         
@@ -1313,7 +1329,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 reward_name, reward_emoji, reward_str = self.tp_reward_strings(self.TROPHY_ROAD[tier], tier)
                 
                 desc = "Claim the reward by using the `-rewards` command!"
-                embed = discord.Embed(color=EMBED_COLOR, title="Trophy Road Reward", description=desc)
+                title = f"Trophy Road Reward [{threshold} trophies]"
+                embed = discord.Embed(color=EMBED_COLOR, title=title, description=desc)
                 embed.set_author(name=user.name, icon_url=user.avatar_url)
                 embed.add_field(name=reward_name, value=f"{reward_emoji} {reward_str}")
 
