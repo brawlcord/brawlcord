@@ -245,10 +245,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if opponent:
             if opponent.id in self.sessions:
                 return await ctx.send(f"{opponent} is already in a brawl!")
+            
+            if opponent != guild.me:
+                self.sessions.append(opponent.id)
         
         self.sessions.append(user.id)
-        if opponent != guild.me:
-            self.sessions.append(opponent.id)
 
         g: GameModes = GameModes(ctx, user, opponent, self.config.user, self.BRAWLERS)
         
