@@ -659,7 +659,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await self.update_player_stat(ctx.author, 'selected',  None, substat='starpower')
 
         skin = brawler_data["selected_skin"]
-        await self.update_player_stat(ctx.author, 'selected',  skin, substat='skin')
+        await self.update_player_stat(ctx.author, 'selected',  skin, substat='brawler_skin')
         
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
