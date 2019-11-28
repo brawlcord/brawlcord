@@ -1446,8 +1446,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             async with self.config.user(user).boxes() as boxes:
                 boxes['big'] += reward_count
 
-        # async with self.config.user(user).tpstored() as tpstored:
-        #     tpstored.remove(reward_number)
+        async with self.config.user(user).tpstored() as tpstored:
+            tpstored.remove(reward_number)
         
     def get_sp_info(self, brawler_name: str, sp: str):
         """Return name and emoji of the Star Power."""
