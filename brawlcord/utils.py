@@ -690,7 +690,10 @@ class GameModes:
                     end = 3
                 
                 if self.second_spawn:
-                    end += 1
+                    if self.second_spawn > 0:
+                        end += 1
+                    else:
+                        self.second_spawn = None
 
                 if self.first_player != self.guild.me:
                     embed = await self.set_embed(ctx, first_can_super, first_gems=first_gems, 
@@ -723,6 +726,7 @@ class GameModes:
                         pass
                     # go to next loop
                     continue
+            
             winner, loser = self.check_if_win(first_gems, second_gems)
 
             if winner == False:
@@ -755,7 +759,10 @@ class GameModes:
                     end = 3
 
                 if self.first_spawn:
-                    end += 1
+                    if self.first_spawn > 0:
+                        end += 1
+                    else:
+                        self.first_spawn = None
 
                 if self.second_player != self.guild.me:
                     embed = await self.set_embed(ctx, second_can_super, first_gems=second_gems, 
@@ -909,8 +916,9 @@ class GameModes:
                         value=f"{gamemode_emotes['Gem Grab']} {first_gems}")
         
         if first_spawn:
-            embed.add_field(name=f"Your {first_spawn_str}'s Health", 
-                    value=f"{emojis['health']} {int(first_spawn)}", inline=False)
+            if first_spawn > 0:
+                embed.add_field(name=f"Your {first_spawn_str}'s Health", 
+                        value=f"{emojis['health']} {int(first_spawn)}", inline=False)
     
         embed.add_field(name="Opponent's Brawler", 
                     value=f"{brawler_emojis[second_brawler]} {second_brawler}")
@@ -921,8 +929,9 @@ class GameModes:
                         value=f"{gamemode_emotes['Gem Grab']} {second_gems}")
 
         if second_spawn:
-            embed.add_field(name=f"Opponent's {second_spawn_str}'s Health", 
-                    value=f"{emojis['health']} {int(second_spawn)}", inline=False)
+            if second_spawn > 0:
+                embed.add_field(name=f"Opponent's {second_spawn_str}'s Health", 
+                        value=f"{emojis['health']} {int(second_spawn)}", inline=False)
     
         if not respawning:
             if first_can_super and not second_spawn:
