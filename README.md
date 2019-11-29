@@ -32,8 +32,6 @@ Brawlcord is a Discord bot, an intance of [Red](https://github.com/Cog-Creators/
 
 Battle with friends or solo across a variety of game modes in under three minutes. Unlock and upgrade dozens of Brawlers with powerful super abilities. Purchase and collect unique skins to stand out and show off in the arena. Join or start a band to share tactics and fight together.
 
----
-
 ## How To Use
 
 You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=311360).  
@@ -49,8 +47,6 @@ The cog replicates the real game in a number of ways while adapting to the text-
 - Climb to the top of the leaderboards in global and local rankings
 - Customize Brawlers with unlockable skins
 - See your stats and show off to friends  
-
----
 
 ## Installation
 
@@ -85,8 +81,6 @@ Unfortunately, due to Discord limitations, you can't add your bot to these serve
 
 My Discord username: **Snowsy#0592**
 
----
-
 ## What's Coming Next
 
 The following features are likely to be added in near future:
@@ -98,16 +92,12 @@ The following features are likely to be added in near future:
 
 You can suggest more features in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ).  
 
----
-
 ## Credits
 
 - [Supercell](https://supercell.com/en/)
 - [Red Bot](https://github.com/Cog-Creators/Red-DiscordBot)
 - [Star List](https://www.starlist.pro) - Huge thanks to Henry for allowing me to use some assets from his site!  
 - [Brawl Stats](https://brawlstats.com) - Huge thanks to tryso for allowing me to use his artwork!  
-
----
 
 ## Disclaimer
 
