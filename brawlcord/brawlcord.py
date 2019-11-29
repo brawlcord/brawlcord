@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 import random
+import traceback
 
 from datetime import datetime, timedelta
 from math import ceil
@@ -262,6 +263,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         except discord.Forbidden:
             return
         except Exception as exc:
+            traceback.print_tb(exc.__traceback__)
             return await ctx.send(f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command.") 
         finally:
             self.sessions.remove(user.id)
