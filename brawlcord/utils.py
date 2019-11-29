@@ -808,8 +808,14 @@ class GameModes:
         if winner == False:
             winner = None
             loser = None
-            await self.first_player.send(f"Time's up. Match ended in a draw.")
-            await self.second_player.send(f"Time's up. Match ended in a draw.")
+            try:
+                await self.first_player.send(f"Time's up. Match ended in a draw.")
+            except:
+                pass
+            try:
+                await self.second_player.send(f"Time's up. Match ended in a draw.")
+            except:
+                pass
         
         await self.update_stats(winner, loser)
         
