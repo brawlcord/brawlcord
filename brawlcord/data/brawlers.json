@@ -242,7 +242,7 @@
         },
         "sp2": {
             "name": "Demolition",
-            "desc": "Adds **+1000** damage to Mike's Super."
+            "desc": "Adds +**1000** damage to Mike's Super."
         },
         "skins": {
             "Santa": [-1, -1],
@@ -311,7 +311,7 @@
         },
         "sp2": {
             "name": "Extra Noxious",
-            "desc": "Adds **+140** damage per second to Barley’s attack."
+            "desc": "Adds +**140** damage per second to Barley’s attack."
         },
         "skins": {
             "Golden": [30, -1],
@@ -376,7 +376,7 @@
         },
         "sp1": {
             "name": "Super Bouncy",
-            "desc": "Rico's bullets, from attack and Super alike, get supercharged by their first bounce and deal **+100** damage!"
+            "desc": "Rico's bullets, from attack and Super alike, get supercharged by their first bounce and deal +**100** damage!"
         },
         "sp2": {
             "name": "Robo Retreat",
@@ -385,6 +385,38 @@
         "skins": {
             "Loaded": [150, -1],
             "Popcorn": [150, -1]
+        }
+    },
+    "Darryl": {
+        "desc": "Darryl has a powerful double-shotgun attack. His Super move is a reckless roll inside of his bouncy barrel!",
+        "health": 4800,
+        "attack": {
+            "name": "Double Deuce",
+            "damage": 380,
+            "desc": "Darryl's double barrel shotguns fire two staggered blasts of heavy close-range damage.",
+            "range": 5.67,
+            "reload": 1.8,
+            "projectiles": 8
+        },
+        "speed": 770,
+        "rarity": "Super Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Barrel Roll",
+            "damage": 400,
+            "desc": "Darryl rolls forward inside his barrel, knocking back enemies and bouncing off walls. His Super recharges over time!",
+            "range": 7
+        },
+        "sp1": {
+            "name": "Steel Hoops",
+            "desc": "Darryl's Super reinforces his barrel, reducing all damage he takes by **30%** for **3.0** seconds."
+        },
+        "sp2": {
+            "name": "Rolling Reload",
+            "desc": "When Darryl uses his Super, he doubles his reload speed for **5.0** seconds."
+        },
+        "skins": {
+            "Dumpling": [-1, -1]
         }
     }
 }

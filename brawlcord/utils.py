@@ -58,7 +58,9 @@ brawlers_map = {
     "Dynamike": Dynamike,
     "El Primo": ElPrimo,
     "Barley": Barley,
-    "Poco": Poco
+    "Poco": Poco,
+    "Rico": Rico,
+    "Darryl": Darryl
 }
 
 level_emotes = {
