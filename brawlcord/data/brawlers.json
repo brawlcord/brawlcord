@@ -178,5 +178,76 @@
             "Dragon Knight": 150,
             "Shadow Knight": -1
         }
+    },
+    "Brock": {
+        "desc": "Brock fires a long-range, explosive rocket at enemies. His Super is a ballistic rocket barrage that destroys cover!",
+        "health": 2800,
+        "attack": {
+            "name": "Rockin' Rocket",
+            "damage": 1100,
+            "desc": "Brock lets fly with a single Rockin' Rocket that really goes the distance.",
+            "range": 10,
+            "reload": 2.1,
+            "projectiles": 1
+        },
+        "speed": 720,
+        "rarity": "Trophy Road",
+        "unlockTrp": 1000,
+        "ult": {
+            "name": "Rocket Rain",
+            "damage": 1040,
+            "desc": "Brock fires a rocket barrage that takes out enemies and obstacles. He only wants to see you bathing in the Rocket Rain!",
+            "range": 8,
+            "projectiles": 9
+        },
+        "sp1": {
+            "name": "Incendiary",
+            "desc": "The impact of Brock's attack sets the ground on fire. Enemies in the area take **600** damage per second! Lasts for 2 seconds."
+        },
+        "sp2": {
+            "name": "Rocket No. Four",
+            "desc": "Brock loads a fourth rocket into his launcher, increasing his ammo capacity (and discarding the thermos bottle he's been keeping in his launcher's #4 rube)."
+        },
+        "skins": {
+            "Rockstar": 80,
+            "Boom Box": 80,
+            "Lion Dance": -1,
+            "Hot Rod": 150
+        }
+    },
+    "Dynamike": {
+        "desc": "Dynamike lobs two explosive sticks of dynamite. His Super attack is a whole barrel full of dynamite that blows up cover!",
+        "health": 2800,
+        "attack": {
+            "name": "Short Fure",
+            "damage": 760,
+            "desc": "Mike tosses two sticks of dynamite, passing over any obstacles in the way. The fuses are cut as short as Mike's explosive temper!",
+            "range": 7,
+            "reload": 1.7,
+            "projectiles": 2
+        },
+        "speed": 720,
+        "rarity": "Trophy Road",
+        "unlockTrp": 2000,
+        "ult": {
+            "name": "Big Barrel o' Boom",
+            "damage": 2200,
+            "desc": "A big-bada-barrel of dynamite blows up cover. Any surviving enemies get knocked back on impact!",
+            "range": 7,
+            "projectiles": 1
+        },
+        "sp1": {
+            "name": "Dyna-Jump",
+            "desc": "Dynamike can ride the blast wave of his explosives to jump over obstacles!"
+        },
+        "sp2": {
+            "name": "Demolition",
+            "desc": "Adds **+1000** damage to Mike's Super."
+        },
+        "skins": {
+            "Santa": -1,
+            "Spicy": 150,
+            "Robo": 300
+        }
     }
 }

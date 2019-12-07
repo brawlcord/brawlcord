@@ -53,7 +53,9 @@ brawlers_map = {
     "Nita": Nita,
     "Colt": Colt,
     "Bull": Bull,
-    "Jessie": Jessie
+    "Jessie": Jessie,
+    "Brock": Brock,
+    "Dynamike": Dynamike
 }
 
 level_emotes = {
