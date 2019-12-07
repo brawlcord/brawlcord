@@ -490,7 +490,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         brawlers = self.BRAWLERS
 
-        # for users who input 'el_primo'
+        # for users who input 'el_primo' or 'primo'
         brawler_name = brawler_name.replace("_", " ")
         if brawler_name.lower() in "el primo":
             brawler_name = "El Primo"
