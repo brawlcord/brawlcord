@@ -29,9 +29,9 @@
             "desc": "When Shelly falls below **40%** health, she instantly heals for **1800** health. Band-Aid recharges in **20.0** seconds."
         },
         "skins": {
-            "Bandita": 80,
-            "Star": -1,
-            "Witch": -1
+            "Bandita": [30, -1],
+            "Star": [-1, -1],
+            "Witch": [-1, -1]
         }
     },
     "Nita": {
@@ -67,9 +67,9 @@
             "desc": "Nita's bear attacks faster. Time between swipes is reduced by **60%**."
         },
         "skins": {
-            "Panda": 30,
-            "Red Nose": -1,
-            "Shiba": 150
+            "Panda": [30, -1],
+            "Red Nose": [-1, -1],
+            "Shiba": [150, -1]
         }
     },
     "Colt": {
@@ -102,9 +102,9 @@
             "desc": "Colt's attack range and bullet speed are increased by **11%**."
         },
         "skins": {
-            "Rockstar": 80,
-            "Royal Agent": -1,
-            "Outlaw": -1
+            "Rockstar": [30, -1],
+            "Royal Agent": [-1, -1],
+            "Outlaw": [-1, 500]
         }
     },
     "Bull": {
@@ -136,9 +136,9 @@
             "desc": "When Bull falls below **40%** health, he gains a shield that reduces all damage he takes by **30%**."
         },
         "skins": {
-            "Viking": 80,
-            "Touchdown": 80,
-            "Linebacker": -1
+            "Viking": [80, -1],
+            "Touchdown": [80, -1],
+            "Linebacker": [-1, 2500]
         }
     },
     "Jessie": {
@@ -174,9 +174,9 @@
             "desc": "Scrappy the Turret now shoots energy orbs that bounce between enemies. The orbs' range after a bounce is **51%** of normal range."
         },
         "skins": {
-            "Summer": 30,
-            "Dragon Knight": 150,
-            "Shadow Knight": -1
+            "Summer": [80, -1],
+            "Dragon Knight": [150, -1],
+            "Shadow Knight": [-1, 10000]
         }
     },
     "Brock": {
@@ -209,10 +209,10 @@
             "desc": "Brock loads a fourth rocket into his launcher, increasing his ammo capacity (and discarding the thermos bottle he's been keeping in his launcher's #4 rube)."
         },
         "skins": {
-            "Rockstar": 80,
-            "Boom Box": 80,
-            "Lion Dance": -1,
-            "Hot Rod": 150
+            "Beach": [80, -1],
+            "Boom Box": [80, -1],
+            "Lion Dance": [-1, -1],
+            "Hot Rod": [150, -1]
         }
     },
     "Dynamike": {
@@ -245,9 +245,9 @@
             "desc": "Adds **+1000** damage to Mike's Super."
         },
         "skins": {
-            "Santa": -1,
-            "Spicy": 150,
-            "Robo": 300
+            "Santa": [-1, -1],
+            "Spicy": [150, -1],
+            "Robo": [300, -1]
         }
     },
     "El Primo": {
@@ -279,9 +279,45 @@
             "desc": "El Primo gains a **25%** speed boost for **4.0** seconds after using his Super."
         },
         "skins": {
-            "El Rudo": 80,
-            "El Rey": 150,
-            "Brown": 150
+            "El Rudo": [80, -1],
+            "El Rey": [150, -1],
+            "El Brown": [150, -1]
+        }
+    },
+    "Barley": {
+        "desc": "Barley attacks by lobbing bottles at enemies, doing splash damage. His Super is a huge barrage of burning bottles!",
+        "health": 2400,
+        "attack": {
+            "name": "Undiluted",
+            "damage": 680,
+            "desc": "Barley lobs a bottle, breaking it on the ground. Enemies take damage from the splash, and more damage over time if they stay in the puddle.",
+            "range": 7,
+            "reload": 2,
+            "projectiles": 1
+        },
+        "speed": 720,
+        "rarity": "Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Last Call",
+            "damage": 680,
+            "desc": "Barley hurls a flurry of fiery bottles, covering a huge area in flames. This one’s on the house!",
+            "range": 9,
+            "projectiles": 5
+        },
+        "sp1": {
+            "name": "Medical Use",
+            "desc": "Barley regains **400** health from each main attack."
+        },
+        "sp2": {
+            "name": "Extra Noxious",
+            "desc": "Adds **+140** damage per second to Barley’s attack."
+        },
+        "skins": {
+            "Golden": [30, -1],
+            "Wizard": [-1, -1],
+            "Bakesale": [150, -1],
+            "Red Wizard": [-1, 2500]
         }
     }
 }
