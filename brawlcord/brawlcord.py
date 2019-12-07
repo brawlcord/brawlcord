@@ -1072,6 +1072,19 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(embed=embed)
             
+    @commands.command(name="give")
+    @commands.is_owner()
+    async def _give(self, ctx: Context, user: discord.User = None):
+        if not user:
+            user = ctx.author
+        
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        box = Box(self.BRAWLERS, brawler_data)
+        embed = await box.bigbox(self.config.user(user), user)
+
+        await ctx.send(embed=embed)
+    
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -1444,7 +1457,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
 
             box = Box(self.BRAWLERS, brawler_data)
-            embed = await box.brawlbox(self.config.user(user), user)
+            embed = await box.megabox(self.config.user(user), user)
 
             await ctx.send(embed=embed)
         
@@ -1506,6 +1519,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         elif reward_type == 14:
             async with self.config.user(user).boxes() as boxes:
                 boxes['big'] += reward_count
+
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+            box = Box(self.BRAWLERS, brawler_data)
+            embed = await box.bigbox(self.config.user(user), user)
+
+            await ctx.send(embed=embed)
 
         async with self.config.user(user).tpstored() as tpstored:
             tpstored.remove(reward_number)
