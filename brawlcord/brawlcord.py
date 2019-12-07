@@ -467,8 +467,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         skin = selected['brawler_skin']
         gamemode = selected['gamemode']
 
+        # el primo skins appear as El Rudo Primo, etc
+        if brawler == "El Primo":
+            if skin != "Default":
+                _brawler = "Primo"
+        else:
+            _brawler = brawler
+
         embed.add_field(name="Selected Brawler", 
-                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {brawler}"
+                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {_brawler}"
                         f'''{f" - {emojis['spblank']} {sp}" if sp else ''}''', inline=False)
         embed.add_field(name="Selected Game Mode", 
                 value=f"{gamemode_emotes[gamemode]} {gamemode}", inline=False)
@@ -559,12 +566,18 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             else:
                 skin += " "
 
+            if brawler == "El Primo":
+                if skin != "Default":
+                    _brawler = "Primo"
+                else:
+                    _brawler = brawler
+
             emote = level_emotes["level_"+str(level)]
             
             value = (f"{emote}`{trophies:>4}` {rank_emojis['br'+str(rank)]} |" 
                         f" {emojis['powerplay']}`{pb:>4}`")
             
-            embed.add_field(name=f"{brawler_emojis[brawler]} {skin.upper()}{brawler.upper()}", 
+            embed.add_field(name=f"{brawler_emojis[brawler]} {skin.upper()}{_brawler.upper()}", 
                 value=value, 
                 inline=False)
         
