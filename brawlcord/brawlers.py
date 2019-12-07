@@ -230,10 +230,10 @@ class Brawler:
         ):
         """Display brawler info in a formatted way."""
 
-        brawler_name = brawler_name.replace(" ", "-")
-        brawler_name = brawler_name.replace("_", "-")
+        brawler_name_url = brawler_name.replace(" ", "-")
+        brawler_name_url = brawler_name_url.replace("_", "-")
 
-        url = brawler_url.format(brawler_name)
+        url = brawler_url.format(brawler_name_url)
 
         title = f"{brawler_emojis[brawler_name]} {brawler_name}"
         if not level:
@@ -241,7 +241,7 @@ class Brawler:
         
         embed = discord.Embed(color=rarity_colors[self.rarity], title=title, 
             description=self.desc, url=url)
-        embed.set_thumbnail(url=brawler_thumb.format(brawler_name.title()))
+        embed.set_thumbnail(url=brawler_thumb.format(brawler_name_url.title()))
         if level:
             embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
             embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
