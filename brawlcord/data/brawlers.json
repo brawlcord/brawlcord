@@ -249,5 +249,39 @@
             "Spicy": 150,
             "Robo": 300
         }
+    },
+    "El Primo": {
+        "desc": "El Primo throws a flurry of punches at his enemies. His Super is a leaping elbow drop that deals damage to all caught underneath!",
+        "health": 5800,
+        "attack": {
+            "name": "Fists of Fury",
+            "damage": 360,
+            "desc": "El Primo fires off a furious flurry of four fiery fists. That's a spicy jalapeno knuckle sandwich!",
+            "range": 3,
+            "reload": 0.8,
+            "projectiles": 4
+        },
+        "speed": 770,
+        "rarity": "Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Flying Elbow Drop",
+            "damage": 800,
+            "desc": "Leaping high, El Primo drops an Intergalactic Elbow that knocks around enemies and destroys cover!",
+            "range": 8.67
+        },
+        "sp1": {
+            "name": "El Fuego",
+            "desc": "Enemies caught in El Primo's Super will burn for **1200** damage over 4 seconds."
+        },
+        "sp2": {
+            "name": "Meteor Rush",
+            "desc": "El Primo gains a **25%** speed boost for **4.0** seconds after using his Super."
+        },
+        "skins": {
+            "El Rudo": 80,
+            "El Rey": 150,
+            "Brown": 150
+        }
     }
 }
