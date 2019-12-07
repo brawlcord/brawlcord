@@ -319,5 +319,38 @@
             "Bakesale": [150, -1],
             "Red Wizard": [-1, 2500]
         }
+    },
+    "Poco": {
+        "desc": "Poco fires damaging sound waves at enemies. His Super can heal both Poco himself and his teammates!",
+        "health": 3800,
+        "attack": {
+            "name": "Power Chord",
+            "damage": 660,
+            "desc": "Poco strums his guitarrón, sending forward bone-jarring sound waves. Enemies hit by the waves take damage.",
+            "range": 7.33,
+            "reload": 1.6,
+            "projectiles": 1
+        },
+        "speed": 720,
+        "rarity": "Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Encore",
+            "heal": 2100,
+            "desc": "Poco heals himself and all friends he can reach with his uplifting melody. Does not affect enemies.",
+            "range": 10.33,
+            "projectiles": 1
+        },
+        "sp1": {
+            "name": "Da Capo",
+            "desc": "When Poco's attack hits friendly Brawlers they now heal for **800** health."
+        },
+        "sp2": {
+            "name": "Screeching Solo",
+            "desc": "Poco’s Super now also hits enemies, dealing **800** damage."
+        },
+        "skins": {
+            "Serenade": [150, -1]
+        }
     }
 }
