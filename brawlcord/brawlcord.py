@@ -1072,18 +1072,18 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(embed=embed)
             
-    @commands.command(name="give")
-    @commands.is_owner()
-    async def _give(self, ctx: Context, user: discord.User = None):
-        if not user:
-            user = ctx.author
+    # @commands.command(name="give")
+    # @commands.is_owner()
+    # async def _give(self, ctx: Context, user: discord.User = None):
+    #     if not user:
+    #         user = ctx.author
         
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+    #     brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
 
-        box = Box(self.BRAWLERS, brawler_data)
-        embed = await box.bigbox(self.config.user(user), user)
+    #     box = Box(self.BRAWLERS, brawler_data)
+    #     embed = await box.bigbox(self.config.user(user), user)
 
-        await ctx.send(embed=embed)
+    #     await ctx.send(embed=embed)
     
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
