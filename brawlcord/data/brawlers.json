@@ -352,5 +352,39 @@
         "skins": {
             "Serenade": [150, -1]
         }
+    },
+    "Rico": {
+        "desc": "Rico fires a burst of bullets that bounce off walls. His Super burst is a long barrage of bouncy bullets that pierce targets!",
+        "health": 2600,
+        "attack": {
+            "name": "Bouncy Bullets",
+            "damage": 320,
+            "desc": "Rico's bullets bounce off walls, gaining range. They can hit enemies behind cover.",
+            "range": 9.67,
+            "reload": 1.2,
+            "projectiles": 5
+        },
+        "speed": 720,
+        "rarity": "Super Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Trick Shot",
+            "damage": 320,
+            "desc": "Rico fires a long burst of bullets that pierce through enemies and bounce off walls, gaining range.",
+            "range": 13.33,
+            "projectiles": 12
+        },
+        "sp1": {
+            "name": "Super Bouncy",
+            "desc": "Rico's bullets, from attack and Super alike, get supercharged by their first bounce and deal **+100** damage!"
+        },
+        "sp2": {
+            "name": "Robo Retreat",
+            "desc": "When Rico falls below **40%** health, he runs **34%** faster!"
+        },
+        "skins": {
+            "Loaded": [150, -1],
+            "Popcorn": [150, -1]
+        }
     }
 }
