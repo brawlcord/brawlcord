@@ -534,13 +534,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         await ctx.send(embed=embed)
  
-    @commands.command(name="brawlers")
-    async def all_brawlers(self, ctx: Context, user: discord.User = None):
-        """Show details of all the Brawlers"""
+    @commands.command(name="brawlers", aliases=['brls'])
+    async def all_owned_brawlers(self, ctx: Context, user: discord.User = None):
+        """Show details of all the Brawlers you own"""
         if not user:
             user = ctx.author
 
-        owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
+        owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
         
         embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=f"{user.name}'s Brawlers")
@@ -582,6 +582,31 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 inline=False)
         
         await ctx.send(embed=embed)  
+
+    @commands.command(name="allbrawlers", aliases=['abrawlers', 'abrls'])
+    async def all_brawlers(self, ctx: Context):
+        """Show list of all the Brawlers"""
+
+        owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
+
+        embed = discord.Embed(color=EMBED_COLOR, title="All Brawlers")
+
+        rarities = ["Trophy Road", "Rare", "Super Rare", "Epic", "Mythic", "Legendary"]
+        for rarity in rarities:
+            rarity_str = ""
+            for brawler in self.BRAWLERS:
+                if rarity != self.BRAWLERS[brawler]["rarity"]:
+                    continue
+                rarity_str += f"\n{brawler_emojis[brawler]} {brawler}"
+                if brawler in owned:
+                    rarity_str += " [Owned]"
+        
+            if rarity_str:
+                embed.add_field(name=rarity, value=rarity_str, inline=False)
+        
+        embed.set_footer(text=f"Owned: {len(owned)} | Total: {len(self.BRAWLERS)}")
+
+        await ctx.send(embed=embed)
 
     @commands.group(name="rewards")
     async def _rewards(self, ctx: Context):
