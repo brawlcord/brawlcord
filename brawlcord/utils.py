@@ -57,7 +57,8 @@ brawlers_map = {
     "Brock": Brock,
     "Dynamike": Dynamike,
     "El Primo": ElPrimo,
-    "Barley": Barley
+    "Barley": Barley,
+    "Poco": Poco
 }
 
 level_emotes = {
@@ -1048,13 +1049,17 @@ class GameModes:
                     second_invincibility = False
             elif choice == 4:
                 if first_can_super:
-                    damage, first_spawn = first._ult(fp_brawler_level)
+                    vals, first_spawn = first._ult(fp_brawler_level)
                     first_attacks = 0
-                    if not second_invincibility:
-                        second_health -= damage
+                    if isinstance(vals, list):
+                        # heal
+                        first_health += vals[0]
                     else:
-                        second_health -= (damage * 0.5)
-                        second_invincibility = False
+                        if not second_invincibility:
+                            second_health -= vals
+                        else:
+                            second_health -= (vals * 0.5)
+                            second_invincibility = False
                 else:
                     second_spawn -= first._attack(fp_brawler_level)
             elif choice == 5:
