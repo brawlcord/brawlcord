@@ -38,7 +38,8 @@ class BrawlcordHelp(RedHelpFormatter):
     async def format_bot_help(self, ctx: Context):
         """Format the default help message"""
 
-        description = "Play a simple version of Brawl Stars on Discord."
+        description = ("Play a simple version of Brawl Stars on Discord. Use `-tutorial`"
+            " command to begin.")
         tagline = f"Type {ctx.clean_prefix}help <command> for more info on a command. "
         
         coms = await self.get_bot_help_mapping(ctx)
