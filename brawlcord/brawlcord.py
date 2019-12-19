@@ -187,7 +187,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
         
-        await self.bot.change_presence(activity=discord.Game(name='1v1 Brawls on Discord!'))
+        await self.bot.change_presence(activity=discord.Game(name='-help | 1v1 Brawls'))
 
     @commands.command(name="brawlcord")
     async def _brawlcord(self, ctx: Context):
