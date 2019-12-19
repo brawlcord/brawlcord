@@ -54,12 +54,12 @@ class BrawlcordHelp(RedHelpFormatter):
             emb["footer"]["text"] = tagline
 
             general_str = ""
-            general_cmd = ["brawl", "profile", "brawler", "brawlers", "allbrawler",
+            general_cmd = ["brawl", "profile", "brawler", "brawlers", "allbrawlers",
                 "stats", "gamemodes", "upgrade"]
             rewards_str = ""
             rewards_cmd = ["brawlbox", "bigbox", "claim", "rewards"]
             misc_str = ""
-            misc_cmd = ["leaderboard", "tutorial", "select", "brawlcord", "notify", "invite"]
+            misc_cmd = ["leaderboard", "tutorial", "select", "brawlcord", "report", "invite"]
             red_cmd = ["info", "licenseinfo"]
 
             # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
