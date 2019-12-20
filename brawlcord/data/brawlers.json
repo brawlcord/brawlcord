@@ -418,5 +418,42 @@
         "skins": {
             "Dumpling": [-1, -1]
         }
+    },
+    "Penny": {
+        "desc": "Penny shoots bags of coins, damaging the target and anyone standing behind. Her Super is a mortar-style cannon turret!",
+        "health": 3200,
+        "attack": {
+            "name": "Plunderbuss",
+            "damage": 900,
+            "desc": "Shoots out a pouch of fool’s gold. If the pouch hits an enemy, it bursts and coins pepper targets behind the first enemy.",
+            "range": 9,
+            "reload": 2,
+            "projectiles": 1
+        },
+        "speed": 720,
+        "rarity": "Super Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Old Lobber",
+            "desc": "Penny sets up her cannon! It can shoot at enemies at a long range, even if they are behind cover.",
+            "cannon": {
+                "health": 2800,
+                "damage": 1200,
+                "range": 14.33,
+                "reload": 2.5
+            }
+        },
+        "sp1": {
+            "name": "Last Blast",
+            "desc": "When Penny's Cannon is destroyed, it shoots out one last barrage of 4 bombs targeting nearby enemies, each dealing **1680** damage."
+        },
+        "sp2": {
+            "name": "Balls of Fire",
+            "desc": "Cannonballs from Penny’s turret set the ground on fire for 3 seconds. Enemies in the burning area take **400** damage per second."
+        },
+        "skins": {
+            "Lil Helper": [-1, -1],
+            "Bunny": [80, -1]
+        }
     }
 }
