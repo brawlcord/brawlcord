@@ -471,6 +471,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if brawler == "El Primo":
             if skin != "Default":
                 _brawler = "Primo"
+            else:
+                _brawler = brawler
         else:
             _brawler = brawler
 
