@@ -220,7 +220,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
     
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
@@ -381,7 +381,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
         await self.update_player_stat(author, 'tutorial_finished', True)
 
@@ -434,7 +434,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
     
     @commands.command(name="profile", aliases=["p", "pro"])
     async def _profile(self, ctx: Context, user: discord.User = None):
@@ -498,7 +498,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
     
     @commands.command(name="brawler", aliases=['binfo'])
     async def _brawler(self, ctx: Context, *, brawler_name: str):
@@ -554,7 +554,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
  
     @commands.command(name="brawlers", aliases=['brls'])
     async def all_owned_brawlers(self, ctx: Context, user: discord.User = None):
@@ -607,7 +607,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
     @commands.command(name="allbrawlers", aliases=['abrawlers', 'abrls'])
     async def all_brawlers(self, ctx: Context):
@@ -636,7 +636,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
     @commands.group(name="rewards")
     async def _rewards(self, ctx: Context):
@@ -672,7 +672,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
     @_rewards.command(name="claim")
     async def rewards_claim(self, ctx: Context, reward_number: str):
@@ -862,7 +862,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
         await self.update_player_stat(user, 'tokens', -100, add_self=True)
     
@@ -889,7 +889,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
         await self.update_player_stat(user, 'startokens', -10, add_self=True)
     
@@ -975,7 +975,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
     @commands.command(name="report")
     @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
@@ -1070,7 +1070,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
     @_claim.command(name="weekly")
     @commands.cooldown(rate=1, per=WEEK, type=commands.BucketType.user)
@@ -1091,7 +1091,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
 
     @commands.command(name="invite")
     async def _invite(self, ctx: Context):
@@ -1128,7 +1128,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
             
     # @commands.command(name="give")
     # @commands.is_owner()
@@ -1504,7 +1504,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 await ctx.send(embed=embed)
             except discord.Forbidden:
                 return await ctx.send("I do not have the permission to embed a link."
-                    " Please give me that permission.")
+                    " Please give/ask someone to give me that permission.")
         
         elif reward_type == 7:
             await self.update_player_stat(user, 'tickets', reward_count, add_self=True)
@@ -1525,7 +1525,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 await ctx.send(embed=embed)
             except discord.Forbidden:
                 return await ctx.send("I do not have the permission to embed a link."
-                    " Please give me that permission.")
+                    " Please give/ask someone to give me that permission.")
         
         elif reward_type == 12:
             await ctx.send("Enter the name of Brawler to add powerpoints to:")
@@ -1595,7 +1595,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 await ctx.send(embed=embed)
             except discord.Forbidden:
                 return await ctx.send("I do not have the permission to embed a link."
-                    " Please give me that permission.")
+                    " Please give/ask someone to give me that permission.")
 
         async with self.config.user(user).tpstored() as tpstored:
             tpstored.remove(reward_number)
@@ -1697,7 +1697,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await ctx.send(embed=embed)
         except discord.Forbidden:
             return await ctx.send("I do not have the permission to embed a link."
-                " Please give me that permission.")
+                " Please give/ask someone to give me that permission.")
     
     async def get_league_data(self, trophies: int):
         """Return league number and emoji."""
