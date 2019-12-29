@@ -593,8 +593,15 @@ class GameModes:
         ob: Brawler = brawlers_map[opp_brawler](self.BRAWLERS, opp_brawler)
 
         if opponent != self.guild.me:
+            if user != self.guild.me:
+                try:
+                    msg = await user.send(f"Waiting for {opponent} to accept the challenge.")
+                except discord.Forbidden:
+                    await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled." 
+                        f" Reason: Unable to DM {user.name}. DMs are required to brawl!")
+                    raise
             try:
-                msg = await opponent.send(f"{user.mention} has challenged you for a brawl."
+                msg = await opponent.send(f"{user} has challenged you for a brawl."
                     f" Game Mode: **{gamemode}**. Accept?")
             except discord.Forbidden:
                 await ctx.send(f"{user.mention} {opponent.mention} Brawl cancelled." 
