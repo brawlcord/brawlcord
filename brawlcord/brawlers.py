@@ -1727,9 +1727,9 @@ class Penny(Brawler):
         """Represent the Super ability of Penny."""
 
         # getting all values
-        bear = self.ult["bear"]
-        br_range = bear["range"]
-        speed = bear["speed"]
+        cannon = self.ult["cannon"]
+        br_range = cannon["range"]
+        speed = cannon["speed"]
         
         stats = self.buff_stats(level)
 
