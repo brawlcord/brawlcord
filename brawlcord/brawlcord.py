@@ -16,6 +16,7 @@ import discord
 from redbot.core import Config, commands, checks
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
+from redbot.core.utils.chat_formatting import humanize_timedelta
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
@@ -978,13 +979,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " Please give/ask someone to give me that permission.")
 
     @commands.command(name="report")
-    @commands.cooldown(rate=1, per=86400, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=DAY/2, type=commands.BucketType.user)
     async def _report(self, ctx: Context, *, msg: str):
         """Send a report to the bot owner"""
-        channel_id = await self.config.report_channel()
-        
+    
         report_str = (f"`{datetime.utcnow().replace(microsecond=0)}` {ctx.author}"
                     f" (`{ctx.author.id}`) reported from `{ctx.guild}`: **{msg}**")
+        
+        channel_id = await self.config.report_channel()
         
         if channel_id:
             for guild in self.bot.guilds:
@@ -1000,12 +1002,27 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         await ctx.send("Thank you for sending a report. Your issue will be resolved as soon as possible.")
     
+    @_report.error
+    async def report_error(self, ctx: Context, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            ctx.command.reset_cooldown(ctx)
+            await ctx.send_help(command=self._report)
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(
+                "This command is on cooldown. Try again in {}.".format(
+                    humanize_timedelta(seconds=error.retry_after) or "1 second"
+                ),
+                delete_after=error.retry_after,
+            )
+        else:
+            log.exception(type(error).__name__, exc_info=error)
+
     @commands.command(name="rchannel")
     @checks.is_owner()
     async def report_channel(self, ctx: Context, channel: discord.TextChannel = None):
         """Set reports channel"""
         if not channel:
-            channel = ctx.channel()
+            channel = ctx.channel
         await self.config.report_channel.set(channel.id)
         await ctx.send(f"Report channel set to {channel.mention}.")
     
