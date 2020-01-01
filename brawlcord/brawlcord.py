@@ -16,7 +16,6 @@ import discord
 from redbot.core import Config, commands, checks
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
-from redbot.core.utils.chat_formatting import humanize_timedelta
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
@@ -28,6 +27,8 @@ from .utils import (Box, default_stats, gamemode_emotes,
 from .brawlhelp import BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, REDDIT_LINK, INVITE_URL
 
 from .errors import UserRejected
+
+from .cooldown import user_cooldown, user_cooldown_msg, humanize_timedelta
 
 
 BaseCog = getattr(commands, "Cog", object)
@@ -980,7 +981,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " Please give/ask someone to give me that permission.")
 
     @commands.command(name="report")
-    @commands.cooldown(rate=1, per=DAY/2, type=commands.BucketType.user)
+    @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
     async def _report(self, ctx: Context, *, msg: str):
         """Send a report to the bot owner"""
     
@@ -1072,9 +1073,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         pass
     
     @_claim.command(name="daily")
-    @commands.cooldown(rate=1, per=DAY, type=commands.BucketType.user)
     async def claim_daily(self, ctx: Context):
         """Claim daily reward"""
+
+        if not (await user_cooldown(1, DAY, self.config, ctx)):
+            msg = await user_cooldown_msg(ctx, self.config)
+            return await ctx.send(msg)
 
         user = ctx.author
 
@@ -1094,9 +1098,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 " Please give/ask someone to give me that permission.")
 
     @_claim.command(name="weekly")
-    @commands.cooldown(rate=1, per=WEEK, type=commands.BucketType.user)
     async def claim_weekly(self, ctx: Context):
         """Claim weekly reward"""
+
+        if not (await user_cooldown(1, WEEK, self.config, ctx)):
+            msg = await user_cooldown_msg(ctx, self.config)
+            return await ctx.send(msg)
+
         user = ctx.author
 
         brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
@@ -1763,6 +1771,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         rank = self.get_rank(data['pb'])
 
         return rank_emojis['br'+str(rank)]
+    
+    @commands.command()
+    @checks.is_owner()
+    async def clear_cooldown(self, ctx: Context, user: discord.User):
+        if not user:
+            user = ctx.author
+
+        async with self.config.user(user).cooldown() as cooldown:
+            cooldown.clear()
     
     def cog_unload(self):
         self.bank_update_task.cancel()
