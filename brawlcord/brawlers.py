@@ -1729,7 +1729,6 @@ class Penny(Brawler):
         # getting all values
         cannon = self.ult["cannon"]
         br_range = cannon["range"]
-        speed = cannon["speed"]
         
         stats = self.buff_stats(level)
 
