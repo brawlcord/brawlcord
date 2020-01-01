@@ -56,6 +56,7 @@ default_user = {
     # "trophies": 0,
     "tutorial_finished": False,
     "bank_update_ts": None,
+    "cooldown": {},
     "brawlers": {
         "Shelly": default_stats
     },
@@ -992,9 +993,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             for guild in self.bot.guilds:
                 try:
                     channel = discord.utils.get(guild.text_channels, id=channel_id)
-                    break
+                    if channel:
+                        break
                 except:
                     pass
+        if channel:
             await channel.send(report_str)
         else:
             owner = self.bot.get_user(self.bot.owner_id)
@@ -1072,6 +1075,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.cooldown(rate=1, per=DAY, type=commands.BucketType.user)
     async def claim_daily(self, ctx: Context):
         """Claim daily reward"""
+
         user = ctx.author
 
         brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
@@ -1147,6 +1151,19 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return await ctx.send("I do not have the permission to embed a link."
                 " Please give/ask someone to give me that permission.")
             
+    @commands.command(name="botinfo")
+    @checks.is_owner()
+    async def _bot_info(self, ctx: Context):
+        """Display bot statistics."""
+        
+        total_guilds = len(self.bot.guilds)
+        total_users = len(await self.config.all_users())
+
+        await ctx.send(f"{total_guilds}, {total_users}")
+
+        # for user in self.config.all_users():
+        #     print(user)
+
     # @commands.command(name="give")
     # @commands.is_owner()
     # async def _give(self, ctx: Context, user: discord.User = None):
@@ -1369,6 +1386,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
     async def update_token_bank(self):
         """Task to update token banks."""
+
         while True:
             for user in self.bot.users:
                 tokens_in_bank = await self.get_player_stat(user, 'tokens_in_bank')
