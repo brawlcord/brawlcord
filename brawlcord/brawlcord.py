@@ -1480,13 +1480,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         if trophies > pb:
             await self.update_player_stat(user, 'brawlers', trophies, substat=brawler, sub_index='pb')
-        
-        # total trophies 
-        # total_trophies = await self.get_trophies(user)
-        # total_pb = await self.get_trophies(user=user, pb=True)
-
-        # if total_trophies > total_pb:
-        #     await self.up
 
     async def update_token_bank(self):
         """Task to update token banks."""
@@ -1544,38 +1537,41 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         rank_as_per_pb = self.get_rank(pb)
 
-        if rank_as_per_pb > rank:
-            await self.update_player_stat(user, 'brawlers', rank_as_per_pb, brawler, 'rank')
-            
-            rank_up_tokens = self.RANKS[str(rank)]["PrimaryLvlUpRewardCount"]
-
-            token_doubler = await self.get_player_stat(user, 'token_doubler')
-        
-            upd_td = token_doubler - rank_up_tokens
-            if upd_td < 0:
-                upd_td = 0
-
-            if token_doubler > rank_up_tokens:
-                rank_up_tokens *= 2
-            else:
-                rank_up_tokens += token_doubler
-
-            rank_up_starpoints = self.RANKS[str(rank)]["SecondaryLvlUpRewardCount"]
-
-            await self.update_player_stat(user, 'tokens', rank_up_tokens, add_self=True)
-            await self.update_player_stat(user, 'starpoints', rank_up_starpoints, add_self=True)
-            await self.update_player_stat(user, 'token_doubler', upd_td)
-
-            embed = discord.Embed(color=EMBED_COLOR, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
-            embed.set_author(name=user.name, icon_url=user.avatar_url)
-            embed.add_field(name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
-            embed.add_field(name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
-            if rank_up_starpoints:
-                embed.add_field(name="Star Points", 
-                            value=f"{emojis['starpoints']} {rank_up_starpoints}")
-            return embed
-        else:
+        if rank_as_per_pb <= rank:
             return False
+
+        await self.update_player_stat(user, 'brawlers', rank_as_per_pb, brawler, 'rank')
+        
+        rank_up_tokens = self.RANKS[str(rank)]["PrimaryLvlUpRewardCount"]
+
+        token_doubler = await self.get_player_stat(user, 'token_doubler')
+    
+        upd_td = token_doubler - rank_up_tokens
+        if upd_td < 0:
+            upd_td = 0
+
+        if token_doubler > rank_up_tokens:
+            rank_up_tokens *= 2
+        else:
+            rank_up_tokens += token_doubler
+
+        rank_up_starpoints = self.RANKS[str(rank)]["SecondaryLvlUpRewardCount"]
+
+        await self.update_player_stat(user, 'tokens', rank_up_tokens, add_self=True)
+        await self.update_player_stat(user, 'starpoints', rank_up_starpoints, add_self=True)
+        await self.update_player_stat(user, 'token_doubler', upd_td)
+
+        embed = discord.Embed(color=EMBED_COLOR, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        embed.add_field(name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
+        embed.add_field(name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
+        if rank_up_starpoints:
+            embed.add_field(name="Star Points", 
+                        value=f"{emojis['starpoints']} {rank_up_starpoints}")
+        if token_doubler > 0:
+            embed.add_field(name="Token Doubler", 
+                    value=f"{emojis['tokendoubler']} x{upd_td} remaining!", inline=False)
+        return embed
     
     async def handle_trophy_road(self, user: discord.User):
         """Function to handle trophy road progress."""   
