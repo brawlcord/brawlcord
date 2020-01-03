@@ -229,6 +229,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.guild_only()
     async def _brawl(self, ctx: Context, opponent: discord.User = None):
         """Brawl against other players"""
+
         guild = ctx.guild
         user = ctx.author
 
@@ -562,6 +563,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="brawlers", aliases=['brls'])
     async def all_owned_brawlers(self, ctx: Context, user: discord.User = None):
         """Show details of all the Brawlers you own"""
+
         if not user:
             user = ctx.author
 
@@ -603,8 +605,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                         f" {emojis['powerplay']}`{pb:>4}`")
             
             embed.add_field(name=f"{brawler_emojis[brawler]} {skin.upper()}{_brawler.upper()}", 
-                value=value, 
-                inline=False)
+                    value=value, inline=False)
         
         try:
             await ctx.send(embed=embed)
@@ -899,14 +900,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="upgrade", aliases=['up'])
     async def upgrade_brawlers(self, ctx: Context, *, brawler: str):
         """Upgrade a Brawler"""
+
         user = ctx.author
         
         user_owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
 
-        # for users who input 'el_primo'
-        brawler = brawler.replace("_", " ")
-
-        brawler = brawler.title()
+        if self.parse_brawler_name(brawler):
+            brawler = self.parse_brawler_name(brawler)
 
         if brawler not in user_owned:
             return await ctx.send(f"You do not own {brawler}!")
@@ -1025,6 +1025,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @checks.is_owner()
     async def report_channel(self, ctx: Context, channel: discord.TextChannel = None):
         """Set reports channel"""
+
         if not channel:
             channel = ctx.channel
         await self.config.report_channel.set(channel.id)
@@ -1124,7 +1125,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
     @commands.command(name="invite")
     async def _invite(self, ctx: Context):
-        """Shows Brawlcord's invite url."""
+        """Shows Brawlcord's invite url"""
         # embed_links=True, 
         # attach_files=True, 
         # external_emojis=True,
@@ -1162,7 +1163,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="botinfo")
     @checks.is_owner()
     async def _bot_info(self, ctx: Context):
-        """Display bot statistics."""
+        """Display bot statistics"""
         
         total_guilds = len(self.bot.guilds)
         total_users = len(await self.config.all_users())
@@ -1172,18 +1173,102 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         # for user in self.config.all_users():
         #     print(user)
 
-    # @commands.command(name="give")
-    # @commands.is_owner()
-    # async def _give(self, ctx: Context, user: discord.User = None):
-    #     if not user:
-    #         user = ctx.author
-        
-    #     brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+    @commands.command(name="upgrades")
+    async def _upgrades(self, ctx: Context):
+        """Show Brawlers which can be upgraded"""
 
-    #     box = Box(self.BRAWLERS, brawler_data)
-    #     embed = await box.bigbox(self.config.user(user), user)
+        user = ctx.author
 
-    #     await ctx.send(embed=embed)
+        user_owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        embed_str = ""
+
+        for idx, brawler in enumerate(user_owned):
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+            
+            level = brawler_data['level']
+            if level >= 9:
+                continue
+
+            powerpoints = brawler_data['powerpoints']
+
+            required_powerpoints = self.LEVEL_UPS[str(level)]["Progress"]
+
+            required_gold = self.LEVEL_UPS[str(level)]["RequiredCurrency"]
+
+            if powerpoints >= required_powerpoints:
+                embed_str += f"\n{idx+1}. {brawler} {brawler_emojis[brawler]} ({level} ->"
+                embed_str += f" {level+1}) - {emojis['gold']} {required_gold}"
+
+        if embed_str:
+            desc = (
+                "The following Brawlers can be upgraded by using the `-upgrade <brawler_name>`"
+                " command."
+            )
+            embed = discord.Embed(color=EMBED_COLOR, description=desc)
+            embed.add_field(name="Upgradable Brawlers", value=embed_str)
+            gold = await self.get_player_stat(user, 'gold')
+            embed.add_field(name="Available Gold", value=f"{emojis['gold']} {gold}")
+        else:
+            embed = discord.Embed(color=EMBED_COLOR, 
+                description="You can't upgrade any Brawler at the moment.")
+
+        embed.set_author(name=f"{user.name}'s Upgradable Brawlers", icon_url=user.avatar_url)
+
+        await ctx.send(embed=embed)
+    
+    @commands.command(name="powerpoints", aliases=['pps'])
+    async def _powerpoints(self, ctx: Context):
+        """Show number of power points each Brawler has"""
+
+        user = ctx.author
+
+        user_owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        embed_str = ""
+
+        for brawler in user_owned:
+            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+
+            level = brawler_data['level']
+            level_emote = level_emotes["level_"+str(level)]
+
+            if level < 9:
+                powerpoints = brawler_data['powerpoints']
+
+                required_powerpoints = self.LEVEL_UPS[str(level)]["Progress"]
+
+                required_gold = self.LEVEL_UPS[str(level)]["RequiredCurrency"]
+
+                embed_str += f"\n{level_emote} {brawler} {brawler_emojis[brawler]}"
+                embed_str += f" - {powerpoints}/{required_powerpoints} {emojis['powerpoint']}"
+            
+            else:
+                sp1 = brawler_data['sp1']
+                sp2 = brawler_data['sp2']
+
+                if sp1:
+                    sp1_icon = sp_icons[brawler][0]
+                else:
+                    sp1_icon = emojis['spgrey']
+                if sp2:
+                    sp2_icon = sp_icons[brawler][1]
+                else:
+                    sp2_icon = emojis['spgrey']
+
+                embed_str += f"\n{level_emote} {brawler} {brawler_emojis[brawler]}"
+                embed_str += f" - {sp1_icon} {sp2_icon}"
+
+        embed = discord.Embed(color=EMBED_COLOR)
+        embed.add_field(name="Brawlers", value=embed_str)
+
+        embed.set_author(name=f"{user.name}'s Power Points Info", icon_url=user.avatar_url)
+
+        try:
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            return await ctx.send("I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission.")
     
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
