@@ -1359,7 +1359,7 @@ class Poco(Brawler):
     """A class to represent Poco."""
     
     def _attack(self, level):
-        """Represent the attack ability of Pocoimo."""
+        """Represent the attack ability of Poco."""
         
         # getting all values 
         att_range = self.attack["range"]
@@ -1697,7 +1697,7 @@ class Penny(Brawler):
     """A class to represent Penny."""
 
     def _attack(self, level):
-        """Represent the attack ability of Penny. """
+        """Represent the attack ability of Penny."""
         
         # getting all values 
         att_range = self.attack["range"]
