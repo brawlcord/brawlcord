@@ -1433,9 +1433,6 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     async def xp_handler(self, user: discord.User):
         """Handle xp level ups."""
 
-        # xp = await self.config.user(ctx.author).xp()
-        # lvl = await self.config.user(ctx.author).lvl()
-
         xp = await self.get_player_stat(user, 'xp')
         lvl = await self.get_player_stat(user, 'lvl')
 
@@ -1451,12 +1448,26 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         level_up_msg = f"Level up! You have reached level {lvl+1}."
 
-        tokens_reward = self.XP_LEVELS[str(lvl)]["TokensRewardCount"]
-        reward_msg = f"Rewards: {tokens_reward} {emojis['token']}"
+        reward_tokens = self.XP_LEVELS[str(lvl)]["TokensRewardCount"]
 
         tokens = await self.get_player_stat(user, 'tokens')
-        tokens += tokens_reward
+        
+        token_doubler = await self.get_player_stat(user, 'token_doubler')
+        
+        upd_td = token_doubler - reward_tokens
+        if upd_td < 0:
+            upd_td = 0
+
+        if token_doubler > reward_tokens:
+            reward_tokens *= 2
+        else:
+            reward_tokens += token_doubler
+
+        reward_msg = f"Rewards: {reward_tokens} {emojis['token']}"
+        
+        tokens += reward_tokens
         await self.update_player_stat(user, 'tokens', tokens)
+        await self.update_player_stat(user, 'token_doubler', upd_td)
 
         return (level_up_msg, reward_msg)
 
@@ -1521,10 +1532,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return 35
     
     async def handle_rank_ups(self, user: discord.User, brawler: str):
-        """Function to handle rank ups. 
+        """Function to handle Brawler rank ups. 
         
         Returns an embed containing rewards if a brawler rank ups.
         """
+
         brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
         
         pb = brawler_data['pb']
@@ -1536,10 +1548,23 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             await self.update_player_stat(user, 'brawlers', rank_as_per_pb, brawler, 'rank')
             
             rank_up_tokens = self.RANKS[str(rank)]["PrimaryLvlUpRewardCount"]
+
+            token_doubler = await self.get_player_stat(user, 'token_doubler')
+        
+            upd_td = token_doubler - rank_up_tokens
+            if upd_td < 0:
+                upd_td = 0
+
+            if token_doubler > rank_up_tokens:
+                rank_up_tokens *= 2
+            else:
+                rank_up_tokens += token_doubler
+
             rank_up_starpoints = self.RANKS[str(rank)]["SecondaryLvlUpRewardCount"]
 
             await self.update_player_stat(user, 'tokens', rank_up_tokens, add_self=True)
             await self.update_player_stat(user, 'starpoints', rank_up_starpoints, add_self=True)
+            await self.update_player_stat(user, 'token_doubler', upd_td)
 
             embed = discord.Embed(color=EMBED_COLOR, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
             embed.set_author(name=user.name, icon_url=user.avatar_url)
