@@ -1,17 +1,17 @@
 {
 	"author": "snowsee",
 	"description": "A multiplayer battler for Discord based on Brawl Stars.",
-    "install_msg" : "Thank you for installing the Brawlcord cog, based on the mobile game Brawl Stars (developed by Supercell).",
-    "min_python_version": [3, 6, 0],
-    "permissions" : [
+	"install_msg": "Thank you for installing the Brawlcord cog, based on the mobile game Brawl Stars (developed by Supercell).",
+	"min_python_version": [3, 6, 0],
+	"permissions": [
 		"add_reactions",
 		"manage_messages"
 	],
 	"short": "A simplified version of Brawl Stars for Discord.",
 	"tags": [
 		"duel",
-        "supercell",
-        "brawlstars",
+		"supercell",
+		"brawlstars",
 		"games",
 		"game"
 	],

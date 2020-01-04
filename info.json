@@ -4,8 +4,8 @@
     "name" : "Brawlcord",
     "short" : "A simplified version of the game Brawl Stars, developed by Supercell.",
     "description" : "Play the game Brawl Stars (by Supercell) on Discord.",
-	"tags": [
-		"duel",
+    "tags": [
+        "duel",
         "supercell",
         "brawlstars",
         "games",
