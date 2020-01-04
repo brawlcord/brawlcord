@@ -24,7 +24,10 @@ from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler, br
 from .utils import (Box, default_stats, gamemode_emotes, 
     spawn_text, brawlers_map, GameModes, level_emotes)
 
-from .brawlhelp import BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, REDDIT_LINK, INVITE_URL
+from .brawlhelp import (
+    BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, 
+    REDDIT_LINK, INVITE_URL, SOURCE_LINK
+)
 
 from .errors import UserRejected
 
@@ -212,7 +215,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         embed.add_field(name="Creator", value=f"[Snowsee]({REDDIT_LINK})")
 
-        embed.add_field(name="Version", value=__version__)
+        embed.add_field(name="Version", value=f"[{__version__}]({SOURCE_LINK})")
 
         embed.add_field(name="Invite Link", value=f"[Click here]({INVITE_URL})")
 
