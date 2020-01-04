@@ -198,9 +198,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         info = (
             "Brawlcord is a Discord bot which allows users to simulate a simple version of"
-            f" [Brawl Stars]({BRAWLSTARS}), a mobile game developed by Supercell. \n\nBrawlcord has"
-            " features such as interactive 1v1 Brawls, diverse Brawlers and leaderboards! You can"
-            " suggest more features in the community server (link below)!"
+            f" [Brawl Stars]({BRAWLSTARS}), a mobile game developed by Supercell. \n\nBrawlcord"
+            " has features such as interactive 1v1 Brawls, diverse Brawlers and leaderboards! You"
+            " can suggest more features in the community server (link below)!"
+            f"\n\n{ctx.me.name} is currently in **{len(self.bot.guilds)}** servers!"
         )
 
         embed = discord.Embed(color=EMBED_COLOR)
