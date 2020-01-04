@@ -487,7 +487,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         skin = selected['brawler_skin']
         gamemode = selected['gamemode']
 
-        # el primo skins appear as El Rudo Primo, etc
+        # el primo skins appear as El Rudo, Primo, etc
         if brawler == "El Primo":
             if skin != "Default":
                 _brawler = "Primo"
