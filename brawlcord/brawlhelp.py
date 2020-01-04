@@ -18,6 +18,7 @@ INVITE_URL = ("https://discordapp.com/api/oauth2/authorize?client_id=64411895791
 SELF_EMOTE = "<:Brawlcord:648245740409323600>"
 DISCORD_EMOTE = "<:discord:648246368539901961>"
 GITHUB_LINK = "https://snowsee.github.io/brawlcord/"
+SOURCE_LINK = "https://github.com/snowsee/brawlcord"
 COMMUNITY_LINK = GITHUB_LINK + "#how-to-use"
 REDDIT_LINK = "https://www.reddit.com/user/Snowsee"
 EMBED_COLOR = 0xFFA232
