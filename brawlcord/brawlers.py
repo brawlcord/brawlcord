@@ -39,7 +39,9 @@ emojis = {
     "spgrey": "<:sp_greyed_out:647382542109900804>",
     "startoken": "<:startoken:645694989417840670>",
     "wintrophy": "<:fwin_trophy:648085703795933194>",
-    "powerplay": "<:powerplay:645341012646035459>"
+    "powerplay": "<:powerplay:645341012646035459>",
+    "superready": "<:super_ready:664073599111659550>",
+    "supernotready": "<:super_not_ready:664073623358799872>"
 }
 
 sp_icons = {
