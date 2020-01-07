@@ -912,6 +912,8 @@ class GameModes:
             second_spawn = self.second_spawn
             second_spawn_str = self.second_spawn_str
 
+            opp_attacks = self.second_attacks
+
         else:
             second_player = self.first_player
             second_brawler = self.first_brawler
@@ -924,12 +926,24 @@ class GameModes:
             first_spawn = self.second_spawn
             first_spawn_str = self.second_spawn_str
 
+            opp_attacks = self.first_attacks
+
+        if opp_attacks >= 6:
+            opp_super_emote = emojis['superready']
+        else:
+            opp_super_emote = emojis['supernotready']
+        
+        if first_can_super:
+            self_super_emote = emojis['superready']
+        else:
+            self_super_emote = emojis['supernotready']
+
         desc = "Pick a move by typing the corresponding move number below."
         embed = discord.Embed(color=EMBED_COLOR, title=f"Brawl against {second_player.name}")
         embed.set_author(name=first_player.name, icon_url=first_player.avatar_url)
 
         embed.add_field(name="Your Brawler", 
-                    value=f"{brawler_emojis[first_brawler]} {first_brawler}")
+                    value=f"{brawler_emojis[first_brawler]} {first_brawler} {self_super_emote}")
         embed.add_field(name="Your Health", 
                     value=f"{emojis['health']} {int(first_health)}")
         if first_gems is not None:
@@ -942,7 +956,7 @@ class GameModes:
                         value=f"{emojis['health']} {int(first_spawn)}", inline=False)
     
         embed.add_field(name="Opponent's Brawler", 
-                    value=f"{brawler_emojis[second_brawler]} {second_brawler}")
+                    value=f"{brawler_emojis[second_brawler]} {second_brawler} {opp_super_emote}")
         embed.add_field(name="Opponent's Health", 
                     value=f"{emojis['health']} {int(second_health)}")
         if second_gems is not None:
