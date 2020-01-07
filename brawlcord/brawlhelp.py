@@ -14,7 +14,7 @@ from redbot.core.utils.chat_formatting import box, pagify
 EmbedField = namedtuple("EmbedField", "name value inline")
 EMPTY_STRING = "\N{ZERO WIDTH SPACE}"
 INVITE_URL = ("https://discordapp.com/api/oauth2/authorize?client_id=644118957917208576"
-    "&permissions=311360&scope=bot")
+    "&permissions=314432&scope=bot")
 SELF_EMOTE = "<:Brawlcord:648245740409323600>"
 DISCORD_EMOTE = "<:discord:648246368539901961>"
 GITHUB_LINK = "https://snowsee.github.io/brawlcord/"
