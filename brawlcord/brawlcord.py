@@ -118,6 +118,7 @@ league_emojis = {
 old_invite = None
 
 BRAWLSTARS = "https://blog.brawlstars.com/index.html"
+FAN_CONTENT_POLICY = "https://www.supercell.com/fan-content-policy"
 
 DAY = 86400
 WEEK = 604800
@@ -207,6 +208,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             f"\n\n{ctx.me.name} is currently in **{len(self.bot.guilds)}** servers!"
         )
 
+        disclaimer = (
+            "This content is not affiliated with, endorsed, sponsored, or specifically approved by"
+            " Supercell and Supercell is not responsible for it. For more information see Supercell’s"
+            f" [Fan Content Policy]({FAN_CONTENT_POLICY})."
+        )
+
         embed = discord.Embed(color=EMBED_COLOR)
 
         # embed.set_author(name=ctx.me.name, icon_url=ctx.me.avatar_url)
@@ -222,6 +229,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="Feedback", value=f"You can give feedback to" 
             f" improve Brawlcord in the [Brawlcord community server]({COMMUNITY_LINK}).", 
             inline=False)
+
+        embed.add_field(name="Disclaimer", value=disclaimer, inline=False)
 
         try: 
             await ctx.send(embed=embed)
@@ -1130,11 +1139,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="invite")
     async def _invite(self, ctx: Context):
         """Shows Brawlcord's invite url"""
+
+        # read_messages=True
+        # send_messages=True
         # embed_links=True, 
         # attach_files=True, 
         # external_emojis=True,
         # add_reactions=True
-        perms = discord.Permissions(311360)
+        perms = discord.Permissions(314432)
 
         try:
             data = await self.bot.application_info()
@@ -1142,6 +1154,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             value = (
                 f"Add Brawlcord to your server by **[clicking here]({invite_url})**."
                 "\n\nNote: By using the link above, Brawlcord will be able to"
+                " read messages,"
+                " send messages,"
                 " embed links,"
                 " attach files,"
                 " add reactions,"
