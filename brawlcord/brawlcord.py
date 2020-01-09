@@ -19,10 +19,12 @@ from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
-from .brawlers import emojis, brawler_emojis, sp_icons, rank_emojis, Brawler, brawler_thumb
+from .brawlers import (
+    emojis, brawler_emojis, sp_icons, brawlers_map,
+    rank_emojis, Brawler, brawler_thumb
+)
 
-from .utils import (Box, default_stats, gamemode_emotes, 
-    spawn_text, brawlers_map, GameModes, level_emotes)
+from .utils import Box, default_stats, gamemode_emotes, spawn_text, GameModes, level_emotes
 
 from .brawlhelp import (
     BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, 
