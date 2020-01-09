@@ -61,23 +61,6 @@ sp_icons = {
     "Carl": ["<:PowerThrow:645349548067258369>", "<:ProtectivePirouette:645349546989322270>"]
 }
 
-brawlers_map = {
-    "Shelly": Shelly,
-    "Nita": Nita,
-    "Colt": Colt,
-    "Bull": Bull,
-    "Jessie": Jessie,
-    "Brock": Brock,
-    "Dynamike": Dynamike,
-    "El Primo": ElPrimo,
-    "Barley": Barley,
-    "Poco": Poco,
-    "Rico": Rico,
-    "Darryl": Darryl,
-    "Penny": Penny,
-    "Carl": Carl
-}
-
 rarity_colors = {
     "Trophy Road": 0x6db2ba,
     "Rare": 0x00d635,
@@ -1966,3 +1949,21 @@ class Carl(Brawler):
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
         return embed
+
+
+brawlers_map = {
+    "Shelly": Shelly,
+    "Nita": Nita,
+    "Colt": Colt,
+    "Bull": Bull,
+    "Jessie": Jessie,
+    "Brock": Brock,
+    "Dynamike": Dynamike,
+    "El Primo": ElPrimo,
+    "Barley": Barley,
+    "Poco": Poco,
+    "Rico": Rico,
+    "Darryl": Darryl,
+    "Penny": Penny,
+    "Carl": Carl
+}
