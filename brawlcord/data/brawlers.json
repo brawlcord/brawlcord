@@ -455,5 +455,40 @@
             "Lil Helper": [-1, -1],
             "Bunny": [80, -1]
         }
+    },
+    "Carl": {
+        "desc": "Carl throws his Pickaxe like a boomerang. His Super is a crazy cart spin that clobbers anyone around him.",
+        "health": 4400,
+        "attack": {
+            "name": "Pickaxe",
+            "damage": 600,
+            "desc": "Carl throws his Pickaxe like a boomerang. After he catches the returning Pickaxe, he can throw it again.",
+            "range": 8,
+            "reload": 0.5,
+            "projectiles": 2
+        },
+        "speed": 720,
+        "rarity": "Super Rare",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Tailspin",
+            "damage": 400,
+            "desc": "Carl goes into a crazy spin for a few seconds, flailing around and damaging nearby opponents.",
+            "duration": 5
+        },
+        "sp1": {
+            "name": "Power Throw",
+            "desc": "Carl throws his Pickaxe with **13%** more speed, allowing it to travel faster and return faster."
+        },
+        "sp2": {
+            "name": "Protective Pirouette",
+            "desc": "During Carl's Super, all damage he receives is reduced by **40%**."
+        },
+        "skins": {
+            "Road Rage": [80, -1],
+            "Hog Rider": [80, -1],
+            "Leonard": [80, -1],
+            "Captain": [-1, -1]
+        }
     }
 }
