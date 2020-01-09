@@ -48,22 +48,6 @@ spawn_text = {
     "8-Bit": "Turret"
 }
 
-brawlers_map = {
-    "Shelly": Shelly,
-    "Nita": Nita,
-    "Colt": Colt,
-    "Bull": Bull,
-    "Jessie": Jessie,
-    "Brock": Brock,
-    "Dynamike": Dynamike,
-    "El Primo": ElPrimo,
-    "Barley": Barley,
-    "Poco": Poco,
-    "Rico": Rico,
-    "Darryl": Darryl,
-    "Penny": Penny
-}
-
 level_emotes = {
     "level_10": "<:level_10:648932852699758593>",
     "level_7": "<:level_7:648932853266251789>",
