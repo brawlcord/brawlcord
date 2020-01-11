@@ -112,7 +112,10 @@ class BrawlcordHelp(RedHelpFormatter):
 
         pages = []
 
-        page_char_limit = await ctx.bot.db.help.page_char_limit()
+        help_settings = await commands.help.HelpSettings.from_context(ctx)
+        
+        page_char_limit = help_settings.page_char_limit
+
         field_groups = self.group_embed_fields(embed_dict["fields"], page_char_limit)
 
         page_count = len(field_groups)
