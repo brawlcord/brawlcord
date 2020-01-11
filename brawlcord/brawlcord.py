@@ -1005,6 +1005,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         channel_id = await self.config.report_channel()
         
+        channel = None
         if channel_id:
             for guild in self.bot.guilds:
                 try:
@@ -1013,6 +1014,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                         break
                 except:
                     pass
+   
         if channel:
             await channel.send(report_str)
         else:
