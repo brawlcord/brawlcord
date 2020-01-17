@@ -1,8 +1,4 @@
-from datetime import datetime, timedelta
-
-from discord.abc import PrivateChannel
-from discord.ext.commands.core import Command, BucketType
-from discord.ext.commands.core import Cooldown, CooldownMapping
+from datetime import datetime
 
 from redbot.core import Config
 from redbot.core.commands.context import Context
@@ -22,7 +18,7 @@ async def user_cooldown(rate, per, config: Config, ctx: Context):
             }
             return True
         else:
-            if (await check_user_cooldown(ctx, config, cooldown)):
+            if await check_user_cooldown(ctx, config, cooldown):
                 return True
     return False
         
@@ -39,14 +35,13 @@ async def check_user_cooldown(ctx: Context, config: Config, cooldown: dict):
     now = utc_timestamp(datetime.utcnow())
 
     if now >= last + per:
-        async with config.user(ctx.author).cooldown() as cooldown:
-            cooldown[command] = {
-                "last": utc_timestamp(datetime.utcnow()),
-                "rate": rate,
-                "per": per,
-                "uses": 1
-            }
-            return True
+        cooldown[command] = {
+            "last": utc_timestamp(datetime.utcnow()),
+            "rate": rate,
+            "per": per,
+            "uses": 1
+        }
+        return True
     else:
         if uses < rate:
             cooldown[command] = {

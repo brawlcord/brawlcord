@@ -1107,7 +1107,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     async def claim_daily(self, ctx: Context):
         """Claim daily reward"""
 
-        if not (await user_cooldown(1, DAY, self.config, ctx)):
+        if not await user_cooldown(1, DAY, self.config, ctx):
             msg = await user_cooldown_msg(ctx, self.config)
             return await ctx.send(msg)
 
@@ -1132,7 +1132,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     async def claim_weekly(self, ctx: Context):
         """Claim weekly reward"""
 
-        if not (await user_cooldown(1, WEEK, self.config, ctx)):
+        if not await user_cooldown(1, WEEK, self.config, ctx):
             msg = await user_cooldown_msg(ctx, self.config)
             return await ctx.send(msg)
 
@@ -1915,10 +1915,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     
     @commands.command()
     @checks.is_owner()
-    async def clear_cooldown(self, ctx: Context, user: discord.User):
+    async def clear_cooldown(self, ctx: Context, user: discord.User = None):
         if not user:
             user = ctx.author
-
         async with self.config.user(user).cooldown() as cooldown:
             cooldown.clear()
     
