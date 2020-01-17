@@ -42,7 +42,7 @@ BaseCog = getattr(commands, "Cog", object)
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 __author__ = "Snowsee"
 
 default = {
