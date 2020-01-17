@@ -84,10 +84,18 @@ default_user = {
         "3v3": [0, 0], # [wins, losses]
         "duo": [0, 0], # [wins, losses]
     },
+    # number of boxes collected from trophy road 
     "boxes": {
         "brawl": 0,
         "big": 0,
         "mega": 0
+    },
+    # rewards added by the bot owner
+    # can be adjusted to include brawlers, gamemodes, etc
+    "gifts": {
+        "brawlbox": 0,
+        "bigbox": 0,
+        "megabox": 0
     }
 }
 
@@ -874,6 +882,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="brawlbox", aliases=['box'])
     async def _brawl_box(self, ctx: Context):
         """Open a Brawl Box using Tokens"""
+
         user = ctx.author
         
         tokens = await self.get_player_stat(user, 'tokens')
@@ -893,7 +902,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
+            await ctx.send("I do not have the permission to embed a link."
                 " Please give/ask someone to give me that permission.")
 
         await self.update_player_stat(user, 'tokens', -100, add_self=True)
@@ -901,6 +910,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     @commands.command(name="bigbox", aliases=['big'])
     async def _big_box(self, ctx: Context):
         """Open a Big Box using Star Tokens"""
+
         user = ctx.author
         
         startokens = await self.get_player_stat(user, 'startokens')
@@ -920,7 +930,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
+            await ctx.send("I do not have the permission to embed a link."
                 " Please give/ask someone to give me that permission.")
 
         await self.update_player_stat(user, 'startokens', -10, add_self=True)
@@ -1305,6 +1315,73 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             return await ctx.send("I do not have the permission to embed a link."
                 " Please give/ask someone to give me that permission.")
     
+    @commands.group(name="gift")
+    async def _gifted(self, ctx: Context):
+        """View and collect gifted Brawl, Big or Mega boxes"""
+        pass
+    
+    @_gifted.command(name="list")
+    async def _gifted_list(self, ctx: Context):
+        """View gifted rewards"""
+
+        user = ctx.author
+        
+        gifts = await self.get_player_stat(user, 'gifts')
+
+        desc = "Use `-gift` command to learn more about claiming rewards!"
+        embed = discord.Embed(color=EMBED_COLOR, title="Gifted Rewards List", description=desc)
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        
+        embed_str = ""
+        
+        for gift_type in gifts:
+            if gift_type in ["brawlbox", "bigbox", "megabox"]:
+                count = gifts[gift_type]
+                emoji = emojis[gift_type]
+                if count > 0:
+                    embed_str += f"\n{emoji} {self._box_name(gift_type)}: x**{count}**"
+            else: continue
+        
+        if embed_str:
+            embed.add_field(name="Rewards", value=embed_str.strip())
+        else:
+            embed.add_field(name="Rewards", value="You don't have any gifts.")
+
+        try:
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            return await ctx.send("I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission.")
+
+    @_gifted.command(name="mega")
+    async def _gifted_mega(self, ctx: Context):
+        """Open a gifted Mega Box, if saved"""
+
+        user = ctx.author
+
+        saved = await self.get_player_stat(user, "gifts", is_iter=True, substat="mega")
+
+        if saved < 1:
+            return await ctx.send("You do not have any gifted mega boxes.")
+        
+        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        box = Box(self.BRAWLERS, brawler_data)
+        try:
+            embed = await box.megabox(self.config.user(user), user)
+        except Exception as exc:
+            return await ctx.send(f"Error \"{exc}\" while opening a Mega Box. Please notify bot creator"
+                " using `-report` command.")
+
+        try:
+            await ctx.send(embed=embed)
+        except discord.Forbidden:
+            await ctx.send("I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission.")
+
+        # await self.update_player_stat(user, 'tokens', -100, add_self=True)
+        await self.update_player_stat(user, "gifts", -1, substat="megabox", add_self=True)
+
     async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
         """Get stats of a player."""
 
@@ -1913,6 +1990,11 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         return rank_emojis['br'+str(rank)]
     
+    def _box_name(self, box: str):
+        """Return box name"""
+
+        return box.split("box")[0].title() + " Box"
+    
     @commands.command()
     @checks.is_owner()
     async def clear_cooldown(self, ctx: Context, user: discord.User = None):
@@ -1920,6 +2002,29 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             user = ctx.author
         async with self.config.user(user).cooldown() as cooldown:
             cooldown.clear()
+    
+    @commands.command()
+    @checks.is_owner()
+    async def add_mega(self, ctx: Context, quantity = 1):
+        """Add a mega box to each"""
+
+        users_data = await self.config.all_users()
+        user_ids = users_data.keys()
+
+        for user_id in user_ids:
+            try:
+                user_group = self.config.user_from_id(user_id)
+            except:
+                log.exception(f"Couldn't fetch user group of {user_id}.")
+                continue
+            try:
+                async with user_group.gifts() as gifts:
+                    gifts["megabox"] += quantity
+            except:
+                log.exception(f"Couldn't fetch gifts for {user_id}.")
+                continue
+
+        await ctx.send(f"Added {quantity} mega boxes to all users (bar errors).")
     
     def cog_unload(self):
         self.bank_update_task.cancel()
