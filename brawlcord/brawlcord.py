@@ -1107,7 +1107,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     async def claim_daily(self, ctx: Context):
         """Claim daily reward"""
 
-        if not await user_cooldown(1, 10, self.config, ctx):
+        if not await user_cooldown(1, DAY, self.config, ctx):
             msg = await user_cooldown_msg(ctx, self.config)
             return await ctx.send(msg)
 
