@@ -24,7 +24,9 @@ from .brawlers import (
     rank_emojis, Brawler, brawler_thumb
 )
 
-from .utils import Box, default_stats, gamemode_emotes, spawn_text, GameModes, level_emotes
+from .utils import Box, default_stats, level_emotes
+
+from .gamemodes import GameMode, gamemode_emotes, gamemodes_map, GemGrab
 
 from .brawlhelp import (
     BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, 
@@ -275,19 +277,20 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         
         self.sessions.append(user.id)
 
-        g: GameModes = GameModes(ctx, user, opponent, self.config.user, self.BRAWLERS)
+        gm = await self.get_player_stat(user, "selected", is_iter=True, substat="gamemode")
+
+        g: GameMode = gamemodes_map[gm](ctx, user, opponent, self.config.user, self.BRAWLERS)
         
         try:
-            first_player, second_player, winner, loser = await g.initialize(ctx)
-        except asyncio.TimeoutError:
-            return
-        except UserRejected:
-            return
-        except discord.Forbidden:
+            first_player, second_player = await g.initialize(ctx)
+        except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
             return
         except Exception as exc:
             traceback.print_tb(exc.__traceback__)
-            return await ctx.send(f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command.") 
+            return await ctx.send(
+                f"Error: \"{exc}\" with initialising brawl."
+                " Please notify bot owner by using `-report` command."
+            )
         finally:
             self.sessions.remove(user.id)
             try:
@@ -295,6 +298,16 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             except:
                 pass
         
+        try:
+            winner, loser = await g.play(ctx)
+        except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
+            return
+        except Exception as exc:
+            traceback.print_tb(exc.__traceback__)
+            return await ctx.send(
+                f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command."
+            )
+
         players = [first_player, second_player]
         
         starplayer = random.choice(players)
