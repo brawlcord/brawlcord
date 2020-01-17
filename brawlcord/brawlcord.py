@@ -1359,7 +1359,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user = ctx.author
 
-        saved = await self.get_player_stat(user, "gifts", is_iter=True, substat="mega")
+        saved = await self.get_player_stat(user, "gifts", is_iter=True, substat="megabox")
 
         if saved < 1:
             return await ctx.send("You do not have any gifted mega boxes.")
