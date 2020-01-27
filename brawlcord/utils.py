@@ -39,7 +39,7 @@ level_emotes = {
 class Box:
     """A class to represent Boxes."""
     
-    def __init__(self, all_brawlers, brawler_data):        
+    def __init__(self, all_brawlers, brawler_data):
         # variables to store possibilities data
         self.can_unlock = {
             "Rare": [],
