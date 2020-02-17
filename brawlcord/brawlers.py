@@ -1,10 +1,10 @@
 """
-This module contains all the Brawler data. Each Brawler has a separate class, which extends from
-the base (Brawler). Perhaps subclassing them as `Shotgunners`, `Spawners`, etc would be better.
+This module contains all the Brawler data. Each Brawler has a
+separate class, which extends from the base (Brawler). Perhaps
+subclassing them as `Shotgunners`, `Spawners`, etc would be better.
 """
 
 
-import json
 import random
 
 import discord
@@ -1537,17 +1537,17 @@ class Rico(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self, 
+        brawler_name: str, 
+        trophies: int = None, 
+        pb:int = None, 
+        rank: int = None,
+        level: int = None, 
+        pp: int = None, 
+        next_level_pp: int = None, 
+        sp1=False, 
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
         embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
