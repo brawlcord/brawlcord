@@ -84,6 +84,10 @@ sp_icons = {
     "Carl": [
         "<:PowerThrow:645349548067258369>",
         "<:ProtectivePirouette:645349546989322270>"
+    ],
+    "Bo": [
+        "<:CirclingEagle:645349548562317313>",
+        "<:SnareABear:678944864477511691>"
     ]
 }
 

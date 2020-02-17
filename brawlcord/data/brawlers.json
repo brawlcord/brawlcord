@@ -250,6 +250,41 @@
             "Robo": [300, -1]
         }
     },
+    "Bo": {
+        "desc": "Bo fires three explosive arrows toward his targets. His Super ability places a trio of hidden, explosive mines on the ground!",
+        "health": 3600,
+        "attack": {
+            "name": "Eagle-Eyed",
+            "damage": 520,
+            "desc": "Bo releases a trio of exploding arrows, tearing up enemies like an eagle's talons.",
+            "range": 8.33,
+            "reload": 1.7,
+            "projectiles": 3
+        },
+        "speed": 720,
+        "rarity": "Trophy Road",
+        "unlockTrp": 3000,
+        "ult": {
+            "name": "Catch a Fox",
+            "damage": 1440,
+            "desc": "Bo hides explosive traps in the ground. When triggered by an enemy, the traps explode after a short delay, knocking back and damaging enemies.",
+            "range": 8.33,
+            "projectiles": 3
+        },
+        "sp1": {
+            "name": "Circling Eagle",
+            "desc": "Bo spots enemies hidden in bushes from **150%** longer distance than normally."
+        },
+        "sp2": {
+            "name": "Snare a Bear",
+            "desc": "Instead of a knockback, Bo's traps now stun the enemy for **2.0** seconds!"
+        },
+        "skins": {
+            "Mecha": [300, -1],
+            "Light Mecha": [-1, 10000],
+            "Gold Mecha": [-1, 50000]
+        }
+    },
     "El Primo": {
         "desc": "El Primo throws a flurry of punches at his enemies. His Super is a leaping elbow drop that deals damage to all caught underneath!",
         "health": 5800,
