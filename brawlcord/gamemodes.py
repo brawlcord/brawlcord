@@ -489,14 +489,14 @@ class GemGrab(GameMode):
                     second.gems -= second.dropped
 
                     try:
-                        await self.first.player.send(
-                            f"Time's up. Match ended in a draw."
+                        await first.player.send(
+                            f"Opponent defeated! Respawning next round."
                         )
                     except Exception:
                         pass  # bot user
                     try:
-                        await self.second.player.send(
-                            f"Time's up. Match ended in a draw."
+                        await second.player.send(
+                            f"You are defeated! Respawning next round."
                         )
                     except Exception:
                         pass  # bot user
@@ -589,7 +589,7 @@ class GemGrab(GameMode):
             if not second.spawn:
                 moves = (
                     "1. Try to collect gem\n2. Dodge next move"
-                    "\n|3. Try to collect dropped gems"
+                    "\n3. Try to collect dropped gems"
                 )
             else:
                 moves = (
