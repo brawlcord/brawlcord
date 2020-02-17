@@ -31,11 +31,9 @@ from .errors import UserRejected, MaintenanceError
 from .cooldown import user_cooldown, user_cooldown_msg, humanize_timedelta
 
 
-BaseCog = getattr(commands, "Cog", object)
-
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 __author__ = "Snowsee"
 
 default = {
@@ -137,7 +135,7 @@ DAY = 86400
 WEEK = 604800
 
 
-class Brawlcord(BaseCog, name="Brawlcord"):
+class Brawlcord(commands.Cog):
     """Play a simple version of Brawl Stars on Discord."""
 
     def __init__(self, bot):
