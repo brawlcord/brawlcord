@@ -31,7 +31,7 @@ class Brawler:
     """Class to represent a Brawler."""
 
     def __init__(self, raw_data: dict, brawler: str):
-        
+
         data = raw_data[brawler]
 
         self.name = brawler
@@ -51,7 +51,7 @@ class Brawler:
             return getattr(self, stat)[substat]
         else:
             return getattr(self, stat)
-    
+
     def get_all_stats(self):
         """Get all Brawler stats."""
         stats = {
@@ -72,11 +72,11 @@ class Brawler:
         stats = self.buff_stats(level)
 
         return stats['health']
-    
+
     def _attack(self, level):
         """Represent the attack ability of the Brawler. """
         pass
-        
+
     def _ult(self, level):
         """Represent the Super ability of the Brawler."""
         pass
@@ -92,35 +92,31 @@ class Brawler:
     def _spawn(self, level):
         """Represent the spawned character of the Brawler."""
         return None
-    
+
     def buff_stats(self, stats: dict, level: int):
         """Get Brawler stats by specified level."""
 
         if level == 10:
             level = 9
-        
-        upd_stats = {}
 
         for stat in stats:
             upgrader = stats[stat]/20
             stats[stat] += int(upgrader * (level - 1))
-            # upd_stats[stat] = stats[stat]
-            # upd_stats.append(stat)
-        
+
         return stats
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Display brawler info in a formatted way."""
 
         brawler_name_url = brawler_name.replace(" ", "-")
@@ -131,18 +127,30 @@ class Brawler:
         title = f"{brawler_emojis[brawler_name]} {brawler_name}"
         if not level:
             title += f" [Not unlocked]"
-        
-        embed = discord.Embed(color=rarity_colors[self.rarity], title=title, 
-            description=self.desc, url=url)
+
+        embed = discord.Embed(
+            color=rarity_colors[self.rarity], title=title,
+            description=self.desc, url=url
+        )
         embed.set_thumbnail(url=brawler_thumb.format(brawler_name_url.title()))
         if level:
             embed.add_field(name="POWER", value=f"{emojis['xp']} {level}")
-            embed.add_field(name="TROPHIES", value=f"{emojis['trophies']} {trophies}")
-            embed.add_field(name="PERSONAL BEST", value=f"{rank_emojis['br'+str(rank)]} {pb} [Rank {rank}]")
+            embed.add_field(
+                name="TROPHIES", value=f"{emojis['trophies']} {trophies}"
+            )
+            embed.add_field(
+                name="PERSONAL BEST",
+                value=f"{rank_emojis['br'+str(rank)]} {pb} [Rank {rank}]"
+            )
             if pp > 0:
-                embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} {pp}/{next_level_pp}")
+                embed.add_field(
+                    name="POWER POINTS",
+                    value=f"{emojis['powerpoint']} {pp}/{next_level_pp}"
+                )
             else:
-                embed.add_field(name="POWER POINTS", value=f"{emojis['powerpoint']} Maxed")
+                embed.add_field(
+                    name="POWER POINTS", value=f"{emojis['powerpoint']} Maxed"
+                )
         else:
             embed.add_field(name="POWER", value=f"{emojis['xp']} 1")
         return embed
@@ -150,13 +158,13 @@ class Brawler:
 
 class Shelly(Brawler):
     """A class to represent Shelly."""
-    
+
     def _attack(self, level):
         """Represent the attack ability of Shelly."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -181,15 +189,15 @@ class Shelly(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Shelly."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # # ult_range = self.ult["range"]
         projectiles = self.ult["projectiles"]
 
         stats = self.buff_stats(level)
 
         damage = stats['ult_damage']
 
-        raw = damage * projectiles * 0.8 
+        raw = damage * projectiles * 0.8
 
         chance = random.randint(0, 10)
 
@@ -214,36 +222,47 @@ class Shelly(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
 
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per shell: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per shell: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -252,9 +271,12 @@ class Shelly(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -266,10 +288,10 @@ class Nita(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Nita. """
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -295,10 +317,10 @@ class Nita(Brawler):
         """Represent the Super ability of Nita."""
 
         # getting all values
-        bear = self.ult["bear"]
-        br_range = bear["range"]
-        speed = bear["speed"]
-        
+        # bear = self.ult["bear"]
+        # br_range = bear["range"]
+        # speed = bear["speed"]
+
         stats = self.buff_stats(level)
 
         damage = stats["bear_damage"]
@@ -317,8 +339,8 @@ class Nita(Brawler):
         elif chance >= 2:
             raw *= 0.3
         else:
-            raw = 0       
-        
+            raw = 0
+
         return raw, health
 
     def buff_stats(self, level: int):
@@ -330,9 +352,9 @@ class Nita(Brawler):
         }
 
         return super().buff_stats(stats, level)
-    
+
     def _spawn(self, level):
-        a_none_type_object = super()._spawn(level)
+        super()._spawn(level)
 
         stats = self.buff_stats(level)
 
@@ -356,38 +378,48 @@ class Nita(Brawler):
         return raw
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + (f"\n{emojis['super']} Bear Damage: {stats['bear_damage']}"
-                    f"\n{emojis['superhealth']} Bear Health: {stats['bear_health']}")
-                    
+        super_str = super_desc + (
+            f"\n{emojis['super']} Bear Damage: {stats['bear_damage']}"
+            f"\n{emojis['superhealth']} Bear Health: {stats['bear_health']}"
+        )
+
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -396,9 +428,12 @@ class Nita(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -410,10 +445,10 @@ class Colt(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Colt."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -438,8 +473,8 @@ class Colt(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Colt."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
         projectiles = self.ult["projectiles"]
 
         stats = self.buff_stats(level)
@@ -471,36 +506,47 @@ class Colt(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -509,9 +555,12 @@ class Colt(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -520,13 +569,13 @@ class Colt(Brawler):
 
 class Bull(Brawler):
     """A class to represent Bull."""
-    
+
     def _attack(self, level):
         """Represent the attack ability of Bull."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -551,8 +600,8 @@ class Bull(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Bull."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
 
         stats = self.buff_stats(level)
 
@@ -583,36 +632,47 @@ class Bull(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
 
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -621,9 +681,12 @@ class Bull(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -635,10 +698,10 @@ class Jessie(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Jessie. """
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -664,10 +727,10 @@ class Jessie(Brawler):
         """Represent the Super ability of Jessie."""
 
         # getting all values
-        scrappy = self.ult["scrappy"]
-        br_range = scrappy["range"]
-        speed = scrappy["speed"]
-        
+        # scrappy = self.ult["scrappy"]
+        # br_range = scrappy["range"]
+        # speed = scrappy["speed"]
+
         stats = self.buff_stats(level)
 
         damage = stats["scrappy_damage"]
@@ -686,8 +749,8 @@ class Jessie(Brawler):
         elif chance >= 2:
             raw *= 0.3
         else:
-            raw = 0       
-        
+            raw = 0
+
         return raw, health
 
     def buff_stats(self, level: int):
@@ -699,9 +762,9 @@ class Jessie(Brawler):
         }
 
         return super().buff_stats(stats, level)
-    
+
     def _spawn(self, level):
-        a_none_type_object = super()._spawn(level)
+        super()._spawn(level)
 
         stats = self.buff_stats(level)
 
@@ -725,38 +788,49 @@ class Jessie(Brawler):
         return raw
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + (f"\n{emojis['super']} Scrappy Damage: {stats['scrappy_damage']}"
-                    f"\n{emojis['superhealth']} Scrappy Health: {stats['scrappy_health']}")
-                    
+        super_str = super_desc + (
+            f"\n{emojis['super']} Scrappy Damage: {stats['scrappy_damage']}"
+            f"\n{emojis['superhealth']} Scrappy Health:"
+            f" {stats['scrappy_health']}"
+        )
+
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -765,9 +839,12 @@ class Jessie(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -779,10 +856,10 @@ class Brock(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Brock."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -807,10 +884,10 @@ class Brock(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Brock."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
         _projectiles = self.ult["projectiles"]
-        # can deal too much damage otherwise 
+        # can deal too much damage otherwise
         projectiles = random.randint(1, _projectiles)
 
         stats = self.buff_stats(level)
@@ -842,36 +919,47 @@ class Brock(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per rocket: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per rocket: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -880,9 +968,12 @@ class Brock(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -894,10 +985,10 @@ class Dynamike(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Dynamike."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -922,8 +1013,8 @@ class Dynamike(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Dynamike."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
         projectiles = self.ult["projectiles"]
 
         stats = self.buff_stats(level)
@@ -955,36 +1046,48 @@ class Dynamike(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per dynamite: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per"
+            + f" dynamite: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -993,9 +1096,12 @@ class Dynamike(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1004,13 +1110,13 @@ class Dynamike(Brawler):
 
 class ElPrimo(Brawler):
     """A class to represent El Primo."""
-    
+
     def _attack(self, level):
         """Represent the attack ability of El Primo."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1035,8 +1141,8 @@ class ElPrimo(Brawler):
     def _ult(self, level):
         """Represent the Super ability of El Primo."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
 
         stats = self.buff_stats(level)
 
@@ -1067,36 +1173,47 @@ class ElPrimo(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
 
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per punch: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per punch: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -1105,9 +1222,12 @@ class ElPrimo(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1119,10 +1239,10 @@ class Barley(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Barley."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         # Barley special -- damage over time
@@ -1131,7 +1251,7 @@ class Barley(Brawler):
         stats = self.buff_stats(level)
 
         damage = stats['att_damage']
-        # damage over time 
+        # damage over time
         damage += damage * duration
 
         raw = damage * projectiles * 0.8
@@ -1152,8 +1272,8 @@ class Barley(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Barley."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
         projectiles = self.ult["projectiles"]
 
         # Barley special -- damage over time
@@ -1190,36 +1310,47 @@ class Barley(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per second: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per second: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per second: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per second: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -1228,9 +1359,12 @@ class Barley(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1239,13 +1373,13 @@ class Barley(Brawler):
 
 class Poco(Brawler):
     """A class to represent Poco."""
-    
+
     def _attack(self, level):
         """Represent the attack ability of Poco."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1270,8 +1404,8 @@ class Poco(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Poco."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
 
         stats = self.buff_stats(level)
 
@@ -1281,7 +1415,7 @@ class Poco(Brawler):
 
         chance = random.randint(0, 10)
 
-        # return raw as a list for healing 
+        # return raw as a list for healing
         if chance >= 9:
             return [raw], None
         elif chance >= 6:
@@ -1303,32 +1437,40 @@ class Poco(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
 
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
@@ -1341,9 +1483,12 @@ class Poco(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1355,10 +1500,10 @@ class Rico(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Rico."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1383,8 +1528,8 @@ class Rico(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Rico."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
         projectiles = self.ult["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1416,36 +1561,47 @@ class Rico(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-        self, 
-        brawler_name: str, 
-        trophies: int = None, 
-        pb:int = None, 
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
         rank: int = None,
-        level: int = None, 
-        pp: int = None, 
-        next_level_pp: int = None, 
-        sp1=False, 
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
         sp2=False
     ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -1454,9 +1610,12 @@ class Rico(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1465,13 +1624,13 @@ class Rico(Brawler):
 
 class Darryl(Brawler):
     """A class to represent Darryl."""
-    
+
     def _attack(self, level):
         """Represent the attack ability of Darryl."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1496,8 +1655,8 @@ class Darryl(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Darryl."""
 
-        # getting all values 
-        ult_range = self.ult["range"]
+        # getting all values
+        # ult_range = self.ult["range"]
 
         stats = self.buff_stats(level)
 
@@ -1528,36 +1687,47 @@ class Darryl(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
 
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -1566,9 +1736,12 @@ class Darryl(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1580,10 +1753,10 @@ class Penny(Brawler):
 
     def _attack(self, level):
         """Represent the attack ability of Penny."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1609,9 +1782,9 @@ class Penny(Brawler):
         """Represent the Super ability of Penny."""
 
         # getting all values
-        cannon = self.ult["cannon"]
-        br_range = cannon["range"]
-        
+        # cannon = self.ult["cannon"]
+        # br_range = cannon["range"]
+
         stats = self.buff_stats(level)
 
         damage = stats["cannon_damage"]
@@ -1630,8 +1803,8 @@ class Penny(Brawler):
         elif chance >= 2:
             raw *= 0.3
         else:
-            raw = 0       
-        
+            raw = 0
+
         return raw, health
 
     def buff_stats(self, level: int):
@@ -1643,9 +1816,9 @@ class Penny(Brawler):
         }
 
         return super().buff_stats(stats, level)
-    
+
     def _spawn(self, level):
-        a_none_type_object = super()._spawn(level)
+        super()._spawn(level)
 
         stats = self.buff_stats(level)
 
@@ -1669,38 +1842,49 @@ class Penny(Brawler):
         return raw
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
-        
+
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + (f"\n{emojis['super']} Cannon Damage: {stats['cannon_damage']}"
-                    f"\n{emojis['superhealth']} Cannon Health: {stats['cannon_health']}")
-                    
+        super_str = super_desc + (
+            f"\n{emojis['super']} Cannon Damage: {stats['cannon_damage']}"
+            f"\n{emojis['superhealth']} Cannon Health:"
+            f" {stats['cannon_health']}"
+        )
+
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -1709,9 +1893,12 @@ class Penny(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
@@ -1720,13 +1907,13 @@ class Penny(Brawler):
 
 class Carl(Brawler):
     """A class to represent Carl."""
-    
+
     def _attack(self, level):
         """Represent the attack ability of Carl."""
-        
-        # getting all values 
-        att_range = self.attack["range"]
-        att_reload = self.attack["reload"]
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
         projectiles = self.attack["projectiles"]
 
         stats = self.buff_stats(level)
@@ -1751,7 +1938,7 @@ class Carl(Brawler):
     def _ult(self, level):
         """Represent the Super ability of Carl."""
 
-        # getting all values 
+        # getting all values
         duration = self.ult["duration"]
 
         stats = self.buff_stats(level)
@@ -1783,36 +1970,47 @@ class Carl(Brawler):
         return super().buff_stats(stats, level)
 
     def brawler_info(
-            self, 
-            brawler_name: str, 
-            trophies: int = None, 
-            pb:int = None, 
-            rank: int = None,
-            level: int = None, 
-            pp: int = None, 
-            next_level_pp: int = None, 
-            sp1=False, 
-            sp2=False
-        ):
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
         """Return embed with Brawler info."""
 
-        embed = super().brawler_info(brawler_name=brawler_name, trophies=trophies, pb=pb, 
-                            rank=rank, level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2)
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
 
         if not level:
             level = 1
 
         stats = self.buff_stats(level)
 
-        embed.add_field(name="HEALTH", value=f"{emojis['health']} {stats['health']}")
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
         attack_desc = f"> {self.attack['desc']}"
-        attack_str = attack_desc + f"\n{emojis['damage']} Damage on hit: {stats['att_damage']}"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage on hit: {stats['att_damage']}"
+        )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
         super_desc = f"> {self.ult['desc']}"
-        super_str = super_desc + f"\n{emojis['super']} Damage per swing: {stats['ult_damage']}"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per swing: {stats['ult_damage']}"
+        )
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
         u1 = u2 = ""
@@ -1821,9 +2019,12 @@ class Carl(Brawler):
             u1 = " [Owned]"
         if sp2:
             u2 = " [Owned]"
-        
-        sp_str = (f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}\n> {self.sp1['desc']}"
-                            f"\n{sp_icons[brawler_name][1]} **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}")
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+        )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
 
