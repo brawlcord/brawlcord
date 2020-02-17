@@ -4,8 +4,8 @@ import discord
 from redbot.core import commands
 from redbot.core.commands import Context
 
-from .brawlers import brawler_emojis, emojis, sp_icons
 from .brawlhelp import EMBED_COLOR
+from .emojis import brawler_emojis, emojis, sp_icons
 from .errors import MaintenanceError
 
 default_stats = {
@@ -19,19 +19,6 @@ default_stats = {
     "selected_skin": "Default",
     "sp1": False,
     "sp2": False
-}
-
-level_emotes = {
-    "level_10": "<:level_10:648932852699758593>",
-    "level_7": "<:level_7:648932853266251789>",
-    "level_8": "<:level_8:648932853584887819>",
-    "level_5": "<:level_5:648932853714780184>",
-    "level_9": "<:level_9:648932853861711872>",
-    "level_3": "<:level_3:648932854188736512>",
-    "level_4": "<:level_4:648932854230941712>",
-    "level_1": "<:level_1:648932855296032799>",
-    "level_2": "<:level_2:648932855375855627>",
-    "level_6": "<:level_6:648932855413735424>",
 }
 
 

@@ -11,25 +11,21 @@ from math import ceil
 
 # Discord
 import discord
-from redbot.core import Config, commands, checks
+from redbot.core import Config, checks, commands
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.menus import start_adding_reactions
-from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
+from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
-from .brawlers import (
-    emojis, brawler_emojis, sp_icons, brawlers_map,
-    rank_emojis, Brawler, brawler_thumb
-)
-from .utils import Box, default_stats, level_emotes, maintenance
-from .gamemodes import GameMode, gamemode_emotes, gamemodes_map
-from .brawlhelp import (
-    BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK,
-    REDDIT_LINK, INVITE_URL, SOURCE_LINK
-)
-from .errors import UserRejected, MaintenanceError
-from .cooldown import user_cooldown, user_cooldown_msg, humanize_timedelta
-
+from .brawlers import Brawler, brawler_thumb, brawlers_map
+from .brawlhelp import (COMMUNITY_LINK, EMBED_COLOR, INVITE_URL, REDDIT_LINK,
+                        SOURCE_LINK, BrawlcordHelp)
+from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
+from .emojis import (brawler_emojis, emojis, gamemode_emotes, level_emotes,
+                     rank_emojis, sp_icons)
+from .errors import MaintenanceError, UserRejected
+from .gamemodes import GameMode, gamemodes_map
+from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 

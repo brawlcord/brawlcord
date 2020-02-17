@@ -21,10 +21,11 @@ async def user_cooldown(rate, per, config: Config, ctx: Context):
             if await check_user_cooldown(ctx, config, cooldown):
                 return True
     return False
-        
+
+
 async def check_user_cooldown(ctx: Context, config: Config, cooldown: dict):
     """Check if command is on cooldown."""
-    
+
     command = ctx.command.qualified_name
 
     last = cooldown[command]["last"]
@@ -53,6 +54,7 @@ async def check_user_cooldown(ctx: Context, config: Config, cooldown: dict):
             return True
     return False
 
+
 async def user_cooldown_msg(ctx: Context, config: Config):
     """Return cooldown message with time remaining."""
 
@@ -62,29 +64,30 @@ async def user_cooldown_msg(ctx: Context, config: Config):
         per = cooldown[command]["per"]
         last = cooldown[command]["last"] + per
         now = utc_timestamp(datetime.utcnow())
-        
+
         return (
                 "This command is on cooldown. Try again in {}.".format(
                     humanize_timedelta(seconds=last-now) or "1 second"
                 )
             )
 
+
 def utc_timestamp(time: datetime) -> float:
     """Return timestamp in UTC.
-    
+
     Parameters
     --------------
     time : datetime
-        datetime object in UTC 
-    
+        datetime object in UTC
+
     Returns
     ---------
     float
-        Timestamp in UTC 
+        Timestamp in UTC
     """
 
     epoch = datetime(1970, 1, 1)
-    # get timestamp in UTC 
+    # get timestamp in UTC
     timestamp = (time - epoch).total_seconds()
 
     return timestamp

@@ -4,7 +4,6 @@ from redbot.core.commands.context import Context
 from redbot.core.commands.help import RedHelpFormatter
 from redbot.core.utils.chat_formatting import pagify
 
-
 EmbedField = namedtuple("EmbedField", "name value inline")
 EMPTY_STRING = "\N{ZERO WIDTH SPACE}"
 INVITE_URL = (
