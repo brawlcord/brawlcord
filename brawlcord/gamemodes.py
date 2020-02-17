@@ -1,34 +1,17 @@
 import asyncio
 import random
-
-import discord
-
 from math import ceil
 
+import discord
 from redbot.core import Config
 from redbot.core.commands.context import Context
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
-from .brawlers import Brawler, brawler_emojis, emojis, brawlers_map
+from .brawlers import Brawler, brawlers_map
 from .brawlhelp import EMBED_COLOR
+from .emojis import brawler_emojis, emojis, gamemode_emotes
 from .errors import UserRejected
-
-
-gamemode_emotes = {
-    "Big Game": "<:big_game:645925169344282624>",
-    "Bounty": "<:bounty:645925169252270081>",
-    "Boss Fight": "<:bossfight:645925170397052929>",
-    "Brawl Ball": "<:brawlball:645925169650466816>",
-    "Gem Grab": "<:gemgrab:645925169730289664>",
-    "Duo Showdown": "<:duo_showdown:645925169805656076>",
-    "Heist": "<:heist:645925170195988491>",
-    "Siege": "<:siege:645925170481201163>",
-    "Solo Showdown": "<:solo_showdown:645925170539921428>",
-    "Robo Rumble": "<:roborumble:645925170594316288>",
-    "Lone Star": "<:lonestar:645925170610962452>",
-    "Takedown": "<:takedown:645925171034587146>"
-}
 
 spawn_text = {
     "Nita": "Bear",
