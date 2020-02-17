@@ -1,13 +1,12 @@
 import random
 
 import discord
+from redbot.core import commands
+from redbot.core.commands import Context
 
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
-from redbot.core.utils.predicates import ReactionPredicate
-
-from .brawlers import *
+from .brawlers import brawler_emojis, emojis, sp_icons
 from .brawlhelp import EMBED_COLOR
-
+from .errors import MaintenanceError
 
 default_stats = {
     "trophies": 0,
@@ -38,7 +37,7 @@ level_emotes = {
 
 class Box:
     """A class to represent Boxes."""
-    
+
     def __init__(self, all_brawlers, brawler_data):
         # variables to store possibilities data
         self.can_unlock = {
@@ -50,7 +49,7 @@ class Box:
         }
         self.can_get_pp = {}
         self.can_get_sp = {}
-        
+
         # odds
         self.powerpoint = 94.6516
         self.rare = 2.2103
@@ -62,22 +61,25 @@ class Box:
 
         self.tickets = 25
         self.gems = 9
-        self.td = 3 # token doubler 
+        self.td = 3  # token doubler
 
         # number of powerpoints required to max
         self.max_pp = 1410
 
-        self.pop = ["Power Points", "Rare", "Super Rare", "Epic", "Mythic", "Legendary", "Star Power"]
+        self.pop = [
+            "Power Points", "Rare", "Super Rare",
+            "Epic", "Mythic", "Legendary", "Star Power"
+        ]
         self.weights = [
-            self.powerpoint, 
-            self.rare, 
-            self.superrare, 
-            self.epic, 
-            self.mythic, 
-            self.legendary, 
+            self.powerpoint,
+            self.rare,
+            self.superrare,
+            self.epic,
+            self.mythic,
+            self.legendary,
             self.starpower
         ]
-        
+
         self.BRAWLERS = all_brawlers
 
         for brawler in all_brawlers:
@@ -85,42 +87,45 @@ class Box:
             if rarity != "Trophy Road":
                 if brawler not in brawler_data:
                     self.can_unlock[rarity].append(brawler)
-        
+
         for brawler in brawler_data:
             # self.owned.append(brawler)
             total_powerpoints = brawler_data[brawler]['total_powerpoints']
             if total_powerpoints < self.max_pp:
                 self.can_get_pp[brawler] = self.max_pp - total_powerpoints
-            
+
             level = brawler_data[brawler]['level']
             if level >= 9:
                 sp1 = brawler_data[brawler]['sp1']
                 sp2 = brawler_data[brawler]['sp2']
 
-                if sp1 == False and sp2 == True:
+                if sp1 is False and sp2 is True:
                     self.can_get_sp[brawler] = ['sp1']
-                elif sp1 == True and sp2 == False:
+                elif sp1 is True and sp2 is False:
                     self.can_get_sp[brawler] = ['sp2']
-                elif sp1 == False and sp2 == False:
+                elif sp1 is False and sp2 is False:
                     self.can_get_sp[brawler] = ['sp1', 'sp2']
                 else:
                     pass
-    
+
     def weighted_random(self, lower, upper, avg):
         avg_low = (avg + lower) / 2
         avg_high = (upper + avg) / 2
-        
+
         p_high = (avg - avg_low) / (avg_high - avg_low)
 
-        chance = random.random() 
+        chance = random.random()
 
         if chance < p_high:
             return random.randint(avg, upper)
         else:
             return random.randint(lower, avg)
-    
+
     def split_in_integers(self, N, m, base=1):
-        """Returns a list after splitting a number N into m number of integers >= base."""
+        """Returns a list after splitting a number into number of integers (m)
+
+        Number of integers to split in should be less than the base.
+        """
 
         assert m * base <= N
         breaks = ([-1] + sorted(
@@ -130,17 +135,19 @@ class Box:
         for idx in range(m):
             buckets[idx] += (breaks[idx + 1] - breaks[idx] - 1)
         return buckets
-        
+
     async def brawlbox(self, conf, user):
         """Function to handle brawl box openings."""
-    
-        gold = self.weighted_random(12, 70, 19) 
-        
+
+        gold = self.weighted_random(12, 70, 19)
+
         rarities = []
         starpowers = 0
         stacks = 0
-        
-        selected = random.choices(population=self.pop, weights=self.weights, k=2)
+
+        selected = random.choices(
+            population=self.pop, weights=self.weights, k=2
+        )
 
         for i in selected:
             if i == "Power Points":
@@ -157,14 +164,14 @@ class Box:
         elif len(self.can_get_pp) == 1:
             gold *= 2
             stacks = 1
-        
+
         if stacks > 0:
             powerpoints = int(self.weighted_random(7, 25, 14))
 
             pieces = self.split_in_integers(powerpoints, stacks)
-            
+
             pp_str = ""
-            
+
             if pieces:
                 for piece in pieces:
                     items = list(self.can_get_pp.items())
@@ -174,21 +181,29 @@ class Box:
                             async with conf.brawlers() as brawlers:
                                 brawlers[brawler]['powerpoints'] += piece
                                 brawlers[brawler]['total_powerpoints'] += piece
-                                pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
+                                pp_str += (
+                                    f"\n{brawler_emojis[brawler]} **{brawler}:"
+                                    f"** {emojis['powerpoint']} {piece}"
+                                )
                         else:
                             continue
                         break
-            
+
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
-        embed = discord.Embed(color=EMBED_COLOR, title=f"{emojis['brawlbox']} Brawl Box")
+        embed = discord.Embed(
+            color=EMBED_COLOR,
+            title=f"{emojis['brawlbox']} Brawl Box"
+        )
         # embed.set_author(name=user.name, icon_url=user.avatar_url)
-        embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        
+        embed.add_field(
+            name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
+
         if stacks > 0:
             if pp_str:
-                embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
+                embed.add_field(
+                    name="Power Points", value=pp_str.strip(), inline=False)
 
         if rarities:
             for rarity in rarities:
@@ -199,7 +214,7 @@ class Box:
                     self.tickets *= 2
                     self.gems *= 2
                     self.td *= 2
-        
+
         # star power
         for _ in range(starpowers):
             if self.can_get_sp:
@@ -208,17 +223,19 @@ class Box:
                 self.tickets *= 2
                 self.gems *= 2
                 self.td *= 2
-        
+
         chance = random.randint(1, 100)
-        
+
         if chance <= self.td:
             old_td = await conf.token_doubler()
             await conf.token_doubler.set(200 + old_td)
-            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} 200")
+            embed.add_field(
+                name="Token Doubler", value=f"{emojis['tokendoubler']} 200"
+            )
         elif chance <= self.gems:
             try:
                 old_gems = await conf.gems()
-            except:
+            except Exception:
                 old_gems = 0
             gems = random.randint(2, 5)
             await conf.gems.set(gems + old_gems)
@@ -227,19 +244,21 @@ class Box:
             old_tickets = await conf.tickets()
             await conf.tickets.set(1 + old_tickets)
             embed.add_field(name="Tickets", value=f"{emojis['ticket']} 1")
-        
+
         return embed
 
     async def bigbox(self, conf, user):
         """Function to handle brawl box openings."""
-    
-        gold = self.weighted_random(36, 210, 63) 
-        
+
+        gold = self.weighted_random(36, 210, 63)
+
         rarities = []
         starpowers = 0
         stacks = 0
-        
-        selected = random.choices(population=self.pop, weights=self.weights, k=5)
+
+        selected = random.choices(
+            population=self.pop, weights=self.weights, k=5
+        )
 
         for i in selected:
             if i == "Power Points":
@@ -260,14 +279,14 @@ class Box:
             self.tickets *= 1.5
             self.gems *= 1.5
             self.td *= 1.5
-        
+
         if stacks > 0:
             powerpoints = int(self.weighted_random(27, 75, 46))
 
             pieces = self.split_in_integers(powerpoints, stacks)
-            
+
             pp_str = ""
-            
+
             if pieces:
                 for piece in pieces:
                     items = list(self.can_get_pp.items())
@@ -277,21 +296,31 @@ class Box:
                             async with conf.brawlers() as brawlers:
                                 brawlers[brawler]['powerpoints'] += piece
                                 brawlers[brawler]['total_powerpoints'] += piece
-                                pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
+                                pp_str += (
+                                    f"\n{brawler_emojis[brawler]} **{brawler}:"
+                                    f"** {emojis['powerpoint']} {piece}"
+                                )
                         else:
                             continue
                         break
-            
+
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
 
-        embed = discord.Embed(color=EMBED_COLOR, title=f" {emojis['bigbox']} Big Box")
+        embed = discord.Embed(
+            color=EMBED_COLOR,
+            title=f" {emojis['bigbox']} Big Box"
+        )
         embed.set_author(name=user.name, icon_url=user.avatar_url)
-        embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        
+        embed.add_field(
+            name="Gold", value=f"{emojis['gold']} {gold}", inline=False
+        )
+
         if stacks > 0:
             if pp_str:
-                embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
+                embed.add_field(
+                    name="Power Points", value=pp_str.strip(), inline=False
+                )
 
         if rarities:
             for rarity in rarities:
@@ -302,7 +331,7 @@ class Box:
                     self.tickets *= 2
                     self.gems *= 2
                     self.td *= 2
-        
+
         # star power
         for _ in range(starpowers):
             if self.can_get_sp:
@@ -311,38 +340,42 @@ class Box:
                 self.tickets *= 2
                 self.gems *= 2
                 self.td *= 2
-        
+
         chance = random.randint(1, 100)
-        
+
         if chance <= self.td:
             old_td = await conf.token_doubler()
             await conf.token_doubler.set(200 + old_td)
-            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} 200")
+            embed.add_field(
+                name="Token Doubler", value=f"{emojis['tokendoubler']} 200"
+            )
         elif chance <= self.gems:
             try:
                 old_gems = await conf.gems()
-            except:
+            except Exception:
                 old_gems = 0
-            gems = random.randint(6, 15) 
+            gems = random.randint(6, 15)
             await conf.gems.set(gems + old_gems)
             embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
         elif chance <= self.tickets:
             old_tickets = await conf.tickets()
             await conf.tickets.set(4 + old_tickets)
             embed.add_field(name="Tickets", value=f"{emojis['ticket']} 4")
-        
+
         return embed
-    
+
     async def megabox(self, conf, user):
         """Function to handle mega box openings."""
-    
-        gold = self.weighted_random(36, 210, 63) 
-        
+
+        gold = self.weighted_random(36, 210, 63)
+
         rarities = []
         starpowers = 0
         stacks = 0
-        
-        selected = random.choices(population=self.pop, weights=self.weights, k=9)
+
+        selected = random.choices(
+            population=self.pop, weights=self.weights, k=9
+        )
 
         for i in selected:
             if i == "Power Points":
@@ -363,13 +396,13 @@ class Box:
             self.tickets *= 2
             self.gems *= 2
             self.td *= 2
-        
+
         if stacks > 0:
             powerpoints = int(self.weighted_random(81, 225, 132))
 
             pieces = self.split_in_integers(powerpoints, stacks)
             pp_str = ""
-            
+
             if pieces:
                 for piece in pieces:
                     items = list(self.can_get_pp.items())
@@ -379,21 +412,28 @@ class Box:
                             async with conf.brawlers() as brawlers:
                                 brawlers[brawler]['powerpoints'] += piece
                                 brawlers[brawler]['total_powerpoints'] += piece
-                                pp_str += f"\n{brawler_emojis[brawler]} **{brawler}:** {emojis['powerpoint']} {piece}"
+                                pp_str += (
+                                    f"\n{brawler_emojis[brawler]} **{brawler}:"
+                                    f"** {emojis['powerpoint']} {piece}"
+                                )
                         else:
                             continue
                         break
-            
+
         old_gold = await conf.gold()
         await conf.gold.set(old_gold + gold)
-        
-        embed = discord.Embed(color=EMBED_COLOR, title=f" {emojis['megabox']} Mega Box")
+
+        embed = discord.Embed(
+            color=EMBED_COLOR, title=f" {emojis['megabox']} Mega Box"
+        )
         embed.set_author(name=user.name, icon_url=user.avatar_url)
-        embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
-        
+        embed.add_field(
+            name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
+
         if stacks > 0:
             if pp_str:
-                embed.add_field(name="Power Points", value=pp_str.strip(), inline=False)
+                embed.add_field(
+                    name="Power Points", value=pp_str.strip(), inline=False)
 
         if rarities:
             for rarity in rarities:
@@ -404,7 +444,7 @@ class Box:
                     self.tickets *= 2
                     self.gems *= 2
                     self.td *= 2
-        
+
         # star power
         for _ in range(starpowers):
             if self.can_get_sp:
@@ -413,41 +453,48 @@ class Box:
                 self.tickets *= 2
                 self.gems *= 2
                 self.td *= 2
-        
+
         chance = random.randint(1, 100)
-        
+
         if chance <= self.td:
             old_td = await conf.token_doubler()
             await conf.token_doubler.set(200 + old_td)
-            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} 200")
+            embed.add_field(
+                name="Token Doubler", value=f"{emojis['tokendoubler']} 200"
+            )
         elif chance <= self.gems:
             try:
                 old_gems = await conf.gems()
-            except:
+            except Exception:
                 old_gems = 0
-            gems = random.randint(18, 45) 
+            gems = random.randint(18, 45)
             await conf.gems.set(gems + old_gems)
             embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
         elif chance <= self.tickets:
             old_tickets = await conf.tickets()
             await conf.tickets.set(12 + old_tickets)
             embed.add_field(name="Tickets", value=f"{emojis['ticket']} 12")
-        
+
         return embed
-    
+
     async def unlock_brawler(self, rarity, conf, embed):
         brawler = random.choice(self.can_unlock[rarity])
         async with conf.brawlers() as brawlers:
             brawlers[brawler] = default_stats
-        embed.add_field(name=f"New {rarity} Brawler :tada:", 
-                value=f"{brawler_emojis[brawler]} {brawler}", inline=False)
-        
+        embed.add_field(
+            name=f"New {rarity} Brawler :tada:",
+            value=f"{brawler_emojis[brawler]} {brawler}",
+            inline=False
+        )
+
         return embed
 
     def check_rarity(self, rarity):
+        """Return rarity by checking the rarities from which user can unlock a brawler.
+
+        ``False`` is returned if no rarity brawler can be unlocked.
         """
-        Return rarity by checking the rarities from which user can unlock a brawler.
-        """
+
         def lower_rarity(rarity):
             if rarity == "Legendary":
                 return "Mythic"
@@ -470,7 +517,7 @@ class Box:
 
         return rarity
 
-    async def get_starpower(self, conf, embed):  
+    async def get_starpower(self, conf, embed):
         sp_brawler = random.choice(list(self.can_get_sp.keys()))
         sp = random.choice(self.can_get_sp[sp_brawler])
 
@@ -480,13 +527,46 @@ class Box:
         sp_desc = self.BRAWLERS[sp_brawler][sp]["desc"]
         sp_index = int(sp[2]) - 1
 
-        sp_str = (f"{sp_icons[sp_brawler][sp_index]} {sp_name} - {brawler_emojis[sp_brawler]}" 
-                f" {sp_brawler}\n> {sp_desc}")
+        sp_str = (
+            f"{sp_icons[sp_brawler][sp_index]} {sp_name}"
+            f" - {brawler_emojis[sp_brawler]}"
+            f" {sp_brawler}\n> {sp_desc}"
+        )
 
         async with conf.brawlers() as brawlers:
             brawlers[sp_brawler]["level"] = 10
             brawlers[sp_brawler][sp] = True
-        
-        embed.add_field(name="New Star Power :tada:", value=sp_str, inline=False)
+
+        embed.add_field(
+            name="New Star Power :tada:", value=sp_str, inline=False
+        )
 
         return embed
+
+
+def maintenance():
+    """A decorator which checks for maintenance."""
+
+    async def predicate(ctx: Context):
+        if await ctx.bot.is_owner(ctx.author):
+            # True means command should run
+            return True
+
+        cog = ctx.cog
+        if cog:
+            config = cog.config
+
+            async with config.maintenance() as maint:
+                setting = maint["setting"]
+
+                if setting:
+                    raise MaintenanceError(
+                        "The bot is currently under maintenance. It will end"
+                        f" in approx. {maint['duration']} minutes."
+                        " Commands will not work till then."
+                        " Sorry for the inconvenience!"
+                    )
+        # Run command if not maintenance
+        return True
+
+    return commands.check(predicate)
