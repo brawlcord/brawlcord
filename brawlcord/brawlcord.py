@@ -335,7 +335,7 @@ class Brawlcord(commands.Cog):
             self.sessions.remove(user.id)
             try:
                 self.sessions.remove(opponent.id)
-            except ValueError:
+            except (ValueError, AttributeError):
                 pass
 
         try:
