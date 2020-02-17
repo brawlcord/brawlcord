@@ -3,38 +3,31 @@ import asyncio
 import json
 import logging
 import random
+import re
 import traceback
-
-from datetime import datetime, timedelta
+import urllib.request
+from datetime import datetime
 from math import ceil
-from typing import Optional
 
 # Discord
 import discord
-
-# Redbot
 from redbot.core import Config, commands, checks
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
-from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
+from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate, MessagePredicate
 
 from .brawlers import (
     emojis, brawler_emojis, sp_icons, brawlers_map,
     rank_emojis, Brawler, brawler_thumb
 )
-
-from .utils import Box, default_stats, level_emotes
-
-from .gamemodes import GameMode, gamemode_emotes, gamemodes_map, GemGrab
-
+from .utils import Box, default_stats, level_emotes, maintenance
+from .gamemodes import GameMode, gamemode_emotes, gamemodes_map
 from .brawlhelp import (
-    BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK, 
+    BrawlcordHelp, EMBED_COLOR, COMMUNITY_LINK,
     REDDIT_LINK, INVITE_URL, SOURCE_LINK
 )
-
-from .errors import UserRejected
-
+from .errors import UserRejected, MaintenanceError
 from .cooldown import user_cooldown, user_cooldown_msg, humanize_timedelta
 
 
@@ -47,7 +40,11 @@ __author__ = "Snowsee"
 
 default = {
     "report_channel": None,
-    "custom_help": True
+    "custom_help": True,
+    "maintenance": {
+        "duration": None,
+        "setting": False
+    }
 }
 
 default_user = {
@@ -80,11 +77,11 @@ default_user = {
     "tppassed": [],
     "tpstored": [],
     "brawl_stats": {
-        "solo": [0, 0], # [wins, losses]
-        "3v3": [0, 0], # [wins, losses]
-        "duo": [0, 0], # [wins, losses]
+        "solo": [0, 0],  # [wins, losses]
+        "3v3": [0, 0],  # [wins, losses]
+        "duo": [0, 0],  # [wins, losses]
     },
-    # number of boxes collected from trophy road 
+    # number of boxes collected from trophy road
     "boxes": {
         "brawl": 0,
         "big": 0,
@@ -131,6 +128,10 @@ old_invite = None
 
 BRAWLSTARS = "https://blog.brawlstars.com/index.html"
 FAN_CONTENT_POLICY = "https://www.supercell.com/fan-content-policy"
+BRAWLCORD_CODE_URL = (
+    "https://raw.githubusercontent.com/snowsee/brawlcord/"
+    "release/brawlcord/brawlcord.py"
+)
 
 DAY = 86400
 WEEK = 604800
@@ -147,7 +148,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         self.tasks = {}
         self.locks = {}
 
-        self.config = Config.get_conf(self, 1_070_701_001, force_registration=True)
+        self.config = Config.get_conf(
+            self, 1_070_701_001, force_registration=True)
 
         self.path = bundled_data_path(self)
 
@@ -172,7 +174,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 logging.exception("Error in something", exc_info=exc)
                 print("Error in something:", exc)
 
-        self.bank_update_task = self.bot.loop.create_task(self.update_token_bank())
+        self.bank_update_task = self.bot.loop.create_task(
+            self.update_token_bank())
         self.bank_update_task.add_done_callback(error_callback)
 
     async def initialize(self):
@@ -205,24 +208,29 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         custom_help = await self.config.custom_help()
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
-        
-        await self.bot.change_presence(activity=discord.Game(name='-help | 1v1 Brawls'))
+
+        await self.bot.change_presence(
+            activity=discord.Game(name='-help | 1v1 Brawls')
+        )
 
     @commands.command(name="brawlcord")
     async def _brawlcord(self, ctx: Context):
         """Shows info about Brawlcord"""
-        
+
         info = (
-            "Brawlcord is a Discord bot which allows users to simulate a simple version of"
-            f" [Brawl Stars]({BRAWLSTARS}), a mobile game developed by Supercell. \n\nBrawlcord"
-            " has features such as interactive 1v1 Brawls, diverse Brawlers and leaderboards! You"
-            " can suggest more features in the community server (link below)!"
-            f"\n\n{ctx.me.name} is currently in **{len(self.bot.guilds)}** servers!"
+            "Brawlcord is a Discord bot which allows users to simulate"
+            f" a simple version of [Brawl Stars]({BRAWLSTARS}), a mobile"
+            f" game developed by Supercell. \n\nBrawlcord has features"
+            " such as interactive 1v1 Brawls, diverse Brawlers and"
+            " leaderboards! You can suggest more features in the community"
+            f" server (link below)!\n\n{ctx.me.name} is currently in"
+            f" **{len(self.bot.guilds)}** servers!"
         )
 
         disclaimer = (
-            "This content is not affiliated with, endorsed, sponsored, or specifically approved by"
-            " Supercell and Supercell is not responsible for it. For more information see Supercell’s"
+            "This content is not affiliated with, endorsed, sponsored,"
+            " or specifically approved by Supercell and Supercell is"
+            " not responsible for it. For more information see Supercell’s"
             f" [Fan Content Policy]({FAN_CONTENT_POLICY})."
         )
 
@@ -234,36 +242,62 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         embed.add_field(name="Creator", value=f"[Snowsee]({REDDIT_LINK})")
 
-        embed.add_field(name="Version", value=f"[{__version__}]({SOURCE_LINK})")
+        page = urllib.request.urlopen(BRAWLCORD_CODE_URL)
 
-        embed.add_field(name="Invite Link", value=f"[Click here]({INVITE_URL})")
+        text = page.read()
 
-        embed.add_field(name="Feedback", value=f"You can give feedback to" 
-            f" improve Brawlcord in the [Brawlcord community server]({COMMUNITY_LINK}).", 
-            inline=False)
+        version_str = f"[{__version__}]({SOURCE_LINK})"
+
+        match = re.search("__version__ = \"(.+)\"", text.decode("utf-8"))
+
+        if match:
+            current_ver = match.group(1)
+            if current_ver != __version__:
+                version_str += f" ({current_ver} is available!)"
+
+        embed.add_field(name="Version", value=version_str)
+
+        embed.add_field(name="Invite Link",
+                        value=f"[Click here]({INVITE_URL})")
+
+        embed.add_field(
+            name="Feedback",
+            value=(
+                f"You can give feedback to improve Brawlcord in the "
+                f"[Brawlcord community server]({COMMUNITY_LINK})."
+            ),
+            inline=False
+        )
 
         embed.add_field(name="Disclaimer", value=disclaimer, inline=False)
 
-        try: 
+        try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
-    
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
+    @maintenance()
     async def _brawl(self, ctx: Context, opponent: discord.User = None):
         """Brawl against other players"""
 
         guild = ctx.guild
         user = ctx.author
 
-        tutorial_finished = await self.get_player_stat(user, 'tutorial_finished')
+        tutorial_finished = await self.get_player_stat(
+            user, 'tutorial_finished'
+        )
 
         if not tutorial_finished:
-            return await ctx.send("You have not finished the tutorial yet." 
-                " Please use the `-tutorial` command to proceed.")
-        
+            return await ctx.send(
+                "You have not finished the tutorial yet."
+                " Please use the `-tutorial` command to proceed."
+            )
+
         if opponent:
             if opponent == user:
                 return await ctx.send("You can't brawl against yourself.")
@@ -271,24 +305,28 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 pass
             # don't allow brawl if opponent is another bot
             elif opponent.bot:
-                return await ctx.send(f"{opponent} is a bot account. Can't brawl against bots.")
-        
+                return await ctx.send(
+                    f"{opponent} is a bot account. Can't brawl against bots.")
+
         if user.id in self.sessions:
             return await ctx.send("You are already in a brawl!")
 
         if opponent:
             if opponent.id in self.sessions:
                 return await ctx.send(f"{opponent} is already in a brawl!")
-            
+
             if opponent != guild.me:
                 self.sessions.append(opponent.id)
-        
+
         self.sessions.append(user.id)
 
-        gm = await self.get_player_stat(user, "selected", is_iter=True, substat="gamemode")
+        gm = await self.get_player_stat(
+            user, "selected", is_iter=True, substat="gamemode"
+        )
 
-        g: GameMode = gamemodes_map[gm](ctx, user, opponent, self.config.user, self.BRAWLERS)
-        
+        g: GameMode = gamemodes_map[gm](
+            ctx, user, opponent, self.config.user, self.BRAWLERS)
+
         try:
             first_player, second_player = await g.initialize(ctx)
         except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
@@ -303,9 +341,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             self.sessions.remove(user.id)
             try:
                 self.sessions.remove(opponent.id)
-            except:
+            except ValueError:
                 pass
-        
+
         try:
             winner, loser = await g.play(ctx)
         except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
@@ -313,20 +351,27 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         except Exception as exc:
             traceback.print_tb(exc.__traceback__)
             return await ctx.send(
-                f"Error: \"{exc}\" with brawl. Please notify bot owner by using `-report` command."
+                f"Error: \"{exc}\" with brawl. Please notify bot owner"
+                " by using `-report` command."
             )
 
         players = [first_player, second_player]
-        
+
         starplayer = random.choice(players)
 
         if winner:
             # starplayer = winner
-            await ctx.send(f"{first_player.mention} {second_player.mention} Match ended. Winner: {winner.name}!")
+            await ctx.send(
+                f"{first_player.mention} {second_player.mention}"
+                f" Match ended. Winner: {winner.name}!"
+            )
         else:
             # starplayer = random.choice(players)
-            await ctx.send(f"{first_player.mention} {second_player.mention} The match ended in a draw!")
-        
+            await ctx.send(
+                f"{first_player.mention} {second_player.mention}"
+                " The match ended in a draw!"
+            )
+
         starplayer = None
 
         count = 0
@@ -344,8 +389,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 is_starplayer = True
             else:
                 is_starplayer = False
-            brawl_rewards, rank_up_rewards, trophy_road_reward = await self.brawl_rewards(player, points, is_starplayer)
-            
+
+            (
+                brawl_rewards,
+                rank_up_rewards,
+                trophy_road_reward
+            ) = await self.brawl_rewards(player, points, is_starplayer)
+
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
@@ -357,17 +407,17 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 await player.send(embed=rank_up_rewards)
             if trophy_road_reward:
                 await player.send(embed=trophy_road_reward)
-    
+
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
+    @maintenance()
     async def _tutorial(self, ctx: Context):
         """Begin the tutorial"""
 
         author = ctx.author
-        guild = ctx.guild
-        author_avatar = author.avatar_url
 
-        finished_tutorial = await self.get_player_stat(author, "tutorial_finished")
+        finished_tutorial = await self.get_player_stat(
+            author, "tutorial_finished")
 
         if finished_tutorial:
             return await ctx.send(
@@ -384,73 +434,99 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.set_thumbnail(url=imgur_links["shelly_tut"])
 
         tut_str = (
-            f"This {emojis['gem']} is a Gem. All the gems are mine! Gotta collect them all!"
-            "\n\nTo collect the gems, you need to take part in the dreaded Brawls! Use `-brawl`"
+            f"This {emojis['gem']} is a Gem. All the gems are mine!"
+            " Gotta collect them all!"
+            "\n\nTo collect the gems, you need to take part in the dreaded"
+            " Brawls! Use `-brawl`"
             " command after this tutorial ends to brawl!"
-            f"\n\nYou win a brawl by collecting 10 Gems before your opponent. But be cautious!"
-            " If the opponent manages to defeat you, you will lose about half of your gems!"
-            " Remember, you can dodge the opponent's attacks. You can also attack the opponent!"
-            "\n\nYou earn Tokens by participating in a brawl. Use the Tokens to open Brawl Boxes."
-            "  They contain goodies that allow you increase your strength and even other Brawlers!"
-            "\n\nYou can keep a track of your resources by using the `-stats`. You can view your"
+            f"\n\nYou win a brawl by collecting 10 Gems before your opponent."
+            " But be cautious!"
+            " If the opponent manages to defeat you, you will lose about half"
+            " of your gems!"
+            " Remember, you can dodge the opponent's attacks. You can also"
+            " attack the opponent!"
+            "\n\nYou earn Tokens by participating in a brawl. Use the Tokens"
+            " to open Brawl Boxes."
+            "  They contain goodies that allow you increase your strength and"
+            " even other Brawlers!"
+            "\n\nYou can keep a track of your resources by using the `-stats`."
+            " You can view your"
             " brawl statistics by using the `-profile` command."
-            "\n\nYou can always check all the commands again by using the `-help` command."
-            f"\n\nThat's all, {author.mention}. You're a natural Brawler! Now, let's go get 'em!"
+            "\n\nYou can always check all the commands again by using the"
+            " `-help` command."
+            f"\n\nThat's all, {author.mention}. You're a natural Brawler! Now,"
+            " let's go get 'em!"
         )
 
         embed.add_field(name="__Introduction:__", value=tut_str, inline=False)
-        
+
         # star shelly skin for beta users
-        # remove this code for global release 
+        # remove this code for global release
         async with self.config.user(author).brawlers() as brawlers:
             if "Star" not in brawlers["Shelly"]["skins"]:
                 brawlers["Shelly"]["skins"].append("Star")
 
-        embed.add_field(name="\u200b\n__Exclusive Skin!__", 
-            value=("Being one of the first users of Brawlcord, you get an exclusive" 
-                " **Star Shelly** skin!"), inline=False)
-        
-        embed.add_field(name="\u200b\n__Feedback:__", value=f"You can give feedback to" 
-            f" improve Brawlcord in the [Brawlcord community server]({COMMUNITY_LINK}).", 
+        embed.add_field(
+            name="\u200b\n__Exclusive Skin!__",
+            value=(
+                "Being one of the first users of Brawlcord,"
+                " you get an exclusive **Star Shelly** skin!"
+            ),
             inline=False)
 
-        embed.set_footer(text="Thanks for using Brawlcord.", 
-            icon_url=ctx.me.avatar_url)
-        
+        embed.add_field(
+            name="\u200b\n__Feedback:__",
+            value=(
+                "You can give feedback to improve Brawlcord in the"
+                f" [Brawlcord community server]({COMMUNITY_LINK})."
+            ),
+            inline=False
+        )
+
+        embed.set_footer(text="Thanks for using Brawlcord.",
+                         icon_url=ctx.me.avatar_url)
+
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
         await self.update_player_stat(author, 'tutorial_finished', True)
 
         dt_now = datetime.utcnow()
         epoch = datetime(1970, 1, 1)
-        # get timestamp in UTC 
+        # get timestamp in UTC
         timestamp = (dt_now - epoch).total_seconds()
         await self.update_player_stat(author, 'bank_update_ts', timestamp)
 
     @commands.command(name="stats", aliases=["stat"])
+    @maintenance()
     async def _stats(self, ctx: Context):
         """Display your resource statistics"""
 
         user = ctx.author
-        
+
         embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_author(name=f"{user.name}'s Resource Stats", icon_url=user.avatar_url)
+        embed.set_author(
+            name=f"{user.name}'s Resource Stats", icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
-        embed.add_field(name="Trophies", value=f"{emojis['trophies']} {trophies:,}")
+        embed.add_field(name="Trophies",
+                        value=f"{emojis['trophies']} {trophies:,}")
 
         pb = await self.get_trophies(user=user, pb=True)
-        embed.add_field(name="Highest Trophies", value=f"{emojis['pb']} {pb:,}")
+        embed.add_field(name="Highest Trophies",
+                        value=f"{emojis['pb']} {pb:,}")
 
         xp = await self.get_player_stat(user, 'xp')
         lvl = await self.get_player_stat(user, 'lvl')
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
-        embed.add_field(name="Experience Level", value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
+        embed.add_field(name="Experience Level",
+                        value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
         gold = await self.get_player_stat(user, 'gold')
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}")
@@ -459,32 +535,39 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed.add_field(name="Tokens", value=f"{emojis['token']} {tokens}")
 
         startokens = await self.get_player_stat(user, 'startokens')
-        embed.add_field(name="Star Tokens", value=f"{emojis['startoken']} {startokens}")
+        embed.add_field(name="Star Tokens",
+                        value=f"{emojis['startoken']} {startokens}")
 
         token_doubler = await self.get_player_stat(user, 'token_doubler')
-        embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} {token_doubler}")
+        embed.add_field(name="Token Doubler",
+                        value=f"{emojis['tokendoubler']} {token_doubler}")
 
         gems = await self.get_player_stat(user, 'gems')
         embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
 
         starpoints = await self.get_player_stat(user, 'starpoints')
-        embed.add_field(name="Star Points", value=f"{emojis['starpoints']} {starpoints}")
+        embed.add_field(name="Star Points",
+                        value=f"{emojis['starpoints']} {starpoints}")
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
-    
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     @commands.command(name="profile", aliases=["p", "pro"])
+    @maintenance()
     async def _profile(self, ctx: Context, user: discord.User = None):
         """Display your or specific user's profile"""
 
         if not user:
             user = ctx.author
-        
+
         embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_author(name=f"{user.name}'s Profile", icon_url=user.avatar_url)
+        embed.set_author(name=f"{user.name}'s Profile",
+                         icon_url=user.avatar_url)
 
         trophies = await self.get_trophies(user)
         league_number, league_emoji = await self.get_league_data(trophies)
@@ -492,26 +575,36 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             extra = f"`{league_number}`"
         else:
             extra = ""
-        embed.add_field(name="Trophies", value=f"{league_emoji}{extra} {trophies:,}")
+        embed.add_field(name="Trophies",
+                        value=f"{league_emoji}{extra} {trophies:,}")
 
         pb = await self.get_trophies(user=user, pb=True)
-        embed.add_field(name="Highest Trophies", value=f"{emojis['pb']} {pb:,}")
+        embed.add_field(name="Highest Trophies",
+                        value=f"{emojis['pb']} {pb:,}")
 
         xp = await self.get_player_stat(user, 'xp')
         lvl = await self.get_player_stat(user, 'lvl')
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
-        embed.add_field(name="Experience Level", value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
+        embed.add_field(name="Experience Level",
+                        value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
-        brawl_stats = await self.get_player_stat(user, 'brawl_stats', is_iter=True)
+        brawl_stats = await self.get_player_stat(
+            user, 'brawl_stats', is_iter=True)
 
         wins_3v3 = brawl_stats["3v3"][0]
         wins_solo = brawl_stats["solo"][0]
         wins_duo = brawl_stats["duo"][0]
 
         embed.add_field(name="3 vs 3 Wins", value=f"{wins_3v3}")
-        embed.add_field(name="Solo Wins", value=f"{gamemode_emotes['Solo Showdown']} {wins_solo}")
-        embed.add_field(name="Duo Wins", value=f"{gamemode_emotes['Duo Showdown']} {wins_duo}")
+        embed.add_field(
+            name="Solo Wins",
+            value=f"{gamemode_emotes['Solo Showdown']} {wins_solo}"
+        )
+        embed.add_field(
+            name="Duo Wins",
+            value=f"{gamemode_emotes['Duo Showdown']} {wins_duo}"
+        )
 
         selected = await self.get_player_stat(user, 'selected', is_iter=True)
         brawler = selected['brawler']
@@ -528,24 +621,39 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         else:
             _brawler = brawler
 
-        embed.add_field(name="Selected Brawler", 
-                value=f"{brawler_emojis[brawler]} {skin if skin != 'Default' else ''} {_brawler}"
-                        f'''{f" - {emojis['spblank']} {sp}" if sp else ''}''', inline=False)
-        embed.add_field(name="Selected Game Mode", 
-                value=f"{gamemode_emotes[gamemode]} {gamemode}", inline=False)
-        
+        embed.add_field(
+            name="Selected Brawler",
+            value=(
+                "{} {} {} {}".format(
+                    brawler_emojis[brawler],
+                    skin if skin != "Default" else "",
+                    _brawler,
+                    f" - {emojis['spblank']} {sp}" if sp else ""
+                )
+            ),
+            inline=False
+        )
+        embed.add_field(
+            name="Selected Game Mode",
+            value=f"{gamemode_emotes[gamemode]} {gamemode}",
+            inline=False
+        )
+
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
-    
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     @commands.command(name="brawler", aliases=['binfo'])
+    @maintenance()
     async def _brawler(self, ctx: Context, *, brawler_name: str):
         """Show stats of a particular Brawler"""
 
         user = ctx.author
-        
+
         brawlers = self.BRAWLERS
 
         # for users who input 'el_primo' or 'primo'
@@ -560,18 +668,20 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 break
             else:
                 brawler = None
-        
+
         if not brawler:
             return await ctx.send(f"{brawler_name} does not exist.")
-        
-        owned_brawlers = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        owned_brawlers = await self.get_player_stat(
+            user, 'brawlers', is_iter=True)
 
         owned = True if brawler in owned_brawlers else False
 
         b: Brawler = brawlers_map[brawler](self.BRAWLERS, brawler)
 
         if owned:
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+            brawler_data = await self.get_player_stat(
+                user, 'brawlers', is_iter=True, substat=brawler)
             pp = brawler_data['powerpoints']
             trophies = brawler_data['trophies']
             rank = brawler_data['rank']
@@ -585,7 +695,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             sp1 = brawler_data['sp1']
             sp2 = brawler_data['sp2']
 
-            embed = b.brawler_info(brawler, trophies, pb, rank, level, pp, next_level_pp, sp1, sp2)
+            embed = b.brawler_info(brawler, trophies, pb,
+                                   rank, level, pp, next_level_pp, sp1, sp2)
 
         else:
             embed = b.brawler_info(brawler)
@@ -593,35 +704,39 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
- 
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     @commands.command(name="brawlers", aliases=['brls'])
-    async def all_owned_brawlers(self, ctx: Context, user: discord.User = None):
+    @maintenance()
+    async def all_owned_brawlers(
+        self, ctx: Context, user: discord.User = None
+    ):
         """Show details of all the Brawlers you own"""
 
         if not user:
             user = ctx.author
 
         owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
-        
+
         embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=f"{user.name}'s Brawlers")
 
-        # below code is to sort brawlers by their trophies 
+        # below code is to sort brawlers by their trophies
         brawlers = {}
         for brawler in owned:
             brawlers[brawler] = owned[brawler]["trophies"]
-        
-        sorted_brawlers = dict(sorted(brawlers.items(), key=lambda x: x[1], reverse=True))
+
+        sorted_brawlers = dict(
+            sorted(brawlers.items(), key=lambda x: x[1], reverse=True))
 
         for brawler in sorted_brawlers:
             level = owned[brawler]["level"]
             trophies = owned[brawler]["trophies"]
             pb = owned[brawler]["pb"]
             rank = owned[brawler]["rank"]
-            sp1 = owned[brawler]["sp1"]
-            sp2 = owned[brawler]["sp2"]
             skin = owned[brawler]["selected_skin"]
 
             if skin == "Default":
@@ -636,28 +751,39 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 _brawler = brawler
 
             emote = level_emotes["level_"+str(level)]
-            
-            value = (f"{emote}`{trophies:>4}` {rank_emojis['br'+str(rank)]} |" 
-                        f" {emojis['powerplay']}`{pb:>4}`")
-            
-            embed.add_field(name=f"{brawler_emojis[brawler]} {skin.upper()}{_brawler.upper()}", 
-                    value=value, inline=False)
-        
+
+            value = (f"{emote}`{trophies:>4}` {rank_emojis['br'+str(rank)]} |"
+                     f" {emojis['powerplay']}`{pb:>4}`")
+
+            embed.add_field(
+                name=(
+                    f"{brawler_emojis[brawler]} {skin.upper()}"
+                    f"{_brawler.upper()}"
+                ),
+                value=value,
+                inline=False
+            )
+
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @commands.command(name="allbrawlers", aliases=['abrawlers', 'abrls'])
+    @maintenance()
     async def all_brawlers(self, ctx: Context):
         """Show list of all the Brawlers"""
 
-        owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
+        owned = await self.get_player_stat(
+            ctx.author, 'brawlers', is_iter=True)
 
         embed = discord.Embed(color=EMBED_COLOR, title="All Brawlers")
 
-        rarities = ["Trophy Road", "Rare", "Super Rare", "Epic", "Mythic", "Legendary"]
+        rarities = ["Trophy Road", "Rare",
+                    "Super Rare", "Epic", "Mythic", "Legendary"]
         for rarity in rarities:
             rarity_str = ""
             for brawler in self.BRAWLERS:
@@ -666,69 +792,85 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 rarity_str += f"\n{brawler_emojis[brawler]} {brawler}"
                 if brawler in owned:
                     rarity_str += " [Owned]"
-        
+
             if rarity_str:
                 embed.add_field(name=rarity, value=rarity_str, inline=False)
-        
-        embed.set_footer(text=f"Owned: {len(owned)} | Total: {len(self.BRAWLERS)}")
+
+        embed.set_footer(
+            text=f"Owned: {len(owned)} | Total: {len(self.BRAWLERS)}")
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @commands.group(name="rewards")
+    @maintenance()
     async def _rewards(self, ctx: Context):
         """View and claim collected trophy road rewards"""
-        pass            
-    
+        pass
+
     @_rewards.command(name="list")
     async def rewards_list(self, ctx: Context):
         """View collected trophy road rewards"""
 
         user = ctx.author
-        
+
         tpstored = await self.get_player_stat(user, 'tpstored')
 
-        desc = "Use `-rewards claim <reward_number>` or `-rewards claimall` to claim rewards!"
-        embed = discord.Embed(color=EMBED_COLOR, title="Rewards List", description=desc)
+        desc = (
+            "Use `-rewards claim <reward_number>` or"
+            " `-rewards claimall` to claim rewards!"
+        )
+        embed = discord.Embed(
+            color=EMBED_COLOR, title="Rewards List", description=desc)
         embed.set_author(name=user.name, icon_url=user.avatar_url)
-        
+
         embed_str = ""
-        
+
         for tier in tpstored:
             reward_data = self.TROPHY_ROAD[tier]
-            reward_name, reward_emoji, reward_str = self.tp_reward_strings(reward_data, tier)
+            reward_name, reward_emoji, reward_str = self.tp_reward_strings(
+                reward_data, tier)
 
-            embed_str += f"\n**{tier}.** {reward_name}: {reward_emoji} {reward_str}"
-        
+            embed_str += (
+                f"\n**{tier}.** {reward_name}: {reward_emoji} {reward_str}"
+            )
+
         if embed_str:
             embed.add_field(name="Rewards", value=embed_str.strip())
         else:
-            embed.add_field(name="Rewards", value="You don't have any rewards.")
+            embed.add_field(
+                name="Rewards", value="You don't have any rewards.")
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @_rewards.command(name="claim")
     async def rewards_claim(self, ctx: Context, reward_number: str):
         """Claim collected trophy road reward"""
 
         user = ctx.author
-        
+
         tpstored = await self.get_player_stat(user, 'tpstored')
 
         if reward_number not in tpstored:
-            return await ctx.send(f"You do not have {reward_number} collected.")
-        
+            return await ctx.send(
+                f"You do not have {reward_number} collected."
+            )
+
         await self.handle_reward_claims(ctx, reward_number)
-        
-        await ctx.send("Reward successfully claimed.")    
-        
+
+        await ctx.send("Reward successfully claimed.")
+
     @_rewards.command(name="claimall")
     async def rewards_claim_all(self, ctx: Context):
         """Claim all collected trophy road rewards"""
@@ -738,19 +880,21 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         for tier in tpstored:
             await self.handle_reward_claims(ctx, str(tier))
-        
-        await ctx.send("Rewards successfully claimed.")    
-    
+
+        await ctx.send("Rewards successfully claimed.")
+
     @commands.group(name="select")
+    @maintenance()
     async def _select(self, ctx: Context):
         """Change selected Brawler, skin, star power or game mode"""
         pass
-    
+
     @_select.command(name="brawler")
     async def select_brawler(self, ctx: Context, *, brawler_name: str):
         """Change selected Brawler"""
 
-        user_owned = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True)
+        user_owned = await self.get_player_stat(
+            ctx.author, 'brawlers', is_iter=True)
 
         # for users who input 'el_primo'
         brawler_name = brawler_name.replace("_", " ")
@@ -759,52 +903,71 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         if brawler_name not in user_owned:
             return await ctx.send(f"You do not own {brawler_name}!")
-        
-        await self.update_player_stat(ctx.author, 'selected', brawler_name, substat='brawler')
-        
-        brawler_data = await self.get_player_stat(ctx.author, 'brawlers', is_iter=True, substat=brawler_name)
 
-        sps = [f"sp{ind}" for ind, sp in enumerate([brawler_data["sp1"], brawler_data["sp2"]], start=1) if sp]
+        await self.update_player_stat(
+            ctx.author, 'selected', brawler_name, substat='brawler')
+
+        brawler_data = await self.get_player_stat(
+            ctx.author, 'brawlers', is_iter=True, substat=brawler_name)
+
+        sps = [f"sp{ind}" for ind, sp in enumerate(
+            [brawler_data["sp1"], brawler_data["sp2"]], start=1) if sp]
         sps = [self.BRAWLERS[brawler_name][sp]["name"] for sp in sps]
-        
+
         if sps:
-            await self.update_player_stat(ctx.author, 'selected',  random.choice(sps), substat='starpower')
+            await self.update_player_stat(
+                ctx.author, 'selected',  random.choice(sps),
+                substat='starpower'
+            )
         else:
-            await self.update_player_stat(ctx.author, 'selected',  None, substat='starpower')
+            await self.update_player_stat(
+                ctx.author, 'selected',  None, substat='starpower')
 
         skin = brawler_data["selected_skin"]
-        await self.update_player_stat(ctx.author, 'selected',  skin, substat='brawler_skin')
-        
+        await self.update_player_stat(
+            ctx.author, 'selected',  skin, substat='brawler_skin')
+
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
     @_select.command(name="gamemode")
     async def select_gamemode(self, ctx: Context, *, gamemode: str):
         """Change selected game mode"""
 
-        return await ctx.send("The game only supports **Gem Grab** at the moment." 
-                " More game modes will be added soon!")
-        
+        return await ctx.send(
+            "The game only supports **Gem Grab** at the moment."
+            " More game modes will be added soon!"
+        )
+
         # for users who input 'gem-grab' or 'gem_grab'
         gamemode = gamemode.replace("-", " ")
         gamemode = gamemode.replace("_", " ")
-        
+
         if gamemode.lower() == "showdown":
-            return await ctx.send("Please select one between Solo and Duo Showdown.")
-        
+            return await ctx.send(
+                "Please select one between Solo and Duo Showdown."
+            )
+
         possible_names = {
             "Gem Grab": ["gem grab", "gemgrab", "gg", "gem"],
             "Brawl Ball": ["brawl ball", "brawlball", "bb", "bball", "ball"],
-            "Solo Showdown": ["solo showdown","ssd", "solo sd", "soloshowdown", "solo", "s sd"],
-            "Duo Showdown": ["duo showdown", "dsd", "duo sd", "duoshowdown", "duo", "d sd"],
+            "Solo Showdown": [
+                "solo showdown", "ssd", "solo sd",
+                "soloshowdown", "solo", "s sd"
+            ],
+            "Duo Showdown": [
+                "duo showdown", "dsd", "duo sd", "duoshowdown", "duo", "d sd"
+            ],
             "Bounty": ["bounty", "bonty", "bunty"],
             "Heist": ["heist", "heis"],
             "Lone Star": ["lone star", "lonestar", "ls", "lone"],
             "Takedown": ["takedown", "take down", "td"],
-            "Robo Rumble": ["robo rumble", "rr", "roborumble", "robo", "rumble"],
+            "Robo Rumble": [
+                "robo rumble", "rr", "roborumble", "robo", "rumble"
+            ],
             "Big Game": ["big game", "biggame", "bg", "big"],
             "Boss Fight": ["boss fight", "bossfight", "bf", "boss"]
         }
-        
+
         for gmtype in possible_names:
             modes = possible_names[gmtype]
             if gamemode.lower() in modes:
@@ -813,15 +976,17 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         else:
             return await ctx.send("Unable to identify game mode.")
 
-        user_owned = await self.get_player_stat(ctx.author, 'gamemodes', is_iter=True)
-        
+        user_owned = await self.get_player_stat(
+            ctx.author, 'gamemodes', is_iter=True)
+
         if gamemode not in user_owned:
             return await ctx.send(f"You do not own {gamemode}!")
-        
-        await self.update_player_stat(ctx.author, 'selected', gamemode, substat='gamemode')
+
+        await self.update_player_stat(
+            ctx.author, 'selected', gamemode, substat='gamemode')
 
         await ctx.send(f"Changed selected game mode to {gamemode}!")
-    
+
     @_select.command(name="skin")
     async def select_skin(self, ctx: Context, *, skin: str):
         """Change selected skin"""
@@ -829,118 +994,150 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         user = ctx.author
 
         skin = skin.title()
-        cur_skin = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler_skin')
+        cur_skin = await self.get_player_stat(
+            user, 'selected', is_iter=True, substat='brawler_skin')
 
-        selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
+        selected_brawler = await self.get_player_stat(
+            user, 'selected', is_iter=True, substat='brawler')
 
         if skin == cur_skin:
-            return await ctx.send(f"{skin} {selected_brawler} skin is already selected.")
+            return await ctx.send(
+                f"{skin} {selected_brawler} skin is already selected.")
 
-        selected_data = await self.get_player_stat(user, 'brawlers', is_iter=True, 
-            substat=selected_brawler)
-        
+        selected_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True, substat=selected_brawler)
+
         skins = selected_data['skins']
 
         if skin not in skins:
-            return await ctx.send(f"You don't own {skin} {selected_brawler} skin or it does not exist.")
-        
-        await self.update_player_stat(user, 'selected', skin, substat='brawler_skin')
-        await self.update_player_stat(user, 'brawlers', skin, 
-            substat=selected_brawler, sub_index='selected_skin')
-        
+            return await ctx.send(
+                f"You don't own {skin} {selected_brawler}"
+                " skin or it does not exist."
+            )
+
+        await self.update_player_stat(
+            user, 'selected', skin, substat='brawler_skin')
+        await self.update_player_stat(
+            user, 'brawlers', skin, substat=selected_brawler,
+            sub_index='selected_skin'
+        )
+
         await ctx.send(f"Changed selected skin from {cur_skin} to {skin}.")
-    
+
     @_select.command(name="starpower", aliases=['sp'])
     async def select_sp(self, ctx: Context, *, starpower_number: int):
         """Change selected star power"""
 
         user = ctx.author
 
-        selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
+        selected_brawler = await self.get_player_stat(
+            user, 'selected', is_iter=True, substat='brawler')
 
         sp = "sp" + str(starpower_number)
         sp_name, emote = self.get_sp_info(selected_brawler, sp)
 
-        cur_sp = await self.get_player_stat(user, 'selected', is_iter=True, substat='starpower')
+        cur_sp = await self.get_player_stat(
+            user, 'selected', is_iter=True, substat='starpower')
 
         if sp_name == cur_sp:
             return await ctx.send(f"{sp_name} is already selected.")
 
-        selected_data = await self.get_player_stat(user, 'brawlers', is_iter=True, 
-            substat=selected_brawler)
-        
+        selected_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True, substat=selected_brawler)
+
         if starpower_number in [1, 2]:
             if selected_data[sp]:
-                await self.update_player_stat(user, 'selected', sp_name, substat='starpower')
+                await self.update_player_stat(
+                    user, 'selected', sp_name, substat='starpower')
             else:
-                return await ctx.send(f"You don't own SP #{starpower_number} of {selected_brawler}.")
+                return await ctx.send(
+                    f"You don't own SP #{starpower_number}"
+                    f" of {selected_brawler}."
+                )
         else:
             return await ctx.send("You can only choose SP #1 or SP #2.")
-        
+
         await ctx.send(f"Changed selected Star Power to {sp_name}.")
-    
+
     @commands.command(name="brawlbox", aliases=['box'])
+    @maintenance()
     async def _brawl_box(self, ctx: Context):
         """Open a Brawl Box using Tokens"""
 
         user = ctx.author
-        
+
         tokens = await self.get_player_stat(user, 'tokens')
 
         if tokens < 100:
-            return await ctx.send("You do not have enough Tokens to open a brawl box.")
-        
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+            return await ctx.send(
+                "You do not have enough Tokens to open a brawl box."
+            )
+
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True)
 
         box = Box(self.BRAWLERS, brawler_data)
         try:
             embed = await box.brawlbox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error \"{exc}\" while opening a Brawl Box. Please notify bot creator"
-                " using `-report` command.")
+            return await ctx.send(
+                f"Error \"{exc}\" while opening a Brawl Box."
+                " Please notify bot creator using `-report` command."
+            )
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
         await self.update_player_stat(user, 'tokens', -100, add_self=True)
-    
+
     @commands.command(name="bigbox", aliases=['big'])
+    @maintenance()
     async def _big_box(self, ctx: Context):
         """Open a Big Box using Star Tokens"""
 
         user = ctx.author
-        
+
         startokens = await self.get_player_stat(user, 'startokens')
 
         if startokens < 10:
-            return await ctx.send("You do not have enough Star Tokens to open a brawl box.")
-        
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+            return await ctx.send(
+                "You do not have enough Star Tokens to open a brawl box."
+            )
+
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True)
 
         box = Box(self.BRAWLERS, brawler_data)
         try:
             embed = await box.bigbox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error {exc} while opening a Big Box. Please notify bot creator"
-                " using `-report` command.")
+            return await ctx.send(
+                f"Error {exc} while opening a Big Box."
+                " Please notify bot creator using `-report` command."
+                )
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
         await self.update_player_stat(user, 'startokens', -10, add_self=True)
-    
+
     @commands.command(name="upgrade", aliases=['up'])
+    @maintenance()
     async def upgrade_brawlers(self, ctx: Context, *, brawler: str):
         """Upgrade a Brawler"""
 
         user = ctx.author
-        
+
         user_owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
 
         if self.parse_brawler_name(brawler):
@@ -948,30 +1145,44 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         if brawler not in user_owned:
             return await ctx.send(f"You do not own {brawler}!")
-        
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True, substat=brawler)
         level = brawler_data['level']
         if level == 9:
-            return await ctx.send("Brawler is already at level 9. Open boxes to collect Star Powers!")
+            return await ctx.send(
+                "Brawler is already at level 9. Open"
+                " boxes to collect Star Powers!"
+            )
         elif level == 10:
-            return await ctx.send("Brawler is already at level 10. If you are missing a Star Power, then open boxes to collect it!")
+            return await ctx.send(
+                "Brawler is already at level 10. If you are"
+                " missing a Star Power, then open boxes to collect it!"
+            )
 
         powerpoints = brawler_data['powerpoints']
 
         required_powerpoints = self.LEVEL_UPS[str(level)]["Progress"]
 
         if powerpoints < required_powerpoints:
-            return await ctx.send(f"You do not have enough powerpoints! ({powerpoints}/{required_powerpoints})")
-        
+            return await ctx.send(
+                "You do not have enough powerpoints!"
+                f" ({powerpoints}/{required_powerpoints})"
+            )
+
         gold = await self.get_player_stat(user, 'gold', is_iter=False)
 
         required_gold = self.LEVEL_UPS[str(level)]["RequiredCurrency"]
 
         if gold < required_gold:
-            return await ctx.send(f"You do not have enough gold! ({gold}/{required_gold})")
-        
-        msg = await ctx.send(f"{user.mention} Upgrading {brawler} to power {level+1} will cost" 
-            f" {emojis['gold']} {required_gold}. Continue?")
+            return await ctx.send(
+                f"You do not have enough gold! ({gold}/{required_gold})"
+            )
+
+        msg = await ctx.send(
+            f"{user.mention} Upgrading {brawler} to power {level+1}"
+            f" will cost {emojis['gold']} {required_gold}. Continue?"
+        )
         start_adding_reactions(msg, ReactionPredicate.YES_OR_NO_EMOJIS)
 
         pred = ReactionPredicate.yes_or_no(msg, user)
@@ -982,26 +1193,33 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         else:
             # User responded with cross
             return await ctx.send("Upgrade cancelled.")
-        
-        await self.update_player_stat(user, 'brawlers', level+1, substat=brawler, sub_index='level')
-        await self.update_player_stat(user, 'brawlers', powerpoints-required_powerpoints, 
-                substat=brawler, sub_index='powerpoints')
+
+        await self.update_player_stat(
+            user, 'brawlers', level+1, substat=brawler, sub_index='level')
+        await self.update_player_stat(
+            user, 'brawlers', powerpoints-required_powerpoints,
+            substat=brawler, sub_index='powerpoints'
+        )
         await self.update_player_stat(user, 'gold', gold-required_gold)
 
         await ctx.send(f"Upgraded {brawler} to power {level+1}!")
-    
+
     @commands.command(name="gamemodes", aliases=['gm', 'events'])
+    @maintenance()
     async def _gamemodes(self, ctx: Context):
         """Show details of all the game modes"""
 
         user = ctx.author
-        
-        user_owned = await self.get_player_stat(user, 'gamemodes', is_iter=True)
-        
+
+        user_owned = await self.get_player_stat(
+            user, 'gamemodes', is_iter=True)
+
         embed = discord.Embed(color=EMBED_COLOR, title="Game Modes")
         embed.set_author(name=user.name, icon_url=user.avatar_url)
-        
-        for event_type in ["Team Event", "Solo Event", "Duo Event", "Ticket Event"]:
+
+        for event_type in [
+            "Team Event", "Solo Event", "Duo Event", "Ticket Event"
+        ]:
             embed_str = ""
             for gamemode in self.GAMEMODES:
                 if event_type != self.GAMEMODES[gamemode]["event_type"]:
@@ -1009,43 +1227,52 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 embed_str += f"\n{gamemode_emotes[gamemode]} {gamemode}"
                 if gamemode not in user_owned:
                     embed_str += f" [Locked]"
-            
+
             embed.add_field(name=event_type+"s", value=embed_str, inline=False)
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @commands.command(name="report")
     @commands.cooldown(rate=1, per=60, type=commands.BucketType.user)
+    @maintenance()
     async def _report(self, ctx: Context, *, msg: str):
         """Send a report to the bot owner"""
-    
-        report_str = (f"`{datetime.utcnow().replace(microsecond=0)}` {ctx.author}"
-                    f" (`{ctx.author.id}`) reported from `{ctx.guild}`: **{msg}**")
-        
+
+        report_str = (
+            f"`{datetime.utcnow().replace(microsecond=0)}` {ctx.author}"
+            f" (`{ctx.author.id}`) reported from `{ctx.guild}`: **{msg}**"
+        )
+
         channel_id = await self.config.report_channel()
-        
+
         channel = None
         if channel_id:
             for guild in self.bot.guilds:
                 try:
-                    channel = discord.utils.get(guild.text_channels, id=channel_id)
+                    channel = discord.utils.get(
+                        guild.text_channels, id=channel_id)
                     if channel:
                         break
-                except:
+                except discord.Forbidden:
                     pass
-   
+
         if channel:
             await channel.send(report_str)
         else:
             owner = self.bot.get_user(self.bot.owner_id)
             await owner.send(report_str)
-        
-        await ctx.send("Thank you for sending a report. Your issue will be resolved as soon as possible.")
-    
+
+        await ctx.send(
+            "Thank you for sending a report. Your issue"
+            " will be resolved as soon as possible."
+        )
+
     @_report.error
     async def report_error(self, ctx: Context, error):
         if isinstance(error, commands.MissingRequiredArgument):
@@ -1063,26 +1290,29 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
     @commands.command(name="rchannel")
     @checks.is_owner()
-    async def report_channel(self, ctx: Context, channel: discord.TextChannel = None):
+    async def report_channel(
+        self, ctx: Context, channel: discord.TextChannel = None
+    ):
         """Set reports channel"""
 
         if not channel:
             channel = ctx.channel
         await self.config.report_channel.set(channel.id)
         await ctx.send(f"Report channel set to {channel.mention}.")
-    
+
     @commands.group(name="leaderboard", aliases=['lb'], autohelp=False)
+    @maintenance()
     async def _leaderboard(self, ctx: Context):
         """Display the leaderboard"""
 
         if not ctx.invoked_subcommand:
-            
+
             title = "Brawlcord Leaderboard"
 
             url = "https://www.starlist.pro/assets/icon/trophy.png"
-            
+
             await self.leaderboard_handler(ctx, title, url, 5)
-    
+
     @_leaderboard.command(name="pb")
     async def pb_leaderboard(self, ctx: Context):
         """Display the personal best leaderboard"""
@@ -1090,29 +1320,32 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         title = "Brawlcord Leaderboard - Highest Trophies"
 
         url = "https://www.starlist.pro/assets/icon/trophy.png"
-        
+
         await self.leaderboard_handler(ctx, title, url, 5, pb=True)
-    
+
     @_leaderboard.command(name="brawler")
     async def brawler_leaderboard(self, ctx: Context, *, brawler_name: str):
         """Display the specified brawler's leaderboard"""
 
         brawler_name = self.parse_brawler_name(brawler_name)
-        
+
         if not brawler_name:
             return await ctx.send(f"{brawler_name} does not exist!")
-        
-        title = f"Brawlcord {brawler_name} Leaderboard"
-        
-        url=f"{brawler_thumb.format(brawler_name)}"
 
-        await self.leaderboard_handler(ctx, title, url, 4, brawler_name=brawler_name)
-  
+        title = f"Brawlcord {brawler_name} Leaderboard"
+
+        url = f"{brawler_thumb.format(brawler_name)}"
+
+        await self.leaderboard_handler(
+            ctx, title, url, 4, brawler_name=brawler_name
+        )
+
     @commands.group(name="claim")
+    @maintenance()
     async def _claim(self, ctx: Context):
         """Claim daily/weekly/monthly rewards"""
         pass
-    
+
     @_claim.command(name="daily")
     async def claim_daily(self, ctx: Context):
         """Claim daily reward"""
@@ -1123,20 +1356,25 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user = ctx.author
 
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True)
 
         box = Box(self.BRAWLERS, brawler_data)
         try:
             embed = await box.brawlbox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error \"{exc}\" while opening a Brawl Box. Please notify bot creator"
-                " using `-report` command.")
+            return await ctx.send(
+                f"Error \"{exc}\" while opening a Brawl Box."
+                " Please notify bot creator using `-report` command."
+            )
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @_claim.command(name="weekly")
     async def claim_weekly(self, ctx: Context):
@@ -1148,29 +1386,35 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user = ctx.author
 
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True)
 
         box = Box(self.BRAWLERS, brawler_data)
         try:
             embed = await box.bigbox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error \"{exc}\" while opening a Big Box. Please notify bot creator"
-                " using `-report` command.")
+            return await ctx.send(
+                f"Error \"{exc}\" while opening a Big Box."
+                " Please notify bot creator using `-report` command."
+            )
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @commands.command(name="invite")
+    @maintenance()
     async def _invite(self, ctx: Context):
         """Shows Brawlcord's invite url"""
 
         # read_messages=True
         # send_messages=True
-        # embed_links=True, 
-        # attach_files=True, 
+        # embed_links=True,
+        # attach_files=True,
         # external_emojis=True,
         # add_reactions=True
         perms = discord.Permissions(314432)
@@ -1179,37 +1423,43 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             data = await self.bot.application_info()
             invite_url = discord.utils.oauth_url(data.id, permissions=perms)
             value = (
-                f"Add Brawlcord to your server by **[clicking here]({invite_url})**."
-                "\n\nNote: By using the link above, Brawlcord will be able to"
+                "Add Brawlcord to your server by **[clicking here]"
+                f"({invite_url})**.\n\nNote: By using the link"
+                " above, Brawlcord will be able to"
                 " read messages,"
                 " send messages,"
                 " embed links,"
                 " attach files,"
                 " add reactions,"
                 " and use external emojis"
-                " wherever allowed. You can remove the permissions manually, but that may break"
-                " the bot."
+                " wherever allowed. You can remove the permissions manually,"
+                " but that may break the bot."
             )
         except Exception as exc:
             invite_url = None
-            value = (f"Error \"{exc}\" while generating invite link. Notify bot owner using the" 
-                " `-report` command.")
+            value = (
+                f"Error \"{exc}\" while generating invite link."
+                " Notify bot owner using the `-report` command."
+            )
 
         embed = discord.Embed(color=0xFFA232)
-        embed.set_author(name=f"Invite {ctx.me.name}", icon_url=ctx.me.avatar_url)
+        embed.set_author(
+            name=f"Invite {ctx.me.name}", icon_url=ctx.me.avatar_url)
         embed.add_field(name="__**Invite Link:**__", value=value)
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
-            
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     @commands.command(name="botinfo")
     @checks.is_owner()
     async def _bot_info(self, ctx: Context):
         """Display bot statistics"""
-        
+
         total_guilds = len(self.bot.guilds)
         total_users = len(await self.config.all_users())
 
@@ -1219,6 +1469,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         #     print(user)
 
     @commands.command(name="upgrades")
+    @maintenance()
     async def _upgrades(self, ctx: Context):
         """Show Brawlers which can be upgraded"""
 
@@ -1229,8 +1480,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed_str = ""
 
         for idx, brawler in enumerate(user_owned):
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
-            
+            brawler_data = await self.get_player_stat(
+                user, 'brawlers', is_iter=True, substat=brawler)
+
             level = brawler_data['level']
             if level >= 9:
                 continue
@@ -1242,27 +1494,36 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             required_gold = self.LEVEL_UPS[str(level)]["RequiredCurrency"]
 
             if powerpoints >= required_powerpoints:
-                embed_str += f"\n{idx+1}. {brawler} {brawler_emojis[brawler]} ({level} ->"
-                embed_str += f" {level+1}) - {emojis['gold']} {required_gold}"
+                embed_str += (
+                    f"\n{idx+1}. {brawler} {brawler_emojis[brawler]} ({level}"
+                    f" -> {level+1}) - {emojis['gold']} {required_gold}"
+                )
 
         if embed_str:
             desc = (
-                "The following Brawlers can be upgraded by using the `-upgrade <brawler_name>`"
-                " command."
+                "The following Brawlers can be upgraded by using the"
+                " `-upgrade <brawler_name>` command."
             )
             embed = discord.Embed(color=EMBED_COLOR, description=desc)
             embed.add_field(name="Upgradable Brawlers", value=embed_str)
             gold = await self.get_player_stat(user, 'gold')
-            embed.add_field(name="Available Gold", value=f"{emojis['gold']} {gold}")
+            embed.add_field(name="Available Gold",
+                            value=f"{emojis['gold']} {gold}")
         else:
-            embed = discord.Embed(color=EMBED_COLOR, 
-                description="You can't upgrade any Brawler at the moment.")
+            embed = discord.Embed(
+                color=EMBED_COLOR,
+                description="You can't upgrade any Brawler at the moment."
+            )
 
-        embed.set_author(name=f"{user.name}'s Upgradable Brawlers", icon_url=user.avatar_url)
+        embed.set_author(
+            name=f"{user.name}'s Upgradable Brawlers",
+            icon_url=user.avatar_url
+        )
 
         await ctx.send(embed=embed)
-    
+
     @commands.command(name="powerpoints", aliases=['pps'])
+    @maintenance()
     async def _powerpoints(self, ctx: Context):
         """Show number of power points each Brawler has"""
 
@@ -1273,7 +1534,8 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed_str = ""
 
         for brawler in user_owned:
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+            brawler_data = await self.get_player_stat(
+                user, 'brawlers', is_iter=True, substat=brawler)
 
             level = brawler_data['level']
             level_emote = level_emotes["level_"+str(level)]
@@ -1283,11 +1545,12 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
                 required_powerpoints = self.LEVEL_UPS[str(level)]["Progress"]
 
-                required_gold = self.LEVEL_UPS[str(level)]["RequiredCurrency"]
+                embed_str += (
+                    f"\n{level_emote} {brawler} {brawler_emojis[brawler]}"
+                    f" - {powerpoints}/{required_powerpoints}"
+                    f" {emojis['powerpoint']}"
+                )
 
-                embed_str += f"\n{level_emote} {brawler} {brawler_emojis[brawler]}"
-                embed_str += f" - {powerpoints}/{required_powerpoints} {emojis['powerpoint']}"
-            
             else:
                 sp1 = brawler_data['sp1']
                 sp2 = brawler_data['sp2']
@@ -1301,47 +1564,58 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 else:
                     sp2_icon = emojis['spgrey']
 
-                embed_str += f"\n{level_emote} {brawler} {brawler_emojis[brawler]}"
-                embed_str += f" - {sp1_icon} {sp2_icon}"
+                embed_str += (
+                    f"\n{level_emote} {brawler} {brawler_emojis[brawler]}"
+                    f" - {sp1_icon} {sp2_icon}"
+                )
 
         embed = discord.Embed(color=EMBED_COLOR)
         embed.add_field(name="Brawlers", value=embed_str)
 
-        embed.set_author(name=f"{user.name}'s Power Points Info", icon_url=user.avatar_url)
+        embed.set_author(
+            name=f"{user.name}'s Power Points Info", icon_url=user.avatar_url)
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
-    
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     @commands.group(name="gift")
+    @maintenance()
     async def _gifted(self, ctx: Context):
         """View and collect gifted Brawl, Big or Mega boxes"""
         pass
-    
+
     @_gifted.command(name="list")
     async def _gifted_list(self, ctx: Context):
         """View gifted rewards"""
 
         user = ctx.author
-        
+
         gifts = await self.get_player_stat(user, 'gifts')
 
         desc = "Use `-gift` command to learn more about claiming rewards!"
-        embed = discord.Embed(color=EMBED_COLOR, title="Gifted Rewards List", description=desc)
+        embed = discord.Embed(
+            color=EMBED_COLOR, title="Gifted Rewards List", description=desc)
         embed.set_author(name=user.name, icon_url=user.avatar_url)
-        
+
         embed_str = ""
-        
+
         for gift_type in gifts:
             if gift_type in ["brawlbox", "bigbox", "megabox"]:
                 count = gifts[gift_type]
                 emoji = emojis[gift_type]
                 if count > 0:
-                    embed_str += f"\n{emoji} {self._box_name(gift_type)}: x**{count}**"
-            else: continue
-        
+                    embed_str += (
+                        f"\n{emoji} {self._box_name(gift_type)}:"
+                        f" x**{count}**"
+                    )
+            else:
+                continue
+
         if embed_str:
             embed.add_field(name="Rewards", value=embed_str.strip())
         else:
@@ -1350,8 +1624,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
     @_gifted.command(name="mega")
     async def _gifted_mega(self, ctx: Context):
@@ -1359,30 +1635,41 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         user = ctx.author
 
-        saved = await self.get_player_stat(user, "gifts", is_iter=True, substat="megabox")
+        saved = await self.get_player_stat(
+            user, "gifts", is_iter=True, substat="megabox")
 
         if saved < 1:
             return await ctx.send("You do not have any gifted mega boxes.")
-        
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True)
 
         box = Box(self.BRAWLERS, brawler_data)
         try:
             embed = await box.megabox(self.config.user(user), user)
         except Exception as exc:
-            return await ctx.send(f"Error \"{exc}\" while opening a Mega Box. Please notify bot creator"
-                " using `-report` command.")
+            return await ctx.send(
+                f"Error \"{exc}\" while opening a Mega Box."
+                " Please notify bot creator using `-report` command."
+            )
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
+            await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
 
         # await self.update_player_stat(user, 'tokens', -100, add_self=True)
-        await self.update_player_stat(user, "gifts", -1, substat="megabox", add_self=True)
+        await self.update_player_stat(
+            user, "gifts", -1, substat="megabox", add_self=True
+        )
 
-    async def get_player_stat(self, user: discord.User, stat: str, is_iter=False, substat: str = None):
+    async def get_player_stat(
+        self, user: discord.User, stat: str,
+        is_iter=False, substat: str = None
+    ):
         """Get stats of a player."""
 
         if not is_iter:
@@ -1394,8 +1681,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             else:
                 return stat[substat]
 
-    async def update_player_stat(self, user: discord.User, stat: str, 
-                                                value, substat: str = None, sub_index=None, add_self=False):
+    async def update_player_stat(
+        self, user: discord.User, stat: str, value,
+        substat: str = None, sub_index=None, add_self=False
+    ):
         """Update stats of a player."""
 
         if substat:
@@ -1418,7 +1707,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 old_val = await self.get_player_stat(user, stat)
             await stat_attr.set(value+old_val)
 
-    async def get_trophies(self, user: discord.User, pb = False, brawler_name: str = None):
+    async def get_trophies(
+        self, user: discord.User,
+        pb=False, brawler_name: str = None
+    ):
         """Get total trophies or trophies of a specified Brawler of an user.
 
         Returns total trophies if a brawler is not specified.
@@ -1433,7 +1725,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         else:
             return brawlers[brawler_name][stat]
 
-    async def brawl_rewards(self, user: discord.User, points: int, is_starplayer=False):
+    async def brawl_rewards(
+        self, user: discord.User,
+        points: int, is_starplayer=False
+    ):
         """Adjust user variables and return embed containing reward."""
 
         if points > 0:
@@ -1460,17 +1755,19 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         tokens_in_bank -= reward_tokens
 
         # brawler trophies
-        selected_brawler = await self.get_player_stat(user, 'selected', is_iter=True, substat='brawler')
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=selected_brawler)
+        selected_brawler = await self.get_player_stat(
+            user, 'selected', is_iter=True, substat='brawler')
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True, substat=selected_brawler)
         trophies = brawler_data['trophies']
 
         reward_trophies = self.trophies_to_reward_mapping(
             trophies, '3v3', position)
 
         trophies += reward_trophies
-        
+
         token_doubler = await self.get_player_stat(user, 'token_doubler')
-        
+
         upd_td = token_doubler - reward_tokens
         if upd_td < 0:
             upd_td = 0
@@ -1479,12 +1776,15 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             reward_tokens *= 2
         else:
             reward_tokens += token_doubler
-        
-        await self.update_player_stat(user, 'tokens', reward_tokens, add_self=True)
+
+        await self.update_player_stat(
+            user, 'tokens', reward_tokens, add_self=True)
         await self.update_player_stat(user, 'tokens_in_bank', tokens_in_bank)
         await self.update_player_stat(user, 'xp', reward_xp, add_self=True)
-        await self.update_player_stat(user, 'brawlers', trophies,
-                                      substat=selected_brawler, sub_index='trophies')
+        await self.update_player_stat(
+            user, 'brawlers', trophies,
+            substat=selected_brawler, sub_index='trophies'
+        )
         await self.update_player_stat(user, 'token_doubler', upd_td)
         await self.handle_pb(user, selected_brawler)
 
@@ -1493,21 +1793,35 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         embed = discord.Embed(color=EMBED_COLOR, title="Rewards")
         embed.set_author(name=user.name, icon_url=user_avatar)
 
-        reward_xp_str = f"{f'{reward_xp} (Star Player)' if is_starplayer else f'{reward_xp}'}"
+        reward_xp_str = (
+            "{}".format(
+                (
+                    f'{reward_xp} (Star Player)' if is_starplayer
+                    else f'{reward_xp}')
+            )
+        )
 
-        embed.add_field(name="Trophies", value=f"{emojis['trophies']} {reward_trophies}")
-        embed.add_field(name="Tokens", value=f"{emojis['token']} {reward_tokens}")
-        embed.add_field(name="Experience", value=f"{emojis['xp']} {reward_xp_str}")
+        embed.add_field(name="Trophies",
+                        value=f"{emojis['trophies']} {reward_trophies}")
+        embed.add_field(
+            name="Tokens", value=f"{emojis['token']} {reward_tokens}")
+        embed.add_field(name="Experience",
+                        value=f"{emojis['xp']} {reward_xp_str}")
 
         if token_doubler > 0:
-            embed.add_field(name="Token Doubler", value=f"{emojis['tokendoubler']} x{upd_td} remaining!")
+            embed.add_field(
+                name="Token Doubler",
+                value=f"{emojis['tokendoubler']} x{upd_td} remaining!"
+            )
 
         rank_up = await self.handle_rank_ups(user, selected_brawler)
         trophy_road_reward = await self.handle_trophy_road(user)
-        
+
         return embed, rank_up, trophy_road_reward
 
-    def trophies_to_reward_mapping(self, trophies: int, game_type="3v3", position=1):
+    def trophies_to_reward_mapping(
+        self, trophies: int, game_type="3v3", position=1
+    ):
 
         # position correlates with the list index
 
@@ -1563,9 +1877,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         reward_tokens = self.XP_LEVELS[str(lvl)]["TokensRewardCount"]
 
         tokens = await self.get_player_stat(user, 'tokens')
-        
+
         token_doubler = await self.get_player_stat(user, 'token_doubler')
-        
+
         upd_td = token_doubler - reward_tokens
         if upd_td < 0:
             upd_td = 0
@@ -1576,7 +1890,7 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             reward_tokens += token_doubler
 
         reward_msg = f"Rewards: {reward_tokens} {emojis['token']}"
-        
+
         tokens += reward_tokens
         await self.update_player_stat(user, 'tokens', tokens)
         await self.update_player_stat(user, 'token_doubler', upd_td)
@@ -1586,42 +1900,48 @@ class Brawlcord(BaseCog, name="Brawlcord"):
     async def handle_pb(self, user: discord.User, brawler: str):
         """Handle personal best changes."""
 
-        # individual brawler 
+        # individual brawler
         trophies = await self.get_trophies(user=user, brawler_name=brawler)
         pb = await self.get_trophies(user=user, pb=True, brawler_name=brawler)
 
         if trophies > pb:
-            await self.update_player_stat(user, 'brawlers', trophies, substat=brawler, sub_index='pb')
+            await self.update_player_stat(
+                user, 'brawlers', trophies, substat=brawler, sub_index='pb')
 
     async def update_token_bank(self):
         """Task to update token banks."""
 
         while True:
             for user in self.bot.users:
-                tokens_in_bank = await self.get_player_stat(user, 'tokens_in_bank')
+                tokens_in_bank = await self.get_player_stat(
+                    user, 'tokens_in_bank')
                 if tokens_in_bank == 200:
                     continue
                 tokens_in_bank += 20
                 if tokens_in_bank > 200:
                     tokens_in_bank = 200
 
-                bank_update_timestamp = await self.get_player_stat(user, 'bank_update_ts')
-                
+                bank_update_timestamp = await self.get_player_stat(
+                    user, 'bank_update_ts')
+
                 if not bank_update_timestamp:
                     continue
 
-                bank_update_ts = datetime.utcfromtimestamp(ceil(bank_update_timestamp))
+                bank_update_ts = datetime.utcfromtimestamp(
+                    ceil(bank_update_timestamp))
                 time_now = datetime.utcnow()
                 delta = time_now - bank_update_ts
                 delta_min = delta.total_seconds() / 60
 
                 if delta_min >= 80:
-                    await self.update_player_stat(user, 'tokens_in_bank', tokens_in_bank)
+                    await self.update_player_stat(
+                        user, 'tokens_in_bank', tokens_in_bank)
                     epoch = datetime(1970, 1, 1)
 
-                    # get timestamp in UTC 
+                    # get timestamp in UTC
                     timestamp = (time_now - epoch).total_seconds()
-                    await self.update_player_stat(user, 'bank_update_ts', timestamp)
+                    await self.update_player_stat(
+                        user, 'bank_update_ts', timestamp)
 
             await asyncio.sleep(60)
 
@@ -1630,20 +1950,22 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         for rank in self.RANKS:
             start = self.RANKS[rank]["ProgressStart"]
-            end = start + self.RANKS[rank]["Progress"]  # 1 is not subtracted as we're calling range 
+            # 1 is not subtracted as we're calling range
+            end = start + self.RANKS[rank]["Progress"]
             if pb in range(start, end):
                 return int(rank)
         else:
             return 35
-    
+
     async def handle_rank_ups(self, user: discord.User, brawler: str):
-        """Function to handle Brawler rank ups. 
-        
+        """Function to handle Brawler rank ups.
+
         Returns an embed containing rewards if a brawler rank ups.
         """
 
-        brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
-        
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True, substat=brawler)
+
         pb = brawler_data['pb']
         rank = brawler_data['rank']
 
@@ -1652,12 +1974,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         if rank_as_per_pb <= rank:
             return False
 
-        await self.update_player_stat(user, 'brawlers', rank_as_per_pb, brawler, 'rank')
-        
+        await self.update_player_stat(
+            user, 'brawlers', rank_as_per_pb, brawler, 'rank')
+
         rank_up_tokens = self.RANKS[str(rank)]["PrimaryLvlUpRewardCount"]
 
         token_doubler = await self.get_player_stat(user, 'token_doubler')
-    
+
         upd_td = token_doubler - rank_up_tokens
         if upd_td < 0:
             upd_td = 0
@@ -1669,24 +1992,37 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         rank_up_starpoints = self.RANKS[str(rank)]["SecondaryLvlUpRewardCount"]
 
-        await self.update_player_stat(user, 'tokens', rank_up_tokens, add_self=True)
-        await self.update_player_stat(user, 'starpoints', rank_up_starpoints, add_self=True)
-        await self.update_player_stat(user, 'token_doubler', upd_td)
+        await self.update_player_stat(
+            user, 'tokens', rank_up_tokens, add_self=True)
+        await self.update_player_stat(
+            user, 'starpoints', rank_up_starpoints, add_self=True)
+        await self.update_player_stat(
+            user, 'token_doubler', upd_td)
 
-        embed = discord.Embed(color=EMBED_COLOR, title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}")
+        embed = discord.Embed(
+            color=EMBED_COLOR,
+            title=f"Brawler Rank Up! {rank} → {rank_as_per_pb}"
+        )
         embed.set_author(name=user.name, icon_url=user.avatar_url)
-        embed.add_field(name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
-        embed.add_field(name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
+        embed.add_field(
+            name="Brawler", value=f"{brawler_emojis[brawler]} {brawler}")
+        embed.add_field(
+            name="Tokens", value=f"{emojis['token']} {rank_up_tokens}")
         if rank_up_starpoints:
-            embed.add_field(name="Star Points", 
-                        value=f"{emojis['starpoints']} {rank_up_starpoints}")
+            embed.add_field(
+                name="Star Points",
+                value=f"{emojis['starpoints']} {rank_up_starpoints}"
+            )
         if token_doubler > 0:
-            embed.add_field(name="Token Doubler", 
-                    value=f"{emojis['tokendoubler']} x{upd_td} remaining!", inline=False)
+            embed.add_field(
+                name="Token Doubler",
+                value=f"{emojis['tokendoubler']} x{upd_td} remaining!",
+                inline=False
+            )
         return embed
-    
+
     async def handle_trophy_road(self, user: discord.User):
-        """Function to handle trophy road progress."""   
+        """Function to handle trophy road progress."""
 
         trophies = await self.get_trophies(user)
         tppased = await self.get_player_stat(user, 'tppassed')
@@ -1701,17 +2037,20 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                     tppassed.append(tier)
                 async with self.config.user(user).tpstored() as tpstored:
                     tpstored.append(tier)
-                
-                reward_name, reward_emoji, reward_str = self.tp_reward_strings(self.TROPHY_ROAD[tier], tier)
-                
+
+                reward_name, reward_emoji, reward_str = self.tp_reward_strings(
+                    self.TROPHY_ROAD[tier], tier)
+
                 desc = "Claim the reward by using the `-rewards` command!"
                 title = f"Trophy Road Reward [{threshold} trophies]"
-                embed = discord.Embed(color=EMBED_COLOR, title=title, description=desc)
+                embed = discord.Embed(
+                    color=EMBED_COLOR, title=title, description=desc)
                 embed.set_author(name=user.name, icon_url=user.avatar_url)
-                embed.add_field(name=reward_name, value=f"{reward_emoji} {reward_str}")
+                embed.add_field(name=reward_name,
+                                value=f"{reward_emoji} {reward_str}")
 
                 return embed
-        
+
         else:
             return False
 
@@ -1733,30 +2072,32 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                     reward_emoji = reward_emoji_root["Solo Showdown"]
                 else:
                     reward_emoji = emojis["bsstar"]
-            
+
         return reward_name, reward_emoji, reward_str
-    
+
     async def handle_reward_claims(self, ctx: Context, reward_number: str):
         """Function to handle reward claims."""
 
         user = ctx.author
-        
+
         reward_type = self.TROPHY_ROAD[reward_number]["RewardType"]
         reward_count = self.TROPHY_ROAD[reward_number]["RewardCount"]
         reward_extra = self.TROPHY_ROAD[reward_number]["RewardExtraData"]
 
         if reward_type == 1:
-            await self.update_player_stat(user, 'gold', reward_count, add_self=True)
-        
+            await self.update_player_stat(
+                user, 'gold', reward_count, add_self=True)
+
         elif reward_type == 3:
             async with self.config.user(user).brawlers() as brawlers:
                 brawlers[reward_extra] = default_stats
-        
+
         elif reward_type == 6:
             async with self.config.user(user).boxes() as boxes:
                 boxes['brawl'] += reward_count
-            
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+
+            brawler_data = await self.get_player_stat(
+                user, 'brawlers', is_iter=True)
 
             box = Box(self.BRAWLERS, brawler_data)
             embed = await box.brawlbox(self.config.user(user), user)
@@ -1764,20 +2105,25 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             try:
                 await ctx.send(embed=embed)
             except discord.Forbidden:
-                return await ctx.send("I do not have the permission to embed a link."
-                    " Please give/ask someone to give me that permission.")
-        
+                return await ctx.send(
+                    "I do not have the permission to embed a link."
+                    " Please give/ask someone to give me that permission."
+                )
+
         elif reward_type == 7:
-            await self.update_player_stat(user, 'tickets', reward_count, add_self=True)
-        
+            await self.update_player_stat(
+                user, 'tickets', reward_count, add_self=True)
+
         elif reward_type == 9:
-            await self.update_player_stat(user, 'token_doubler', reward_count, add_self=True)
-        
+            await self.update_player_stat(
+                user, 'token_doubler', reward_count, add_self=True)
+
         elif reward_type == 10:
             async with self.config.user(user).boxes() as boxes:
                 boxes['mega'] += reward_count
 
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+            brawler_data = await self.get_player_stat(
+                user, 'brawlers', is_iter=True)
 
             box = Box(self.BRAWLERS, brawler_data)
             embed = await box.megabox(self.config.user(user), user)
@@ -1785,41 +2131,55 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             try:
                 await ctx.send(embed=embed)
             except discord.Forbidden:
-                return await ctx.send("I do not have the permission to embed a link."
-                    " Please give/ask someone to give me that permission.")
-        
+                return await ctx.send(
+                    "I do not have the permission to embed a link."
+                    " Please give/ask someone to give me that permission."
+                )
+
         elif reward_type == 12:
             await ctx.send("Enter the name of Brawler to add powerpoints to:")
-            pred = await self.bot.wait_for("message", check=MessagePredicate.same_context(ctx))
-            
+            pred = await self.bot.wait_for(
+                "message", check=MessagePredicate.same_context(ctx)
+            )
+
             brawler = pred.content
             # for users who input 'el_primo'
             brawler = brawler.replace("_", " ")
-            
+
             brawler = brawler.title()
 
-            user_brawlers = await self.get_player_stat(user, 'brawlers', is_iter=True)
-            
+            user_brawlers = await self.get_player_stat(
+                user, 'brawlers', is_iter=True)
+
             if brawler not in user_brawlers:
                 return await ctx.send(f"You do not own {brawler}!")
-            
-            total_powerpoints = (await self.get_player_stat(user, 'brawlers', 
-                        is_iter=True, substat=brawler))['total_powerpoints']
+
+            total_powerpoints = (await self.get_player_stat(
+                        user, 'brawlers', is_iter=True, substat=brawler)
+                    )['total_powerpoints']
 
             if total_powerpoints == 1410:
-                return await ctx.send(f"{brawler} can not recieve more powerpoints.")
+                return await ctx.send(
+                    f"{brawler} can not recieve more powerpoints."
+                )
             elif total_powerpoints + reward_count > 1410:
-                return await ctx.send(f"{brawler} can not recieve {reward_count} powerpoints.")
+                return await ctx.send(
+                    f"{brawler} can not recieve {reward_count} powerpoints."
+                )
             else:
                 pass
-            
-            await self.update_player_stat(user, 'brawlers', reward_count, substat=brawler, 
-                                                sub_index='powerpoints', add_self=True)
-            await self.update_player_stat(user, 'brawlers', reward_count, substat=brawler, 
-                                                sub_index='total_powerpoints', add_self=True)
+
+            await self.update_player_stat(
+                user, 'brawlers', reward_count, substat=brawler,
+                sub_index='powerpoints', add_self=True
+            )
+            await self.update_player_stat(
+                user, 'brawlers', reward_count, substat=brawler,
+                sub_index='total_powerpoints', add_self=True
+            )
 
             await ctx.send(f"Added {reward_count} powerpoints to {brawler}.")
-        
+
         elif reward_type == 13:
             async with self.config.user(user).gamemodes() as gamemodes:
                 if reward_extra == "Brawl Ball":
@@ -1842,12 +2202,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 elif reward_extra == "Solo Events":
                     gamemodes.append("Lone Star")
                     gamemodes.append("Takedown")
-        
+
         elif reward_type == 14:
             async with self.config.user(user).boxes() as boxes:
                 boxes['big'] += reward_count
 
-            brawler_data = await self.get_player_stat(user, 'brawlers', is_iter=True)
+            brawler_data = await self.get_player_stat(
+                user, 'brawlers', is_iter=True)
 
             box = Box(self.BRAWLERS, brawler_data)
             embed = await box.bigbox(self.config.user(user), user)
@@ -1855,12 +2216,14 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             try:
                 await ctx.send(embed=embed)
             except discord.Forbidden:
-                return await ctx.send("I do not have the permission to embed a link."
-                    " Please give/ask someone to give me that permission.")
+                return await ctx.send(
+                    "I do not have the permission to embed a link."
+                    " Please give/ask someone to give me that permission."
+                )
 
         async with self.config.user(user).tpstored() as tpstored:
             tpstored.remove(reward_number)
-        
+
     def get_sp_info(self, brawler_name: str, sp: str):
         """Return name and emoji of the Star Power."""
 
@@ -1869,9 +2232,9 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 sp_name = self.BRAWLERS[brawler][sp]['name']
                 sp_ind = int(sp[2]) - 1
                 sp_icon = sp_icons[brawler][sp_ind]
-        
+
         return sp_name, sp_icon
-    
+
     def parse_brawler_name(self, brawler_name: str):
         """Parse brawler name."""
         # for users who input 'el_primo'
@@ -1881,11 +2244,13 @@ class Brawlcord(BaseCog, name="Brawlcord"):
 
         if brawler_name not in self.BRAWLERS:
             return False
-        
+
         return brawler_name
-    
-    async def leaderboard_handler(self, ctx: Context, title: str, thumb_url: str, padding: int, 
-            pb=False, brawler_name=None):
+
+    async def leaderboard_handler(
+        self, ctx: Context, title: str, thumb_url: str,
+        padding: int, pb=False, brawler_name=None
+    ):
         """Handler for all leaderboards."""
 
         all_users = await self.config.all_users()
@@ -1894,20 +2259,23 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             for user_id in all_users:
                 try:
                     user = guild.get_member(user_id)
-                    trophies = await self.get_trophies(user, pb=pb, brawler_name=brawler_name)
+                    trophies = await self.get_trophies(
+                        user, pb=pb, brawler_name=brawler_name)
                     users.append((user, trophies))
-                except:
+                except Exception:
                     pass
-        
-        # remove duplicates 
+
+        # remove duplicates
         users = list(set(users))
         users = sorted(users, key=lambda k: k[1], reverse=True)
-        
-        embed_desc = "Check out who is at the top of the Brawlcord leaderboard!\n\u200b"
+
+        embed_desc = (
+            "Check out who is at the top of the Brawlcord leaderboard!\n\u200b"
+        )
         add_user = True
         # return first 10 (or fewer) members
         for i in range(10):
-            try:    
+            try:
                 trophies = users[i][1]
                 user = users[i][0]
                 if brawler_name:
@@ -1915,19 +2283,27 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                 else:
                     num, emoji = await self.get_league_data(trophies)
                 if user == ctx.author:
-                    embed_desc += (f"**\n`{(i+1):02d}.` {user} {emoji}{trophies:>{padding},}**")
+                    embed_desc += (
+                        f"**\n`{(i+1):02d}.` {user} {emoji}"
+                        f"{trophies:>{padding},}**"
+                    )
                     add_user = False
                 else:
-                    # embed_desc += (f"\n`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
-                    #     f" {user.mention} - {user}")
-                    embed_desc += (f"\n`{(i+1):02d}.` {user} {emoji}{trophies:>{padding},}")
-            except:
+                    # embed_desc += (
+                    #     f"\n`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
+                    #     f" {user.mention} - {user}"
+                    # )
+                    embed_desc += (
+                        f"\n`{(i+1):02d}.` {user} {emoji}"
+                        f"{trophies:>{padding},}"
+                    )
+            except Exception:
                 pass
 
         embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
         embed.set_author(name=title, icon_url=ctx.guild.me.avatar_url)
         embed.set_thumbnail(url=thumb_url)
-        
+
         # add rank of user
         if add_user:
             for idx, user in enumerate(users):
@@ -1937,29 +2313,38 @@ class Brawlcord(BaseCog, name="Brawlcord"):
                         trophies = users[idx][1]
                         user = users[idx][0]
                         if brawler_name:
-                            emoji = await self.get_rank_emoji(user, brawler_name)
+                            emoji = await self.get_rank_emoji(
+                                user, brawler_name)
                         else:
                             num, emoji = await self.get_league_data(trophies)
-                        # val_str += (f"\n**`{(idx+1):02d}.` {emoji}"
-                        #     f"`{trophies:>{padding}}` {user.mention} - {user}**")
-                        val_str += (f"**\n`{(idx+1):02d}.` {user} {emoji}{trophies:>{padding},}**")
-                    except:
+                        # val_str += (
+                        #     f"\n**`{(idx+1):02d}.` {emoji}"
+                        #     f"`{trophies:>{padding}}`"
+                        #     f" {user.mention} - {user}**"
+                        # )
+                        val_str += (
+                            f"**\n`{(idx+1):02d}.` {user} {emoji}"
+                            f"{trophies:>{padding},}**"
+                        )
+                    except Exception:
                         pass
             try:
                 embed.add_field(name="Your position", value=val_str)
             except UnboundLocalError:
-                # happens only in case of brawlers 
-                embed.add_field(name=f"\u200bNo one owns {brawler_name}!", 
-                    value="Open boxes to unlock new Brawlers.")
-            except:
+                # happens only in case of brawlers
+                embed.add_field(name=f"\u200bNo one owns {brawler_name}!",
+                                value="Open boxes to unlock new Brawlers.")
+            except Exception:
                 pass
 
         try:
             await ctx.send(embed=embed)
         except discord.Forbidden:
-            return await ctx.send("I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission.")
-    
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
     async def get_league_data(self, trophies: int):
         """Return league number and emoji."""
         for league in self.LEAGUES:
@@ -1974,27 +2359,28 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             else:
                 if trophies >= 14000:
                     name = "Star V"
-        
+
         if name == "No League":
             return False, league_emojis[name]
-        
+
         league_name = name.split(" ")[0]
         league_number = name.split(" ")[1]
 
         return league_number, league_emojis[league_name]
-    
+
     async def get_rank_emoji(self, user: discord.User, brawler: str):
 
-        data = await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+        data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True, substat=brawler)
         rank = self.get_rank(data['pb'])
 
         return rank_emojis['br'+str(rank)]
-    
+
     def _box_name(self, box: str):
         """Return box name"""
 
         return box.split("box")[0].title() + " Box"
-    
+
     @commands.command()
     @checks.is_owner()
     async def clear_cooldown(self, ctx: Context, user: discord.User = None):
@@ -2002,10 +2388,10 @@ class Brawlcord(BaseCog, name="Brawlcord"):
             user = ctx.author
         async with self.config.user(user).cooldown() as cooldown:
             cooldown.clear()
-    
+
     @commands.command()
     @checks.is_owner()
-    async def add_mega(self, ctx: Context, quantity = 1):
+    async def add_mega(self, ctx: Context, quantity=1):
         """Add a mega box to each"""
 
         users_data = await self.config.all_users()
@@ -2014,25 +2400,74 @@ class Brawlcord(BaseCog, name="Brawlcord"):
         for user_id in user_ids:
             try:
                 user_group = self.config.user_from_id(user_id)
-            except:
+            except Exception:
                 log.exception(f"Couldn't fetch user group of {user_id}.")
                 continue
             try:
                 async with user_group.gifts() as gifts:
                     gifts["megabox"] += quantity
-            except:
+            except Exception:
                 log.exception(f"Couldn't fetch gifts for {user_id}.")
                 continue
 
-        await ctx.send(f"Added {quantity} mega boxes to all users (bar errors).")
-    
+        await ctx.send(
+            f"Added {quantity} mega boxes to all users (bar errors)."
+        )
+
+    @commands.command(aliases=["maintenance"])
+    @checks.is_owner()
+    async def maint(
+        self, ctx: Context, setting: bool = False, duration: int = None
+    ):
+        """Set/remove maintenance. Duration should be in minutes."""
+
+        async with self.config.maintenance() as maint:
+            maint["setting"] = setting
+            maint["duration"] = duration if duration else 0
+
+        if setting:
+            await ctx.send(
+                f"Maintenance set for {duration} minutes."
+                " Commands will be disabled until then."
+            )
+        else:
+            await ctx.send("Disabled maintenance. Commands are enabled now.")
+
+    @commands.command()
+    @checks.is_owner()
+    async def minfo(self, ctx: Context):
+        """Display maintenance info."""
+
+        async with self.config.maintenance() as maint:
+            setting = maint["setting"]
+            duration = maint["duration"]
+
+        await ctx.send(f"**Setting:** {setting}\n**Duration:** {duration}")
+
+    async def cog_command_error(self, ctx: Context, error: Exception):
+        if not isinstance(
+            getattr(error, "original", error),
+            (
+                commands.CheckFailure,
+                commands.UserInputError,
+                commands.DisabledCommand,
+                commands.CommandOnCooldown,
+            ),
+        ):
+            if isinstance(error, MaintenanceError):
+                await ctx.send(error)
+
+        await ctx.bot.on_command_error(
+            ctx, getattr(error, "original", error), unhandled_by_cog=True
+        )
+
     def cog_unload(self):
         self.bank_update_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
-            except:
+            except Exception:
                 pass
             self.bot.add_command(old_invite)
-    
+
     __unload = cog_unload
