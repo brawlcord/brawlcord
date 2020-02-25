@@ -209,7 +209,7 @@ class Brawlcord(commands.Cog):
 
     @commands.command(name="brawlcord")
     async def _brawlcord(self, ctx: Context):
-        """Shows info about Brawlcord"""
+        """Show info about Brawlcord"""
 
         info = (
             "Brawlcord is a Discord bot which allows users to simulate"
@@ -1403,7 +1403,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="invite")
     @maintenance()
     async def _invite(self, ctx: Context):
-        """Shows Brawlcord's invite url"""
+        """Show Brawlcord's invite url"""
 
         # read_messages=True
         # send_messages=True
@@ -1659,6 +1659,25 @@ class Brawlcord(commands.Cog):
         await self.update_player_stat(
             user, "gifts", -1, substat="megabox", add_self=True
         )
+
+    @commands.command(name="credits")
+    async def _credits(self, ctx: Context):
+        """Display credits"""
+
+        credits_ = (
+            "- [`Supercell`](https://supercell.com/en/)"
+            "\n- [`Red`](https://github.com/Cog-Creators/Red-DiscordBot)"
+            "\n- [`Star List`](https://www.starlist.pro) - Huge thanks to"
+            " Henry for allowing me to use assets from his site!"
+            "\n- [`Brawl Stats`](https://brawlstats.com) - Huge thanks to"
+            " tryso for allowing me to use his artwork!"
+        )
+
+        embed = discord.Embed(
+            color=EMBED_COLOR, title="Credits", description=credits_
+        )
+
+        await ctx.send(embed=embed)
 
     async def get_player_stat(
         self, user: discord.User, stat: str,
@@ -2442,7 +2461,6 @@ class Brawlcord(commands.Cog):
         if not isinstance(
             getattr(error, "original", error),
             (
-                commands.CheckFailure,
                 commands.UserInputError,
                 commands.DisabledCommand,
                 commands.CommandOnCooldown,
