@@ -319,6 +319,8 @@ class GameMode:
         if isinstance(vals, list):
             # heal
             first.health += vals[0]
+            if first.static_health < first.health:
+                first.health = first.static_health
         else:
             if not second.invincibility:
                 second.health -= vals
@@ -331,12 +333,19 @@ class GameMode:
 
     def _move_spawn_attack(self, first: Player, second: Player):
         if first.spawn:
-            damage = first.brawler._spawn(first.brawler_level)
-            if not second.invincibility:
-                second.health -= damage
-                first.attacks += 1
+            vals = first.brawler._spawn(first.brawler_level)
+            if isinstance(vals, list):
+                # heal
+                first.static_health
+                first.health += vals[0]
+                if first.static_health < first.health:
+                    first.health = first.static_health
             else:
-                second.invincibility = False
+                if not second.invincibility:
+                    second.health -= vals
+                    first.attacks += 1
+                else:
+                    second.invincibility = False
 
     def respawning(self, player: Player):
         player.is_respawning = True
