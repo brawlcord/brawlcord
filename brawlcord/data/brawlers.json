@@ -560,5 +560,38 @@
             "Calavera": [-1, -1],
             "Cupid": [150, -1]
         }
+    },
+    "Pam": {
+        "desc": "Pam shoots from the hip, peppering targets with shrapnel. Her Super is a healing turret that restores her and teammates' health!",
+        "health": 4800,
+        "attack": {
+            "name": "Scrapstorm",
+            "damage": 260,
+            "desc": "Pam sprays a large area with bursts of scrap metal. Safety goggles advised!",
+            "range": 9,
+            "reload": 1.3,
+            "projectiles": 9
+        },
+        "speed": 720,
+        "rarity": "Epic",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Mama's Kiss'",
+            "desc": "Pam's healing turret will fix up her and teammates who stay in its area of effect.",
+            "turret": {
+                "health": 2800,
+                "heal": 320,
+                "range": 5
+            }
+        },
+        "sp1": {
+            "name": "Mama's Hug",
+            "desc": "Whenever Pam hits enemies with Scrapstorm, she heals herself and nearby friendly Brawlers for **40** health."
+        },
+        "sp2": {
+            "name": "Mama's Squeeze",
+            "desc": "Healing turret now also damages enemies for **500** damage per second."
+        },
+        "skins": {}
     }
 }
