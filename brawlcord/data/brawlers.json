@@ -525,5 +525,40 @@
             "Leonard": [80, -1],
             "Captain": [-1, -1]
         }
+    },
+    "Piper": {
+        "desc": "Piper's sniper shots do more damage the farther they travel. Her Super drops grenades at her feet, while Piper herself leaps away!",
+        "health": 2400,
+        "attack": {
+            "name": "Gunbrella",
+            "damage": 1520,
+            "desc": "Piper fires a sniper shot from the tip of her parasol. The shot gains more oompf the farther it flies!",
+            "range": 10,
+            "reload": 2.3,
+            "projectiles": 1
+        },
+        "speed": 720,
+        "rarity": "Epic",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Poppin'",
+            "damage": 900,
+            "desc": "Piper hops away to avoid pushy suitors. She leaves them a lady's favor though: live grenades from her garter!",
+            "range": 8.67,
+            "projectiles": 4
+        },
+        "sp1": {
+            "name": "Ambush",
+            "desc": "Piper's attack deals **+800** extra damage (at max range) when she's hidden in a bush."
+        },
+        "sp2": {
+            "name": "Snappy Sniping",
+            "desc": "When Piper hits an enemy with her attack, she reloads **0.3** ammo instantly."
+        },
+        "skins": {
+            "Pink": [-1, 500],
+            "Calavera": [-1, -1],
+            "Cupid": [150, -1]
+        }
     }
 }
