@@ -1405,13 +1405,14 @@ class Brawlcord(commands.Cog):
     async def _invite(self, ctx: Context):
         """Show Brawlcord's invite url"""
 
-        # read_messages=True
-        # send_messages=True
+        # read_messages=True,
+        # send_messages=True,
+        # manage_messages=True,
         # embed_links=True,
         # attach_files=True,
         # external_emojis=True,
         # add_reactions=True
-        perms = discord.Permissions(314432)
+        perms = discord.Permissions(321600)
 
         try:
             data = await self.bot.application_info()
@@ -1422,6 +1423,7 @@ class Brawlcord(commands.Cog):
                 " above, Brawlcord will be able to"
                 " read messages,"
                 " send messages,"
+                " manage messages,"
                 " embed links,"
                 " attach files,"
                 " add reactions,"
@@ -1678,6 +1680,30 @@ class Brawlcord(commands.Cog):
         )
 
         await ctx.send(embed=embed)
+
+    @commands.command(name="setprefix")
+    @commands.admin_or_permissions(manage_guild=True)
+    async def _set_prefix(self, ctx: Context, *prefixes: str):
+        """Set Brawlcord's server prefix(es).
+
+        Enter prefixes as a comma separated list.
+        """
+
+        if not prefixes:
+            await ctx.bot._prefix_cache.set_prefixes(
+                guild=ctx.guild, prefixes=[]
+            )
+            await ctx.send("Server prefixes have been reset.")
+            return
+        prefixes = sorted(prefixes, reverse=True)
+        await ctx.bot._prefix_cache.set_prefixes(
+            guild=ctx.guild, prefixes=prefixes
+        )
+        inline_prefixes = [f"`{prefix}`" for prefix in prefixes]
+        await ctx.send(
+            f"Set {', '.join(inline_prefixes)} as server"
+            f" {'prefix' if len(prefixes) == 1 else 'prefixes'}."
+        )
 
     async def get_player_stat(
         self, user: discord.User, stat: str,
