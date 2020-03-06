@@ -127,6 +127,7 @@ dmypy.json
 /.vscode
 .DS_Store
 /red_setup_logs
+/community
 
 # Test files
 test*
