@@ -1,4 +1,4 @@
-<h4 align="center">Brawler Data Contribution</h4>
+<h1 align="center">Brawler Data Contribution</h1>
 
 <p align="center">
   <a href="#How-To">How-To</a>
@@ -14,9 +14,9 @@ Please follow the steps and guidelines on this page when contributing to the Bra
 
 ## How-To
 
-Firstly, open a text editor with json support. [Visual Studio Code](https://code.visualstudio.com), [Atom](https://atom.io) and [Sublime Text](https://www.sublimetext.com) are popular choices.
+Firstly, open/download a text editor with `json` support. [Visual Studio Code](https://code.visualstudio.com), [Atom](https://atom.io) and [Sublime Text](https://www.sublimetext.com) are popular choices.
 
-Once you have the text editor opened, make a new file named `"[brawler_name].json"` (replacing `brawler_name` with the actual name). Enter all the data as outlined in [Guidelines and Reference](#guidelines-and-reference) section.
+Once you have the text editor opened, make a new file named `[brawler_name].json` (replacing `brawler_name` with the actual name). Enter all the data as outlined in [Guidelines and Reference](#guidelines-and-reference) section.
 
 Save the file and send it to me on Discord, via a direct message. My Discord username is `Snowsy#0529`.
 
