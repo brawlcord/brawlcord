@@ -1,4 +1,4 @@
-from .brawlcord import old_invite, Brawlcord
+from .brawlcord import Brawlcord
 
 
 async def setup(bot):
