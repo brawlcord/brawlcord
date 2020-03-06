@@ -12,6 +12,7 @@ from math import ceil
 # Discord
 import discord
 from redbot.core import Config, checks, commands
+from redbot.core.bot import Red
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.menus import start_adding_reactions
@@ -134,7 +135,7 @@ WEEK = 604800
 class Brawlcord(commands.Cog):
     """Play a simple version of Brawl Stars on Discord."""
 
-    def __init__(self, bot):
+    def __init__(self, bot: Red):
         self.bot = bot
 
         # self._brawl_countdown = {}
@@ -165,12 +166,17 @@ class Brawlcord(commands.Cog):
             except asyncio.CancelledError:
                 pass
             except Exception as exc:
-                logging.exception("Error in something", exc_info=exc)
-                print("Error in something:", exc)
+                logging.exception("Error in task", exc_info=exc)
+                print("Error in task:", exc)
 
         self.bank_update_task = self.bot.loop.create_task(
-            self.update_token_bank())
+            self.update_token_bank()
+        )
+        self.status_task = self.bot.loop.create_task(
+            self.update_status()
+        )
         self.bank_update_task.add_done_callback(error_callback)
+        self.status_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -202,10 +208,6 @@ class Brawlcord(commands.Cog):
         custom_help = await self.config.custom_help()
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
-
-        await self.bot.change_presence(
-            activity=discord.Game(name='-help | 1v1 Brawls')
-        )
 
     @commands.command(name="brawlcord")
     async def _brawlcord(self, ctx: Context):
@@ -2499,8 +2501,28 @@ class Brawlcord(commands.Cog):
             ctx, getattr(error, "original", error), unhandled_by_cog=True
         )
 
+    async def update_status(self):
+        """Task to update bot's status with total guilds.
+
+        Runs every 2 minutes.
+        """
+
+        while True:
+            prefix = (await self.bot.get_valid_prefixes())[0]
+
+            guilds = len(self.bot.guilds)
+
+            await self.bot.change_presence(
+                activity=discord.Game(
+                    name=f'{prefix}help | {guilds} Servers'
+                )
+            )
+
+            await asyncio.sleep(120)
+
     def cog_unload(self):
         self.bank_update_task.cancel()
+        self.status_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
