@@ -8,7 +8,7 @@ EmbedField = namedtuple("EmbedField", "name value inline")
 EMPTY_STRING = "\N{ZERO WIDTH SPACE}"
 INVITE_URL = (
     "https://discordapp.com/api/oauth2/authorize?client_id="
-    "644118957917208576&permissions=314432&scope=bot"
+    "644118957917208576&permissions=321600&scope=bot"
 )
 SELF_EMOTE = "<:Brawlcord:648245740409323600>"
 DISCORD_EMOTE = "<:discord:648246368539901961>"
@@ -55,7 +55,7 @@ class BrawlcordHelp(RedHelpFormatter):
             }
 
             # do not change
-            emb["embed"]["title"] = "***Red V3***"
+            emb["embed"]["title"] = "Brawlcord"
             emb["footer"]["text"] = tagline
 
             general_cmd = [
@@ -64,14 +64,16 @@ class BrawlcordHelp(RedHelpFormatter):
             ]
             rewards_cmd = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
 
-            misc_cmd = ["leaderboard", "tutorial", "select",
-                        "brawlcord", "report", "invite"]
+            utility_cmd = [
+                "leaderboard", "tutorial", "select",
+                "brawlcord", "report", "invite"
+            ]
 
-            red_cmd = ["info", "licenseinfo"]
+            misc_cmd = ["setprefix", "info", "licenseinfo"]
 
             # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
 
-            titles = ["General", "Rewards", "Miscellaneous", "Red"]
+            titles = ["General", "Rewards", "Utility", "Misc"]
 
             for title in titles:
                 cog_text = ""
@@ -99,10 +101,10 @@ class BrawlcordHelp(RedHelpFormatter):
                             if name in rewards_cmd:
                                 cog_text += add_com()
                         elif title == titles[2]:
-                            if name in misc_cmd:
+                            if name in utility_cmd:
                                 cog_text += add_com()
                         elif title == titles[3]:
-                            if name in red_cmd:
+                            if name in misc_cmd:
                                 cog_text += add_com()
                         else:
                             continue
