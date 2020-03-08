@@ -21,7 +21,7 @@ spawn_text = {
     "8-Bit": "Turret"
 }
 
-healing_over_time = 300
+healing_over_time = 100
 healing_time = 3
 
 
