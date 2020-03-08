@@ -334,12 +334,18 @@ class GameMode:
             first.health += vals[0]
             if first.static_health < first.health:
                 first.health = first.static_health
+
+            # hardcoding for Mortis to both
+            # deal damage and heal
+            vals = vals[0]
+            if first.brawler_name != "Mortis":
+                return
+
+        if not second.invincibility:
+            second.health -= vals
         else:
-            if not second.invincibility:
-                second.health -= vals
-            else:
-                second.health -= (vals * 0.5)
-                second.invincibility = False
+            second.health -= (vals * 0.5)
+            second.invincibility = False
 
     def _move_attack_spawn(self, first: Player, second: Player):
         second.spawn -= first.brawler._attack(first.brawler_level)
