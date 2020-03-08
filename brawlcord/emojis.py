@@ -96,6 +96,10 @@ sp_icons = {
     "Pam": [
         "<:MamasHug:645349546704240640>",
         "<:MamasSqueeze:681921854092607498>"
+    ],
+    "Mortis": [
+        "<:CreepyHarvest:645349549115965451>",
+        "<:CoiledSnake:686257393302372414>"
     ]
 }
 

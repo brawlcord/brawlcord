@@ -21,9 +21,12 @@ spawn_text = {
     "8-Bit": "Turret"
 }
 
+healing_over_time = 100
+healing_time = 3
+
 
 class Player:
-    """A class to represent Player data and stats"""
+    """A class for Player data and stats."""
 
     def __init__(self, user: discord.User, brawler: Brawler, level: int):
         self.player = user
@@ -44,6 +47,8 @@ class Player:
         self.static_health = self.brawler._health(self.brawler_level)
 
         self.health = self.static_health
+
+        self.last_attack = -1  # round number when last attacked
 
         try:
             self.spawn_str: str = spawn_text[self.brawler_name]
@@ -74,7 +79,7 @@ class Player:
 
 
 class GameMode:
-    """A base class for game modes."""
+    """Base class for game modes."""
 
     def __init__(
         self,
@@ -226,6 +231,8 @@ class GameMode:
         return opp_brawler, opp_brawler_level, opp_brawler_sp
 
     async def send_waiting_message(self, ctx, first_player, second_player):
+        """Send the waiting message to the second player."""
+
         if second_player != self.guild.me:
             try:
                 await second_player.send(
@@ -296,11 +303,15 @@ class GameMode:
             )
             raise
 
-    def move_handler(self, choice: int, first: Player, second: Player):
+    def move_handler(
+        self, choice: int, first: Player, second: Player, round_num: int
+    ):
         """Handle user and spawn actions"""
         pass
 
-    def _move_attack(self, first: Player, second: Player):
+    def _move_attack(self, first: Player, second: Player, round_num: int):
+        first.last_attack = round_num
+
         damage = first.brawler._attack(first.brawler_level)
         if not second.invincibility:
             second.health -= damage
@@ -313,7 +324,9 @@ class GameMode:
         if second.invincibility:
             second.invincibility = False
 
-    def _move_super(self, first: Player, second: Player):
+    def _move_super(self, first: Player, second: Player, round_num: int):
+        first.last_attack = round_num
+
         vals, first.spawn = first.brawler._ult(first.brawler_level)
         first.attacks = 0
         if isinstance(vals, list):
@@ -321,12 +334,18 @@ class GameMode:
             first.health += vals[0]
             if first.static_health < first.health:
                 first.health = first.static_health
+
+            # hardcoding for Mortis to both
+            # deal damage and heal
+            vals = vals[0]
+            if first.brawler_name != "Mortis":
+                return
+
+        if not second.invincibility:
+            second.health -= vals
         else:
-            if not second.invincibility:
-                second.health -= vals
-            else:
-                second.health -= (vals * 0.5)
-                second.invincibility = False
+            second.health -= (vals * 0.5)
+            second.invincibility = False
 
     def _move_attack_spawn(self, first: Player, second: Player):
         second.spawn -= first.brawler._attack(first.brawler_level)
@@ -421,9 +440,17 @@ class GameMode:
 
         return winner, loser
 
+    def healing(self, round_num: int, player: Player):
+        """Heal Player over time."""
+
+        if player.last_attack + healing_time < round_num:
+            player.health += healing_over_time
+            if player.health > player.static_health:
+                player.health = player.static_health
+
 
 class GemGrab(GameMode):
-    """Class to represent Gem Grab"""
+    """Class to represent Gem Grab."""
 
     def __init__(self, ctx, user, opponent, conf, brawlers):
         super().__init__(ctx, user, opponent, conf, brawlers)
@@ -455,6 +482,9 @@ class GemGrab(GameMode):
                 except Exception:
                     pass
             else:
+
+                self.healing(i, first)
+
                 try:
                     await self.send_waiting_message(
                         ctx, first.player, second.player
@@ -490,7 +520,7 @@ class GemGrab(GameMode):
                     # develop bot logic
                     choice = random.randint(1, end)
 
-                self.move_handler(choice, first, second)
+                self.move_handler(choice, first, second, i)
 
                 if second.health <= 0:
                     self.respawning(second)
@@ -640,12 +670,14 @@ class GemGrab(GameMode):
 
         return embed
 
-    def move_handler(self, choice: int, first: Player, second: Player):
+    def move_handler(
+        self, choice: int, first: Player, second: Player, round_num: int
+    ):
 
         if not second.is_respawning:
             if choice == 1:
                 # attack
-                self._move_attack(first, second)
+                self._move_attack(first, second, round_num)
             elif choice == 2:
                 # collect gem
                 self._move_gem(first, second)
@@ -655,7 +687,7 @@ class GemGrab(GameMode):
             elif choice == 4:
                 if first.can_super:
                     # super
-                    self._move_super(first, second)
+                    self._move_super(first, second, round_num)
                 else:
                     # attack spawn
                     self._move_attack_spawn(first, second)

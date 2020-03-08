@@ -593,5 +593,40 @@
             "desc": "Healing turret now also damages enemies for **500** damage per second."
         },
         "skins": {}
+    },
+    "Mortis": {
+        "desc": "Mortis dashes forward with each swing of his shovel. As his Super attack, he sends a cloud of bats to damage enemies and heal himself!",
+        "health": 3800,
+        "attack": {
+            "name": "Shovel Swings",
+            "damage": 1200,
+            "desc": "Mortis dashes forward with a sharp swing of his shovel, creating business opportunities for himself.",
+            "range": 2.67,
+            "reload": 2.4,
+            "projectiles": 1
+        },
+        "speed": 820,
+        "rarity": "Mythic",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Life Blood'",
+            "damage": 900,
+            "desc": "Mortis calls forth a swarm of vampire bats that drain the health of his enemies while restoring his. Creepy!",
+            "range": 11,
+            "projectiles": 1
+        },
+        "sp1": {
+            "name": "Creepy Harvest",
+            "desc": "Mortis reaps the life essence of Brawler he defeats, restoring **1800** of his health."
+        },
+        "sp2": {
+            "name": "Snappy Sniping",
+            "desc": "Mortis gains a Dash Bar! His dash range is increased by **75%** when the bar is fully charged. It takes **3.5** seconds for the bar to charge when Mortis has all three dashes ready."
+        },
+        "skins": {
+            "Pink": [-1, 500],
+            "Calavera": [-1, -1],
+            "Cupid": [150, -1]
+        }
     }
 }
