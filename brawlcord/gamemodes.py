@@ -721,7 +721,7 @@ class GemGrab(GameMode):
         collected_gem = random.choice([0, 1, 1, 1])
         first.gems += collected_gem
         if second.invincibility:
-            second.initialize = False
+            second.invincibility = False
 
     def _move_dropped_gems(self, first: Player, second: Player):
         collected = random.randint(0, second.dropped)
