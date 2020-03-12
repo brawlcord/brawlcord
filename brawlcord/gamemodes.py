@@ -51,6 +51,8 @@ class Player:
 
         self.last_attack = -1  # round number when last attacked
 
+        self.stunned = False
+
         try:
             self.spawn_str: str = spawn_text[self.brawler_name]
         except KeyError:
@@ -350,6 +352,10 @@ class GameMode:
             second.health -= (vals * 0.5)
             second.invincibility = False
 
+        # hardcoding for Frank's stun
+        if first.brawler_name == "Frank":
+            second.stunned = True
+
     def _move_attack_spawn(self, first: Player, second: Player):
         second.spawn -= first.brawler._attack(first.brawler_level)
 
@@ -450,6 +456,19 @@ class GameMode:
             if player.health > player.static_health:
                 player.health = player.static_health
 
+    async def handle_stun(self, stunned: Player, other: Player):
+        """Send stun messages and set stun to False."""
+
+        if stunned != self.guild.me:
+            await stunned.player.send(
+                "**You are stunned!**"
+            )
+
+        if other != self.guild.me:
+            await other.player.send("**Opponent is stunned!**")
+
+        stunned.stunned = False
+
 
 class GemGrab(GameMode):
     """Class to represent Gem Grab."""
@@ -481,11 +500,14 @@ class GemGrab(GameMode):
             if first.is_respawning:
                 try:
                     await first.player.send("You are respawning!")
-                except Exception:
+                except discord.Forbidden:
                     pass
             else:
-
                 self.healing(i, first)
+                if first.stunned:
+                    await self.handle_stun(first, second)
+                    i += 1
+                    continue
 
                 try:
                     await self.send_waiting_message(
@@ -768,6 +790,12 @@ class Showdown(GameMode):
 
             self.healing(i, first)
 
+            # check for stun
+            if first.stunned:
+                await self.handle_stun(first, second)
+                i += 1
+                continue
+
             try:
                 await self.send_waiting_message(
                     ctx, first.player, second.player
@@ -998,6 +1026,10 @@ class Showdown(GameMode):
         else:
             second.health -= (self.apply_powerups(first, vals) * 0.5)
             second.invincibility = False
+
+        # hardcoding for Frank's stun
+        if first.brawler_name == "Frank":
+            second.stunned = True
 
     def _move_attack_spawn(self, first: Player, second: Player):
         second.spawn -= self.apply_powerups(
