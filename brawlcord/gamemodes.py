@@ -437,13 +437,13 @@ class GameMode:
                 await self.first.player.send(
                     f"Time's up. Match ended in a draw."
                 )
-            except Exception:
+            except AttributeError:
                 pass  # bot user
             try:
                 await self.second.player.send(
                     f"Time's up. Match ended in a draw."
                 )
-            except Exception:
+            except AttributeError:
                 pass  # bot user
 
         return winner, loser
@@ -500,7 +500,7 @@ class GemGrab(GameMode):
             if first.is_respawning:
                 try:
                     await first.player.send("You are respawning!")
-                except discord.Forbidden:
+                except AttributeError:
                     pass
             else:
                 self.healing(i, first)
@@ -555,13 +555,13 @@ class GemGrab(GameMode):
                         await first.player.send(
                             f"Opponent defeated! Respawning next round."
                         )
-                    except Exception:
+                    except AttributeError:
                         pass  # bot user
                     try:
                         await second.player.send(
                             f"You are defeated! Respawning next round."
                         )
-                    except Exception:
+                    except AttributeError:
                         pass  # bot user
 
                     # go to next loop
