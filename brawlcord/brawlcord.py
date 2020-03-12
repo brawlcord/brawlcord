@@ -15,7 +15,10 @@ from redbot.core import Config, checks, commands
 from redbot.core.bot import Red
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
-from redbot.core.utils.menus import start_adding_reactions
+from redbot.core.utils.chat_formatting import pagify
+from redbot.core.utils.menus import (
+    menu, start_adding_reactions, DEFAULT_CONTROLS
+)
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
 from .brawlers import Brawler, brawler_thumb, brawlers_map
@@ -100,7 +103,8 @@ default_user = {
         "brawlbox": 0,
         "bigbox": 0,
         "megabox": 0
-    }
+    },
+    "shop": {}
 }
 
 imgur_links = {
@@ -1490,7 +1494,8 @@ class Brawlcord(commands.Cog):
 
         embed_str = ""
 
-        for idx, brawler in enumerate(user_owned):
+        idx = 1
+        for brawler in user_owned:
             brawler_data = await self.get_player_stat(
                 user, 'brawlers', is_iter=True, substat=brawler)
 
@@ -1506,32 +1511,46 @@ class Brawlcord(commands.Cog):
 
             if powerpoints >= required_powerpoints:
                 embed_str += (
-                    f"\n{idx+1}. {brawler} {brawler_emojis[brawler]} ({level}"
+                    f"\n{idx}. {brawler} {brawler_emojis[brawler]} ({level}"
                     f" -> {level+1}) - {emojis['gold']} {required_gold}"
                 )
+                idx += 1
 
+        embeds = []
         if embed_str:
+            gold = await self.get_player_stat(user, 'gold')
             desc = (
                 "The following Brawlers can be upgraded by using the"
                 " `-upgrade <brawler_name>` command."
+                f"\n\nAvailable Gold: {emojis['gold']} {gold}"
             )
-            embed = discord.Embed(color=EMBED_COLOR, description=desc)
-            embed.add_field(name="Upgradable Brawlers", value=embed_str)
-            gold = await self.get_player_stat(user, 'gold')
-            embed.add_field(name="Available Gold",
-                            value=f"{emojis['gold']} {gold}")
+            pages = list(pagify(text=embed_str))
+            total = len(pages)
+            for i, page in enumerate(pages, start=1):
+                embed = discord.Embed(
+                    color=EMBED_COLOR,
+                    description=desc,
+                    timestamp=ctx.message.created_at
+                )
+                embed.set_author(
+                    name=f"{user.name}'s Upgradable Brawlers",
+                    icon_url=user.avatar_url
+                )
+                embed.set_footer(text=f"Page {i}/{total}")
+                embed.add_field(name="Upgradable Brawlers", value=page)
+                embeds.append(embed)
         else:
             embed = discord.Embed(
                 color=EMBED_COLOR,
                 description="You can't upgrade any Brawler at the moment."
             )
+            embed.set_author(
+                name=f"{user.name}'s Upgradable Brawlers",
+                icon_url=user.avatar_url
+            )
+            embeds.append(embed)
 
-        embed.set_author(
-            name=f"{user.name}'s Upgradable Brawlers",
-            icon_url=user.avatar_url
-        )
-
-        await ctx.send(embed=embed)
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
 
     @commands.command(name="powerpoints", aliases=['pps'])
     @maintenance()
@@ -1580,14 +1599,27 @@ class Brawlcord(commands.Cog):
                     f" - {sp1_icon} {sp2_icon}"
                 )
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.add_field(name="Brawlers", value=embed_str)
+        embeds = []
+        # embed.add_field(name="Brawlers", value=embed_str)
 
-        embed.set_author(
-            name=f"{user.name}'s Power Points Info", icon_url=user.avatar_url)
+        pages = list(pagify(text=embed_str))
+        total = len(pages)
+        for i, page in enumerate(pages, start=1):
+            embed = discord.Embed(
+                color=EMBED_COLOR,
+                description=page,
+                timestamp=ctx.message.created_at
+            )
+
+            embed.set_author(
+                name=f"{user.name}'s Power Points Info",
+                icon_url=user.avatar_url
+            )
+            embed.set_footer(text=f"Page {i}/{total}")
+            embeds.append(embed)
 
         try:
-            await ctx.send(embed=embed)
+            await menu(ctx, embeds, DEFAULT_CONTROLS)
         except discord.Forbidden:
             return await ctx.send(
                 "I do not have the permission to embed a link."
