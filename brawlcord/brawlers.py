@@ -251,14 +251,14 @@ class Shelly(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per shell: {stats['ult_damage']}"
@@ -274,8 +274,8 @@ class Shelly(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -407,14 +407,14 @@ class Nita(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = super_desc + (
             f"\n{emojis['super']} Bear Damage: {stats['bear_damage']}"
             f"\n{emojis['superhealth']} Bear Health: {stats['bear_health']}"
@@ -431,8 +431,8 @@ class Nita(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -535,14 +535,14 @@ class Colt(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
@@ -558,8 +558,8 @@ class Colt(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -661,14 +661,14 @@ class Bull(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
@@ -684,8 +684,8 @@ class Bull(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -817,14 +817,14 @@ class Jessie(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = super_desc + (
             f"\n{emojis['super']} Scrappy Damage: {stats['scrappy_damage']}"
             f"\n{emojis['superhealth']} Scrappy Health:"
@@ -842,8 +842,8 @@ class Jessie(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -948,14 +948,14 @@ class Brock(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per rocket: {stats['ult_damage']}"
@@ -971,8 +971,8 @@ class Brock(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1075,7 +1075,7 @@ class Dynamike(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per"
@@ -1083,7 +1083,7 @@ class Dynamike(Brawler):
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
@@ -1099,8 +1099,8 @@ class Dynamike(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1202,14 +1202,14 @@ class ElPrimo(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per punch: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
@@ -1225,8 +1225,8 @@ class ElPrimo(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1339,14 +1339,14 @@ class Barley(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per second: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per second: {stats['ult_damage']}"
@@ -1362,8 +1362,8 @@ class Barley(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1466,14 +1466,14 @@ class Poco(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = super_desc + f"\n{emojis['health']} Heal: {stats['heal']}"
         embed.add_field(name="SUPER", value=super_str, inline=False)
 
@@ -1486,8 +1486,8 @@ class Poco(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1590,14 +1590,14 @@ class Rico(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per bullet: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per bullet: {stats['ult_damage']}"
@@ -1613,8 +1613,8 @@ class Rico(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1716,14 +1716,14 @@ class Darryl(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per shell: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
@@ -1739,8 +1739,8 @@ class Darryl(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1871,14 +1871,14 @@ class Penny(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = super_desc + (
             f"\n{emojis['super']} Cannon Damage: {stats['cannon_damage']}"
             f"\n{emojis['superhealth']} Cannon Health:"
@@ -1896,8 +1896,8 @@ class Penny(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -1999,14 +1999,14 @@ class Carl(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage on hit: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per swing: {stats['ult_damage']}"
@@ -2022,8 +2022,8 @@ class Carl(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -2126,14 +2126,14 @@ class Bo(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per arrow: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per mine: {stats['ult_damage']}"
@@ -2149,8 +2149,8 @@ class Bo(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -2255,7 +2255,7 @@ class Piper(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc + (
                 f"\n{emojis['damage']} Damage at max"
@@ -2264,7 +2264,7 @@ class Piper(Brawler):
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage per grenade: {stats['ult_damage']}"
@@ -2280,8 +2280,8 @@ class Piper(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -2413,14 +2413,14 @@ class Pam(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage per scrap: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = super_desc + (
             f"\n{emojis['super']} Turret Heal Per"
             f" Second: {stats['turret_heal']}"
@@ -2439,8 +2439,8 @@ class Pam(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -2543,7 +2543,7 @@ class Mortis(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc + (
                 f"\n{emojis['damage']} Damage: {stats['att_damage']}"
@@ -2551,7 +2551,7 @@ class Mortis(Brawler):
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
@@ -2567,8 +2567,8 @@ class Mortis(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -2671,14 +2671,14 @@ class Frank(Brawler):
         )
         embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
 
-        attack_desc = f"> {self.attack['desc']}"
+        attack_desc = f"```{self.attack['desc']}```"
         attack_str = (
             attack_desc
             + f"\n{emojis['damage']} Damage: {stats['att_damage']}"
         )
         embed.add_field(name="ATTACK", value=attack_str, inline=False)
 
-        super_desc = f"> {self.ult['desc']}"
+        super_desc = f"```{self.ult['desc']}```"
         super_str = (
             super_desc
             + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
@@ -2694,8 +2694,135 @@ class Frank(Brawler):
 
         sp_str = (
             f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
-            f"\n> {self.sp1['desc']}\n{sp_icons[brawler_name][1]}"
-            f" **{self.sp2['name']}**{u2}\n> {self.sp2['desc']}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
+        )
+
+        embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
+
+        return embed
+
+
+class Tara(Brawler):
+    """A class to represent Tara."""
+
+    def _attack(self, level):
+        """Represent the attack ability of Tara."""
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
+        projectiles = self.attack["projectiles"]
+
+        stats = self.buff_stats(level)
+
+        damage = stats['att_damage']
+
+        raw = damage * projectiles * 0.8
+
+        chance = random.randint(0, 10)
+
+        if chance >= 9:
+            return raw
+        elif chance >= 6:
+            return raw * 0.7
+        elif chance >= 4:
+            return raw * 0.5
+        elif chance >= 2:
+            return raw * 0.3
+        else:
+            return 0
+
+    def _ult(self, level):
+        """Represent the Super ability of Tara."""
+
+        # getting all values
+        # ult_range = self.ult["range"]
+        projectiles = self.ult["projectiles"]
+
+        stats = self.buff_stats(level)
+
+        damage = stats['ult_damage']
+
+        raw = damage * projectiles * 0.8
+
+        chance = random.randint(0, 10)
+
+        if chance >= 9:
+            return raw, None
+        elif chance >= 6:
+            return raw * 0.7, None
+        elif chance >= 4:
+            return raw * 0.5, None
+        elif chance >= 2:
+            return raw * 0.3, None
+        else:
+            return 0, None
+
+    def buff_stats(self, level: int):
+        stats = {
+            "health": self.health,
+            "att_damage": self.attack["damage"],
+            "ult_damage": self.ult["damage"]
+        }
+
+        return super().buff_stats(stats, level)
+
+    def brawler_info(
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
+        """Return embed with Brawler info."""
+
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
+
+        if not level:
+            level = 1
+
+        stats = self.buff_stats(level)
+
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
+        embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
+
+        attack_desc = f"```{self.attack['desc']}```"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per card: {stats['att_damage']}"
+        )
+        embed.add_field(name="ATTACK", value=attack_str, inline=False)
+
+        super_desc = f"```{self.ult['desc']}```"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage: {stats['ult_damage']}"
+        )
+        embed.add_field(name="SUPER", value=super_str, inline=False)
+
+        u1 = u2 = ""
+
+        if sp1:
+            u1 = " [Owned]"
+        if sp2:
+            u2 = " [Owned]"
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
         )
 
         embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
@@ -2722,5 +2849,6 @@ brawlers_map = {
     "Piper": Piper,
     "Pam": Pam,
     "Mortis": Mortis,
-    "Frank": Frank
+    "Frank": Frank,
+    "Tara": Tara
 }
