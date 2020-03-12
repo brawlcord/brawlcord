@@ -8,7 +8,8 @@
             "desc": "Shelly's boomstick fires a wide spread of pellets to a medium range. The more pellets hit, the greater the damage.",
             "range": 7.67,
             "reload": 1.5,
-            "projectiles": 5
+            "projectiles": 5,
+            "extra": "Damage per shell"
         },
         "speed": 720,
         "rarity": "Trophy Road",
@@ -18,15 +19,16 @@
             "damage": 320,
             "desc": "Shelly's Super Shell obliterates both cover and enemies. Any survivors get knocked back.",
             "range": 7.33,
-            "projectiles": 9
+            "projectiles": 9,
+            "extra": "Damage per shell"
         },
         "sp1": {
             "name": "Shell Shock",
-            "desc": "Shelly's Super shells slow down enemies for **3.0** seconds!"
+            "desc": "Shelly's Super shells slow down enemies for 3.0 seconds!"
         },
         "sp2": {
             "name": "Band-Aid",
-            "desc": "When Shelly falls below **40%** health, she instantly heals for **1800** health. Band-Aid recharges in **20.0** seconds."
+            "desc": "When Shelly falls below 40% health, she instantly heals for 1800 health. Band-Aid recharges in 20.0 seconds."
         },
         "skins": {
             "Bandita": [30, -1],
@@ -55,16 +57,17 @@
                 "health": 4000,
                 "damage": 400,
                 "range": 1.33,
-                "speed": 620
+                "speed": 620,
+                "name": "Bear"
             }
         },
         "sp1": {
             "name": "Bear with Me",
-            "desc": "Nita recovers **500** health whenever her bear hits an enemy. When Nita deals damage, her bear regains **500** health."
+            "desc": "Nita recovers 500 health whenever her bear hits an enemy. When Nita deals damage, her bear regains 500 health."
         },
         "sp2": {
             "name": "Happy Bear",
-            "desc": "Nita's bear attacks faster. Time between swipes is reduced by **60%**."
+            "desc": "Nita's bear attacks faster. Time between swipes is reduced by 60%."
         },
         "skins": {
             "Panda": [30, -1],
@@ -81,7 +84,8 @@
             "desc": "Colt shoots six straight long-range shots out of his revolvers.",
             "range": 8.67,
             "reload": 1.5,
-            "projectiles": 6
+            "projectiles": 6,
+            "extra": "Damage per bullet"
         },
         "speed": 720,
         "rarity": "Trophy Road",
@@ -91,15 +95,16 @@
             "damage": 300,
             "desc": "Colt rattles off a massive burst of bullets that shoot extra far and destroy cover.",
             "range": 11,
-            "projectiles": 12
+            "projectiles": 12,
+            "extra": "Damage per bullet"
         },
         "sp1": {
             "name": "Slick Boots",
-            "desc": "Colt's movement speed is increased by **10%**."
+            "desc": "Colt's movement speed is increased by 10%."
         },
         "sp2": {
             "name": "Magnum Special",
-            "desc": "Colt's attack range and bullet speed are increased by **11%**."
+            "desc": "Colt's attack range and bullet speed are increased by 11%."
         },
         "skins": {
             "Rockstar": [30, -1],
@@ -116,7 +121,8 @@
             "desc": "Bull's double-barreled shotgun deals heavy damage. It has very short range, so Bull likes to get up close and personal.",
             "range": 5,
             "reload": 1.6,
-            "projectiles": 5
+            "projectiles": 5,
+            "extra": "Damage per shell"
         },
         "speed": 770,
         "rarity": "Trophy Road",
@@ -129,11 +135,11 @@
         },
         "sp1": {
             "name": "Berserker",
-            "desc": "When Bull falls below **40%** health, his reload speed doubles!"
+            "desc": "When Bull falls below 40% health, his reload speed doubles!"
         },
         "sp2": {
             "name": "Tough Guy",
-            "desc": "When Bull falls below **40%** health, he gains a shield that reduces all damage he takes by **30%**."
+            "desc": "When Bull falls below 40% health, he gains a shield that reduces all damage he takes by 30%."
         },
         "skins": {
             "Viking": [80, -1],
@@ -162,16 +168,17 @@
                 "health": 2800,
                 "damage": 260,
                 "range": 4.67,
-                "speed": 0
+                "speed": 0,
+                "name": "Scrappy"
             }
         },
         "sp1": {
             "name": "Energize",
-            "desc": "Jessie can repair her gun turret for **800** of its missing health by zapping it with her attack."
+            "desc": "Jessie can repair her gun turret for 800 of its missing health by zapping it with her attack."
         },
         "sp2": {
             "name": "Shocky",
-            "desc": "Scrappy the Turret now shoots energy orbs that bounce between enemies. The orbs' range after a bounce is **51%** of normal range."
+            "desc": "Scrappy the Turret now shoots energy orbs that bounce between enemies. The orbs' range after a bounce is 51% of normal range."
         },
         "skins": {
             "Summer": [80, -1],
@@ -198,11 +205,12 @@
             "damage": 1040,
             "desc": "Brock fires a rocket barrage that takes out enemies and obstacles. He only wants to see you bathing in the Rocket Rain!",
             "range": 8,
-            "projectiles": 9
+            "projectiles": 9,
+            "extra": "Damage per rocket"
         },
         "sp1": {
             "name": "Incendiary",
-            "desc": "The impact of Brock's attack sets the ground on fire. Enemies in the area take **600** damage per second! Lasts for 2 seconds."
+            "desc": "The impact of Brock's attack sets the ground on fire. Enemies in the area take 600 damage per second! Lasts for 2 seconds."
         },
         "sp2": {
             "name": "Rocket No. Four",
@@ -224,7 +232,8 @@
             "desc": "Mike tosses two sticks of dynamite, passing over any obstacles in the way. The fuses are cut as short as Mike's explosive temper!",
             "range": 7,
             "reload": 1.7,
-            "projectiles": 2
+            "projectiles": 2,
+            "extra": "Damage per dynamite"
         },
         "speed": 720,
         "rarity": "Trophy Road",
@@ -242,7 +251,7 @@
         },
         "sp2": {
             "name": "Demolition",
-            "desc": "Adds +**1000** damage to Mike's Super."
+            "desc": "Adds +1000 damage to Mike's Super."
         },
         "skins": {
             "Santa": [-1, -1],
@@ -259,7 +268,8 @@
             "desc": "Bo releases a trio of exploding arrows, tearing up enemies like an eagle's talons.",
             "range": 8.33,
             "reload": 1.7,
-            "projectiles": 3
+            "projectiles": 3,
+            "extra": "Damage per arrow"
         },
         "speed": 720,
         "rarity": "Trophy Road",
@@ -269,15 +279,16 @@
             "damage": 1440,
             "desc": "Bo hides explosive traps in the ground. When triggered by an enemy, the traps explode after a short delay, knocking back and damaging enemies.",
             "range": 8.33,
-            "projectiles": 3
+            "projectiles": 3,
+            "extra": "Damage per mine"
         },
         "sp1": {
             "name": "Circling Eagle",
-            "desc": "Bo spots enemies hidden in bushes from **150%** longer distance than normally."
+            "desc": "Bo spots enemies hidden in bushes from 150% longer distance than normally."
         },
         "sp2": {
             "name": "Snare a Bear",
-            "desc": "Instead of a knockback, Bo's traps now stun the enemy for **2.0** seconds!"
+            "desc": "Instead of a knockback, Bo's traps now stun the enemy for 2.0 seconds!"
         },
         "skins": {
             "Mecha": [300, -1],
@@ -294,7 +305,8 @@
             "desc": "El Primo fires off a furious flurry of four fiery fists. That's a spicy jalapeno knuckle sandwich!",
             "range": 3,
             "reload": 0.8,
-            "projectiles": 4
+            "projectiles": 4,
+            "extra": "Damage per punch"
         },
         "speed": 770,
         "rarity": "Rare",
@@ -307,11 +319,11 @@
         },
         "sp1": {
             "name": "El Fuego",
-            "desc": "Enemies caught in El Primo's Super will burn for **1200** damage over 4 seconds."
+            "desc": "Enemies caught in El Primo's Super will burn for 1200 damage over 4 seconds."
         },
         "sp2": {
             "name": "Meteor Rush",
-            "desc": "El Primo gains a **25%** speed boost for **4.0** seconds after using his Super."
+            "desc": "El Primo gains a 25% speed boost for 4.0 seconds after using his Super."
         },
         "skins": {
             "El Rudo": [80, -1],
@@ -328,7 +340,8 @@
             "desc": "Barley lobs a bottle, breaking it on the ground. Enemies take damage from the splash, and more damage over time if they stay in the puddle.",
             "range": 7,
             "reload": 2,
-            "projectiles": 1
+            "projectiles": 1,
+            "extra": "Damage per second"
         },
         "speed": 720,
         "rarity": "Rare",
@@ -338,15 +351,16 @@
             "damage": 680,
             "desc": "Barley hurls a flurry of fiery bottles, covering a huge area in flames. This one’s on the house!",
             "range": 9,
-            "projectiles": 5
+            "projectiles": 5,
+            "extra": "Damage per puddle per second"
         },
         "sp1": {
             "name": "Medical Use",
-            "desc": "Barley regains **400** health from each main attack."
+            "desc": "Barley regains 400 health from each main attack."
         },
         "sp2": {
             "name": "Extra Noxious",
-            "desc": "Adds +**140** damage per second to Barley’s attack."
+            "desc": "Adds +140 damage per second to Barley’s attack."
         },
         "skins": {
             "Golden": [30, -1],
@@ -378,11 +392,11 @@
         },
         "sp1": {
             "name": "Da Capo",
-            "desc": "When Poco's attack hits friendly Brawlers they now heal for **800** health."
+            "desc": "When Poco's attack hits friendly Brawlers they now heal for 800 health."
         },
         "sp2": {
             "name": "Screeching Solo",
-            "desc": "Poco’s Super now also hits enemies, dealing **800** damage."
+            "desc": "Poco’s Super now also hits enemies, dealing 800 damage."
         },
         "skins": {
             "Serenade": [150, -1]
@@ -397,7 +411,8 @@
             "desc": "Rico's bullets bounce off walls, gaining range. They can hit enemies behind cover.",
             "range": 9.67,
             "reload": 1.2,
-            "projectiles": 5
+            "projectiles": 5,
+            "extra": "Damage per bullet"
         },
         "speed": 720,
         "rarity": "Super Rare",
@@ -407,15 +422,16 @@
             "damage": 320,
             "desc": "Rico fires a long burst of bullets that pierce through enemies and bounce off walls, gaining range.",
             "range": 13.33,
-            "projectiles": 12
+            "projectiles": 12,
+            "extra": "Damage per bullet"
         },
         "sp1": {
             "name": "Super Bouncy",
-            "desc": "Rico's bullets, from attack and Super alike, get supercharged by their first bounce and deal +**100** damage!"
+            "desc": "Rico's bullets, from attack and Super alike, get supercharged by their first bounce and deal +100 damage!"
         },
         "sp2": {
             "name": "Robo Retreat",
-            "desc": "When Rico falls below **40%** health, he runs **34%** faster!"
+            "desc": "When Rico falls below 40% health, he runs 34% faster!"
         },
         "skins": {
             "Loaded": [150, -1],
@@ -431,7 +447,8 @@
             "desc": "Darryl's double barrel shotguns fire two staggered blasts of heavy close-range damage.",
             "range": 5.67,
             "reload": 1.8,
-            "projectiles": 8
+            "projectiles": 8,
+            "extra": "Damage per shell"
         },
         "speed": 770,
         "rarity": "Super Rare",
@@ -444,11 +461,11 @@
         },
         "sp1": {
             "name": "Steel Hoops",
-            "desc": "Darryl's Super reinforces his barrel, reducing all damage he takes by **30%** for **0.9** seconds."
+            "desc": "Darryl's Super reinforces his barrel, reducing all damage he takes by 30% for 0.9 seconds."
         },
         "sp2": {
             "name": "Rolling Reload",
-            "desc": "When Darryl uses his Super, he doubles his reload speed for **5.0** seconds."
+            "desc": "When Darryl uses his Super, he doubles his reload speed for 5.0 seconds."
         },
         "skins": {
             "Dumpling": [-1, -1]
@@ -475,16 +492,17 @@
                 "health": 2800,
                 "damage": 1200,
                 "range": 14.33,
-                "reload": 2.5
+                "reload": 2.5,
+                "name": "Cannon"
             }
         },
         "sp1": {
             "name": "Last Blast",
-            "desc": "When Penny's Cannon is destroyed, it shoots out one last barrage of 4 bombs targeting nearby enemies, each dealing **1680** damage."
+            "desc": "When Penny's Cannon is destroyed, it shoots out one last barrage of 4 bombs targeting nearby enemies, each dealing 1680 damage."
         },
         "sp2": {
             "name": "Balls of Fire",
-            "desc": "Cannonballs from Penny’s turret set the ground on fire for 3 seconds. Enemies in the burning area take **400** damage per second."
+            "desc": "Cannonballs from Penny’s turret set the ground on fire for 3 seconds. Enemies in the burning area take 400 damage per second."
         },
         "skins": {
             "Lil Helper": [-1, -1],
@@ -500,7 +518,8 @@
             "desc": "Carl throws his Pickaxe like a boomerang. After he catches the returning Pickaxe, he can throw it again.",
             "range": 8,
             "reload": 0.5,
-            "projectiles": 2
+            "projectiles": 2,
+            "extra": "Damage on hit"
         },
         "speed": 720,
         "rarity": "Super Rare",
@@ -509,15 +528,16 @@
             "name": "Tailspin",
             "damage": 400,
             "desc": "Carl goes into a crazy spin for a few seconds, flailing around and damaging nearby opponents.",
-            "duration": 5
+            "duration": 5,
+            "extra": "Damage per swing"
         },
         "sp1": {
             "name": "Power Throw",
-            "desc": "Carl throws his Pickaxe with **13%** more speed, allowing it to travel faster and return faster."
+            "desc": "Carl throws his Pickaxe with 13% more speed, allowing it to travel faster and return faster."
         },
         "sp2": {
             "name": "Protective Pirouette",
-            "desc": "During Carl's Super, all damage he receives is reduced by **40%**."
+            "desc": "During Carl's Super, all damage he receives is reduced by 40%."
         },
         "skins": {
             "Road Rage": [80, -1],
@@ -535,7 +555,8 @@
             "desc": "Piper fires a sniper shot from the tip of her parasol. The shot gains more oompf the farther it flies!",
             "range": 10,
             "reload": 2.3,
-            "projectiles": 1
+            "projectiles": 1,
+            "extra": "Damage at max range"
         },
         "speed": 720,
         "rarity": "Epic",
@@ -545,15 +566,16 @@
             "damage": 900,
             "desc": "Piper hops away to avoid pushy suitors. She leaves them a lady's favor though: live grenades from her garter!",
             "range": 8.67,
-            "projectiles": 4
+            "projectiles": 4,
+            "extra": "Damage per grenade"
         },
         "sp1": {
             "name": "Ambush",
-            "desc": "Piper's attack deals **+800** extra damage (at max range) when she's hidden in a bush."
+            "desc": "Piper's attack deals +800 extra damage (at max range) when she's hidden in a bush."
         },
         "sp2": {
             "name": "Snappy Sniping",
-            "desc": "When Piper hits an enemy with her attack, she reloads **0.3** ammo instantly."
+            "desc": "When Piper hits an enemy with her attack, she reloads 0.3 ammo instantly."
         },
         "skins": {
             "Pink": [-1, 500],
@@ -570,7 +592,8 @@
             "desc": "Pam sprays a large area with bursts of scrap metal. Safety goggles advised!",
             "range": 9,
             "reload": 1.3,
-            "projectiles": 9
+            "projectiles": 9,
+            "extra": "Damage per scrap"
         },
         "speed": 720,
         "rarity": "Epic",
@@ -578,19 +601,21 @@
         "ult": {
             "name": "Mama's Kiss'",
             "desc": "Pam's healing turret will fix up her and teammates who stay in its area of effect.",
+            "extra": "Heal per second",
             "turret": {
                 "health": 2800,
                 "heal": 320,
-                "range": 5
+                "range": 5,
+                "name": "Healing Turret"
             }
         },
         "sp1": {
             "name": "Mama's Hug",
-            "desc": "Whenever Pam hits enemies with Scrapstorm, she heals herself and nearby friendly Brawlers for **40** health."
+            "desc": "Whenever Pam hits enemies with Scrapstorm, she heals herself and nearby friendly Brawlers for 40 health."
         },
         "sp2": {
             "name": "Mama's Squeeze",
-            "desc": "Healing turret now also damages enemies for **500** damage per second."
+            "desc": "Healing turret now also damages enemies for 500 damage per second."
         },
         "skins": {}
     },
@@ -617,11 +642,11 @@
         },
         "sp1": {
             "name": "Creepy Harvest",
-            "desc": "Mortis reaps the life essence of Brawler he defeats, restoring **1800** of his health."
+            "desc": "Mortis reaps the life essence of Brawler he defeats, restoring 1800 of his health."
         },
         "sp2": {
             "name": "Coiled Snake",
-            "desc": "Mortis gains a Dash Bar! His dash range is increased by **75%** when the bar is fully charged. It takes **3.5** seconds for the bar to charge when Mortis has all three dashes ready."
+            "desc": "Mortis gains a Dash Bar! His dash range is increased by 75% when the bar is fully charged. It takes 3.5 seconds for the bar to charge when Mortis has all three dashes ready."
         },
         "skins": {
             "Pink": [-1, 500],
@@ -652,15 +677,50 @@
         },
         "sp1": {
             "name": "Power Grab",
-            "desc": "Frank steals the power of a Brawler he defeats, increasing his damage by **50%** for **12** seconds!"
+            "desc": "Frank steals the power of a Brawler he defeats, increasing his damage by 50% for 12 seconds!"
         },
         "sp2": {
             "name": "Sponge",
-            "desc": "Frank gains **+1100** health."
+            "desc": "Frank gains +1100 health."
         },
         "skins": {
             "Caveman": [80, -1],
             "DJ": [80, -1]
+        }
+    },
+    "Tara": {
+        "desc": "Tara's triple tarot card attack pierces through enemies. Her Super is a black hole that sucks in all nearby enemies, causing damage!",
+        "health": 3200,
+        "attack": {
+            "name": "Triple Tarot",
+            "damage": 420,
+            "desc": "Tara flicks her wrist, snapping off three tarot cards that pierce through enemies. Quite a trick!",
+            "range": 8,
+            "reload": 2,
+            "projectiles": 3,
+            "extra": "Damage per card"
+        },
+        "speed": 720,
+        "rarity": "Mythic",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Gravity",
+            "damage": 800,
+            "desc": "Tara conjures up a mind-boggling gravity well! Enemies in the area of effect get pulled in, crashing together painfully hard.",
+            "range": 6.67,
+            "projectiles": 1
+        },
+        "sp1": {
+            "name": "Black Portal",
+            "desc": "Tara's Super cracks open a dimensional portal! A shadowy version of Tara appears and attacks her enemies."
+        },
+        "sp2": {
+            "name": "Healing Shade",
+            "desc": "Tara's Super cracks open a dimensional portal! A shadowy version of Tara appears to heal Tara and her teammates."
+        },
+        "skins": {
+            "Iris": [-1, 500],
+            "Street Ninja": [-1, -1]
         }
     }
 }
