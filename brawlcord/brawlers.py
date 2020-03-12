@@ -2962,6 +2962,141 @@ class Spike(Brawler):
         return embed
 
 
+class Crow(Brawler):
+    """A class to represent Crow."""
+
+    def _attack(self, level):
+        """Represent the attack ability of Crow."""
+
+        # getting all values
+        # att_range = self.attack["range"]
+        # att_reload = self.attack["reload"]
+        projectiles = self.attack["projectiles"]
+
+        stats = self.buff_stats(level)
+
+        damage = (
+            stats['att_damage']
+            + stats['poison_damage'] * random.randint(1, 3)
+        )
+
+        raw = damage * projectiles * 0.8
+
+        chance = random.randint(0, 10)
+
+        if chance >= 9:
+            return raw
+        elif chance >= 6:
+            return raw * 0.7
+        elif chance >= 4:
+            return raw * 0.5
+        elif chance >= 2:
+            return raw * 0.3
+        else:
+            return 0
+
+    def _ult(self, level):
+        """Represent the Super ability of Crow."""
+
+        # getting all values
+        # ult_range = self.ult["range"]
+        projectiles = self.ult["projectiles"]
+
+        stats = self.buff_stats(level)
+
+        damage = (
+            stats['ult_damage']
+            + stats['poison_damage'] * random.randint(1, 3)
+        )
+
+        raw = damage * projectiles * 0.8
+
+        chance = random.randint(0, 10)
+
+        if chance >= 9:
+            return raw, None
+        elif chance >= 6:
+            return raw * 0.7, None
+        elif chance >= 4:
+            return raw * 0.5, None
+        elif chance >= 2:
+            return raw * 0.3, None
+        else:
+            return 0, None
+
+    def buff_stats(self, level: int):
+        stats = {
+            "health": self.health,
+            "att_damage": self.attack["damage"],
+            "poison_damage": self.attack["poison_damage"],
+            "ult_damage": self.ult["damage"]
+        }
+
+        return super().buff_stats(stats, level)
+
+    def brawler_info(
+        self,
+        brawler_name: str,
+        trophies: int = None,
+        pb: int = None,
+        rank: int = None,
+        level: int = None,
+        pp: int = None,
+        next_level_pp: int = None,
+        sp1=False,
+        sp2=False
+    ):
+        """Return embed with Brawler info."""
+
+        embed = super().brawler_info(
+            brawler_name=brawler_name, trophies=trophies, pb=pb, rank=rank,
+            level=level, pp=pp, next_level_pp=next_level_pp, sp1=sp1, sp2=sp2
+        )
+
+        if not level:
+            level = 1
+
+        stats = self.buff_stats(level)
+
+        embed.add_field(
+            name="HEALTH",
+            value=f"{emojis['health']} {stats['health']}"
+        )
+        embed.add_field(name="SPEED", value=f"{emojis['speed']} {self.speed}")
+
+        attack_desc = f"```{self.attack['desc']}```"
+        attack_str = (
+            attack_desc
+            + f"\n{emojis['damage']} Damage per dagger: {stats['att_damage']}"
+            + f"\n{emojis['damage']} Poison damage: {stats['poison_damage']}"
+        )
+        embed.add_field(name="ATTACK", value=attack_str, inline=False)
+
+        super_desc = f"```{self.ult['desc']}```"
+        super_str = (
+            super_desc
+            + f"\n{emojis['super']} Damage per dagger: {stats['ult_damage']}"
+        )
+        embed.add_field(name="SUPER", value=super_str, inline=False)
+
+        u1 = u2 = ""
+
+        if sp1:
+            u1 = " [Owned]"
+        if sp2:
+            u2 = " [Owned]"
+
+        sp_str = (
+            f"{sp_icons[brawler_name][0]} **{self.sp1['name']}**{u1}"
+            f"\n```k\n{self.sp1['desc']}```\n{sp_icons[brawler_name][1]}"
+            f" **{self.sp2['name']}**{u2}\n```k\n{self.sp2['desc']}```"
+        )
+
+        embed.add_field(name="STAR POWERS", value=sp_str, inline=False)
+
+        return embed
+
+
 brawlers_map = {
     "Shelly": Shelly,
     "Nita": Nita,
@@ -2983,5 +3118,6 @@ brawlers_map = {
     "Mortis": Mortis,
     "Frank": Frank,
     "Tara": Tara,
-    "Spike": Spike
+    "Spike": Spike,
+    "Crow": Crow
 }

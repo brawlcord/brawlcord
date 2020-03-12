@@ -758,5 +758,45 @@
             "Sakura": [80, -1],
             "Robo": [150, -1]
         }
+    },
+    "Crow": {
+        "desc": "Crow fires a trio of poisoned daggers. As a Super move he leaps, firing daggers both on jump and on landing!",
+        "health": 2400,
+        "attack": {
+            "name": "Switchblade",
+            "damage": 320,
+            "poison_damage": 80,
+            "desc": "Crow throws a triple threat of daggers. Enemies nicked by the poisoned blades will take damage over time.",
+            "range": 8.67,
+            "reload": 1.4,
+            "projectiles": 3,
+            "extra": "Damage per dagger"
+        },
+        "speed": 820,
+        "rarity": "Legendary",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Swoop",
+            "damage": 400,
+            "desc": "Crow takes to the skies, throwing a ring of poisoned daggers around him both on take-off and landing.",
+            "range": 8.67,
+            "projectiles": 14,
+            "extra": "Damage per dagger"
+        },
+        "sp1": {
+            "name": "Extra Toxic",
+            "desc": "Crow's poison saps the strength of enemies, who deal 20% less damage while poisoned."
+        },
+        "sp2": {
+            "name": "Carrion Crow",
+            "desc": "Crow deals +120 damage with his attack and Super to targets with 50% or less health."
+        },
+        "skins": {
+            "White": [80, -1],
+            "Phoenix": [300, -1],
+            "Mecha": [300, -1],
+            "Night Mecha": [-1, 10000],
+            "Gold Mecha": [-1, 50000]
+        }
     }
 }
