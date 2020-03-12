@@ -19,11 +19,23 @@ from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
 from .brawlers import Brawler, brawler_thumb, brawlers_map
-from .brawlhelp import (COMMUNITY_LINK, EMBED_COLOR, INVITE_URL, REDDIT_LINK,
-                        SOURCE_LINK, BrawlcordHelp)
+from .brawlhelp import (
+    COMMUNITY_LINK,
+    EMBED_COLOR,
+    INVITE_URL,
+    REDDIT_LINK,
+    SOURCE_LINK,
+    BrawlcordHelp
+)
 from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
-from .emojis import (brawler_emojis, emojis, gamemode_emotes, level_emotes,
-                     rank_emojis, sp_icons)
+from .emojis import (
+    brawler_emojis,
+    emojis,
+    gamemode_emotes,
+    level_emotes,
+    rank_emojis,
+    sp_icons
+)
 from .errors import MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
 from .utils import Box, default_stats, maintenance
@@ -925,14 +937,9 @@ class Brawlcord(commands.Cog):
 
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
-    @_select.command(name="gamemode")
+    @_select.command(name="gamemode", aliases=["gm"])
     async def select_gamemode(self, ctx: Context, *, gamemode: str):
         """Change selected game mode"""
-
-        return await ctx.send(
-            "The game only supports **Gem Grab** at the moment."
-            " More game modes will be added soon!"
-        )
 
         # for users who input 'gem-grab' or 'gem_grab'
         gamemode = gamemode.replace("-", " ")
@@ -971,6 +978,12 @@ class Brawlcord(commands.Cog):
                 break
         else:
             return await ctx.send("Unable to identify game mode.")
+
+        if gamemode in ["Gem Grab", "Solo Showdown"]:
+            return await ctx.send(
+                "The game only supports **Gem Grab** and **Solo Showdown**"
+                " at the moment. More game modes will be added soon!"
+            )
 
         user_owned = await self.get_player_stat(
             ctx.author, 'gamemodes', is_iter=True)
@@ -2433,7 +2446,7 @@ class Brawlcord(commands.Cog):
     @commands.command()
     @checks.is_owner()
     async def add_mega(self, ctx: Context, quantity=1):
-        """Add a mega box to each"""
+        """Add a mega box to each user who has used the bot at least once."""
 
         users_data = await self.config.all_users()
         user_ids = users_data.keys()
