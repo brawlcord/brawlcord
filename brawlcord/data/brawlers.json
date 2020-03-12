@@ -444,7 +444,7 @@
         },
         "sp1": {
             "name": "Steel Hoops",
-            "desc": "Darryl's Super reinforces his barrel, reducing all damage he takes by **30%** for **3.0** seconds."
+            "desc": "Darryl's Super reinforces his barrel, reducing all damage he takes by **30%** for **0.9** seconds."
         },
         "sp2": {
             "name": "Rolling Reload",
