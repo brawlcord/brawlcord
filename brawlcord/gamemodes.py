@@ -45,8 +45,9 @@ class Player:
         self.brawler_level = level
 
         self.static_health = self.brawler._health(self.brawler_level)
-
         self.health = self.static_health
+
+        self.can_super = False
 
         self.last_attack = -1  # round number when last attacked
 
@@ -57,8 +58,10 @@ class Player:
 
     def gemgrab(self):
         self.gems = 0
-        self.can_super = False
         self.dropped = 0
+
+    def showdown(self):
+        self.powerups = 1
 
     def _to_json(self) -> dict:
         """Return a dict with player data"""
@@ -332,7 +335,7 @@ class GameMode:
         if isinstance(vals, list):
             # heal
             first.health += vals[0]
-            if first.static_health < first.health:
+            if first.health > first.static_health:
                 first.health = first.static_health
 
             # hardcoding for Mortis to both
@@ -355,9 +358,8 @@ class GameMode:
             vals = first.brawler._spawn(first.brawler_level)
             if isinstance(vals, list):
                 # heal
-                first.static_health
                 first.health += vals[0]
-                if first.static_health < first.health:
+                if first.health > first.static_health:
                     first.health = first.static_health
             else:
                 if not second.invincibility:
@@ -731,6 +733,306 @@ class GemGrab(GameMode):
             second.invincibility = False
 
 
+class Showdown(GameMode):
+    """Class to represent Solo Showdown.
+
+    It will be changed in the future to serve as a base for both Solo and Duo.
+    """
+
+    def __init__(self, ctx, user, opponent, conf, brawlers):
+        super().__init__(ctx, user, opponent, conf, brawlers)
+
+        self.poison_starting = 15
+        self.poison_damage = 300
+
+    async def initialize(self, ctx):
+        first, second = await super().initialize(ctx)
+
+        self.first.showdown()
+        self.second.showdown()
+
+        return first, second
+
+    async def play(self, ctx: Context) -> (discord.User, discord.User):
+        """Function to run the game"""
+
+        i = 0
+        while i < 100:
+            # game ends after 50th round
+            if i % 2 == 0:
+                first = self.first
+                second = self.second
+            else:
+                first = self.second
+                second = self.first
+
+            self.healing(i, first)
+
+            try:
+                await self.send_waiting_message(
+                    ctx, first.player, second.player
+                )
+            except discord.Forbidden:
+                raise
+
+            if first.attacks >= 6:
+                first.can_super = True
+                end = 4
+            else:
+                first.can_super = False
+                end = 3
+
+            if second.spawn:
+                if second.spawn > 0:
+                    end += 1
+                else:
+                    second.spawn = None
+
+            if first.player != self.guild.me:
+                embed = await self.set_embed(ctx, first, second)
+                try:
+                    choice = await self.get_user_choice(
+                        ctx, embed, end, first.player, second.player)
+                except asyncio.TimeoutError:
+                    winner, loser = second.player, first.player
+                    break
+            else:
+                # develop bot logic
+                choice = random.randint(1, end)
+
+            self.move_handler(choice, first, second, i)
+
+            # poison damage
+            self.poison_effect(i)
+
+            winner, loser = self.check_if_win(first, second)
+
+            if winner is False:
+                pass
+            else:
+                break
+            # go to next loop
+            i += 1
+
+        # time up
+        winner, loser = await self.time_up(winner, loser)
+
+        await self.update_stats(winner, loser)
+
+        return winner, loser
+
+    def check_if_win(self, first: Player, second: Player):
+        if first.health > 0 and second.health <= 0:
+            winner = first.player
+            loser = second.player
+        elif second.health > 0 and first.health <= 0:
+            winner = second.player
+            loser = first.player
+        elif second.health <= 0 and first.health <= 0:
+            # draw
+            winner = None
+            loser = None
+        else:
+            # continues game
+            winner = False
+            loser = False
+
+        return winner, loser
+
+    async def set_embed(self, ctx: Context, first: Player, second: Player):
+        if first.can_super:
+            self_super_emote = emojis['superready']
+        else:
+            self_super_emote = emojis['supernotready']
+
+        if second.can_super:
+            opp_super_emote = emojis['superready']
+        else:
+            opp_super_emote = emojis['supernotready']
+
+        embed = discord.Embed(
+            color=EMBED_COLOR,
+            title=f"Brawl against {second.player.name}"
+        )
+        embed.set_author(
+            name=first.player.name, icon_url=first.player.avatar_url
+        )
+
+        embed = self.set_embed_fields(embed, first, self_super_emote, False)
+
+        embed = self.set_embed_fields(embed, second, opp_super_emote, True)
+
+        moves = self.moves_str(first, second)
+
+        embed.add_field(name="Available Moves", value=moves, inline=False)
+
+        return embed
+
+    def moves_str(self, first: Player, second: Player):
+        if first.can_super and not second.spawn:
+            moves = (
+                "1. Attack\n2. Try to collect powerup\n"
+                "3. Dodge next move\n4. Use Super"
+            )
+        elif first.can_super and second.spawn:
+            moves = (
+                "1. Attack\n2. Try to collect powerup\n3. Dodge next move"
+                f"\n4. Use Super\n5. Attack {second.spawn_str}"
+            )
+        elif not first.can_super and second.spawn:
+            moves = (
+                "1. Attack\n2. Try to collect powerup\n3. Dodge next move"
+                f"\n4. Attack enemy {second.spawn_str}"
+            )
+        else:
+            moves = (
+                "1. Attack\n2. Try to collect powerup\n3. Dodge next move"
+            )
+
+        return moves
+
+    def powerups_field(
+        self,
+        embed: discord.Embed,
+        player: Player,
+        opponent=False
+    ):
+        if opponent:
+            iden = "Opponent's"
+        else:
+            iden = "Your"
+
+        embed.add_field(
+            name=f"{iden} Powerups",
+            value=f"{emojis['powercube']} {player.powerups}"
+            )
+
+        return embed
+
+    def set_embed_fields(
+        self,
+        embed: discord.Embed,
+        player: Player,
+        super_emote: str,
+        opponent=False
+    ):
+        embed = self.initial_fields(embed, player, super_emote, opponent)
+        embed = self.powerups_field(embed, player, opponent)
+        embed = self.spawn_field(embed, player, opponent)
+
+        return embed
+
+    def move_handler(
+        self, choice: int, first: Player, second: Player, round_num: int
+    ):
+        if not second.is_respawning:
+            if choice == 1:
+                # attack
+                self._move_attack(first, second, round_num)
+            elif choice == 2:
+                # collect powerup
+                self._move_powerup(first, second, round_num)
+            elif choice == 3:
+                # invincibility
+                self._move_invinc(first, second)
+            elif choice == 4:
+                if first.can_super:
+                    # super
+                    self._move_super(first, second, round_num)
+                else:
+                    # attack spawn
+                    self._move_attack_spawn(first, second)
+            elif choice == 5:
+                # attack spawn
+                self._move_attack_spawn(first, second)
+
+            # spawn's attack
+            self._move_spawn_attack(first, second)
+
+    def _move_powerup(self, first: Player, second: Player, round_num: int):
+        first.last_attack = round_num
+
+        # 0.5 of collecting powerup
+        collected_powerup = random.choice([0, 1])
+        first.powerups += collected_powerup
+        if collected_powerup:
+            self.buff_health(first)
+        if second.invincibility:
+            second.invincibility = False
+
+    def buff_health(self, player: Player):
+        player.static_health += 400
+        player.health += 400
+
+    def _move_attack(self, first: Player, second: Player, round_num: int):
+        first.last_attack = round_num
+
+        damage = self.apply_powerups(
+            first, first.brawler._attack(first.brawler_level)
+        )
+        if not second.invincibility:
+            second.health -= damage
+            first.attacks += 1
+        else:
+            second.invincibility = False
+
+    def _move_super(self, first: Player, second: Player, round_num: int):
+        first.last_attack = round_num
+
+        vals, first.spawn = first.brawler._ult(first.brawler_level)
+        first.attacks = 0
+        if isinstance(vals, list):
+            # heal
+            first.health += self.apply_powerups(first, vals[0])
+            if first.health > first.static_health:
+                first.health = first.static_health
+
+            # hardcoding for Mortis to both
+            # deal damage and heal
+            vals = vals[0]
+            if first.brawler_name != "Mortis":
+                return
+
+        if not second.invincibility:
+            second.health -= self.apply_powerups(first, vals)
+        else:
+            second.health -= (self.apply_powerups(first, vals) * 0.5)
+            second.invincibility = False
+
+    def _move_attack_spawn(self, first: Player, second: Player):
+        second.spawn -= self.apply_powerups(
+            first, first.brawler._attack(first.brawler_level)
+        )
+
+    def _move_spawn_attack(self, first: Player, second: Player):
+        if first.spawn:
+            vals = first.brawler._spawn(first.brawler_level)
+            if isinstance(vals, list):
+                # heal
+                first.health += self.apply_powerups(first, vals[0])
+                if first.health > first.static_health:
+                    first.health = first.static_health
+            else:
+                if not second.invincibility:
+                    second.health -= self.apply_powerups(first, vals)
+                    first.attacks += 1
+                else:
+                    second.invincibility = False
+
+    def apply_powerups(self, player: Player, value: int):
+        # 10% increase per powerup
+        for _ in range(1, player.powerups):
+            value += round(value * 0.1)
+
+        return value
+
+    def poison_effect(self, round_num: int):
+        if round_num > self.poison_starting:
+            self.first.health -= self.poison_damage
+            self.second.health -= self.poison_damage
+
+
 gamemodes_map = {
-    "Gem Grab": GemGrab
+    "Gem Grab": GemGrab,
+    "Solo Showdown": Showdown
 }
