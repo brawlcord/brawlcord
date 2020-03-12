@@ -979,7 +979,7 @@ class Brawlcord(commands.Cog):
         else:
             return await ctx.send("Unable to identify game mode.")
 
-        if gamemode in ["Gem Grab", "Solo Showdown"]:
+        if gamemode not in ["Gem Grab", "Solo Showdown"]:
             return await ctx.send(
                 "The game only supports **Gem Grab** and **Solo Showdown**"
                 " at the moment. More game modes will be added soon!"
