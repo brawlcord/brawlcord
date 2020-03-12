@@ -628,5 +628,39 @@
             "Calavera": [-1, -1],
             "Cupid": [150, -1]
         }
+    },
+    "Frank": {
+        "desc": "Frank swings his hammer at enemies, sending a shockwave. His Super is an especially powerful blow that stuns enemies!",
+        "health": 6400,
+        "attack": {
+            "name": "Hammer Hit",
+            "damage": 1200,
+            "desc": "Frank takes a while to wind up his hammer blow, but the hit is so hard it sends a shockwave.",
+            "range": 6,
+            "reload": 0.8,
+            "projectiles": 1
+        },
+        "speed": 770,
+        "rarity": "Epic",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Stunning Blow",
+            "damage": 1200,
+            "desc": "Frank's greatest hit sends a shockwave that destroys environment and stuns enemies for a while.",
+            "range": 7,
+            "projectiles": 1
+        },
+        "sp1": {
+            "name": "Power Grab",
+            "desc": "Frank steals the power of a Brawler he defeats, increasing his damage by **50%** for **12** seconds!"
+        },
+        "sp2": {
+            "name": "Sponge",
+            "desc": "Frank gains **+1100** health."
+        },
+        "skins": {
+            "Caveman": [80, -1],
+            "DJ": [80, -1]
+        }
     }
 }
