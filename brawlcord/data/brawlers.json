@@ -722,5 +722,41 @@
             "Iris": [-1, 500],
             "Street Ninja": [-1, -1]
         }
+    },
+    "Spike": {
+        "desc": "Spike throws cactus grenades that send needles flying, and a show-stopping Super: a field of cactus spines that slows down and damages enemies!",
+        "health": 2400,
+        "attack": {
+            "name": "Needle Grenade",
+            "damage": 520,
+            "desc": "Spike fires off a small cactus that explodes, shooting spikes in different directions.",
+            "range": 7.67,
+            "reload": 2,
+            "projectiles": 6,
+            "extra": "Damage per spike"
+        },
+        "speed": 720,
+        "rarity": "Legendary",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Stick Around!",
+            "damage": 400,
+            "desc": "Spike lobs a thorny grenade. Enemies caught in the blast area take damage and are slowed down.",
+            "range": 7.67,
+            "projectiles": 1,
+            "extra": "Damage per second"
+        },
+        "sp1": {
+            "name": "Fertilize",
+            "desc": "After using Super, Spike regenerates 800 health per second by staying in its area of effect."
+        },
+        "sp2": {
+            "name": "Curveball",
+            "desc": "Spikes from the cactus grenade fly in a curving motion, making it easier to hit targets."
+        },
+        "skins": {
+            "Sakura": [80, -1],
+            "Robo": [150, -1]
+        }
     }
 }
