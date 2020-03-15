@@ -5,7 +5,7 @@ from redbot.core.commands.context import Context
 from redbot.core.utils.chat_formatting import humanize_timedelta
 
 
-async def user_cooldown(rate, per, config: Config, ctx: Context):
+async def user_cooldown(rate: int, per: int, config: Config, ctx: Context):
     """Handle user cooldown"""
 
     async with config.user(ctx.author).cooldown() as cooldown:

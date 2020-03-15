@@ -25,7 +25,8 @@ emojis = {
     "wintrophy": "<:fwin_trophy:648085703795933194>",
     "powerplay": "<:powerplay:645341012646035459>",
     "superready": "<:super_ready:664073599111659550>",
-    "supernotready": "<:super_not_ready:664073623358799872>"
+    "supernotready": "<:super_not_ready:664073623358799872>",
+    "powercube": "<:powercube:687358153423454222>"
 }
 
 sp_icons = {
@@ -100,6 +101,22 @@ sp_icons = {
     "Mortis": [
         "<:CreepyHarvest:645349549115965451>",
         "<:CoiledSnake:686257393302372414>"
+    ],
+    "Frank": [
+        "<:PowerGrab:645349547073077268>",
+        "<:Sponge:687594154909368320>"
+    ],
+    "Tara": [
+        "<:BlackPortal:645349546981064734>",
+        "<:HealingShade:687604609535311883>"
+    ],
+    "Spike": [
+        "<:Fertilize:645349548297945138>",
+        "<:Curveball:687625644548685847>"
+    ],
+    "Crow": [
+        "<:ExtraToxic:645349548625231922>",
+        "<:CarrionCrow:687633224553463861>"
     ]
 }
 

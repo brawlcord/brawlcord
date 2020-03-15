@@ -16,9 +16,9 @@ Please follow the steps and guidelines on this page when contributing to the Bra
 
 Firstly, open/download a text editor with `json` support. [Visual Studio Code](https://code.visualstudio.com), [Atom](https://atom.io) and [Sublime Text](https://www.sublimetext.com) are popular choices.
 
-Once you have the text editor opened, make a new file named `[brawler_name].json` (replacing `brawler_name` with the actual name). Enter all the data as outlined in [Guidelines and Reference](#guidelines-and-reference) section.
+Once you have the text editor opened, make a new file named `brawler_name.json` (replacing `brawler_name` with the actual name). Enter all the data as outlined in [Guidelines and Reference](#guidelines-and-reference) section.
 
-Save the file and send it to me on Discord, via a direct message. My Discord username is `Snowsy#0529`.
+Save the file and send it to me on Discord via a direct message. My Discord username is `Snowsy#0529`.
 
 And that is all! I'll add the file to the bot data and credit you in the bot's credit command and on the webpage. You can choose any name and optionally share a website (link to your profile, server, etc.) for the credit.
 
@@ -228,15 +228,15 @@ The best place to find all the data is the [Brawl Stars Wiki](https://brawlstars
 - [ ] 8-Bit
 - [ ] Emz
 - [ ] Rosa
-- [ ] Frank
+- [X] Frank
 - [ ] Bibi
 - [ ] Bea
-- [ ] Mortis
-- [ ] Tara
+- [X] Mortis
+- [X] Tara
 - [ ] Gene
 - [ ] Max
 - [ ] Mr. P
-- [ ] Crow
-- [ ] Spike
+- [X] Crow
+- [X] Spike
 - [ ] Leon
 - [ ] Sandy

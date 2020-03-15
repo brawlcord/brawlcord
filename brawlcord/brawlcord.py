@@ -6,8 +6,9 @@ import random
 import re
 import traceback
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import ceil
+from typing import Union
 
 # Discord
 import discord
@@ -15,22 +16,38 @@ from redbot.core import Config, checks, commands
 from redbot.core.bot import Red
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
-from redbot.core.utils.menus import start_adding_reactions
+from redbot.core.utils.chat_formatting import pagify
+from redbot.core.utils.menus import (
+    menu, start_adding_reactions, DEFAULT_CONTROLS
+)
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
 from .brawlers import Brawler, brawler_thumb, brawlers_map
-from .brawlhelp import (COMMUNITY_LINK, EMBED_COLOR, INVITE_URL, REDDIT_LINK,
-                        SOURCE_LINK, BrawlcordHelp)
+from .brawlhelp import (
+    COMMUNITY_LINK,
+    EMBED_COLOR,
+    INVITE_URL,
+    REDDIT_LINK,
+    SOURCE_LINK,
+    BrawlcordHelp
+)
 from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
-from .emojis import (brawler_emojis, emojis, gamemode_emotes, level_emotes,
-                     rank_emojis, sp_icons)
+from .emojis import (
+    brawler_emojis,
+    emojis,
+    gamemode_emotes,
+    level_emotes,
+    rank_emojis,
+    sp_icons
+)
 from .errors import MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
+from .shop import Shop
 from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "1.1.2"
+__version__ = "2.0.0"
 __author__ = "Snowsee"
 
 default = {
@@ -39,7 +56,9 @@ default = {
     "maintenance": {
         "duration": None,
         "setting": False
-    }
+    },
+    "shop_reset_ts": None,  # shop reset timestamp
+    "st_reset_ts": None  # star tokens reset timestamp
 }
 
 default_user = {
@@ -88,12 +107,14 @@ default_user = {
         "brawlbox": 0,
         "bigbox": 0,
         "megabox": 0
-    }
+    },
+    "shop": {},
+    # list of gamemodes where the user
+    # already received daily star tokens
+    "todays_st": []
 }
 
-imgur_links = {
-    "shelly_tut": "https://i.imgur.com/QfKYzso.png"
-}
+shelly_tut = "https://i.imgur.com/QfKYzso.png"
 
 reward_types = {
     1: ["Gold", emojis["gold"]],
@@ -175,8 +196,12 @@ class Brawlcord(commands.Cog):
         self.status_task = self.bot.loop.create_task(
             self.update_status()
         )
+        self.shop_and_st_task = self.bot.loop.create_task(
+            self.update_shop_and_st()
+        )
         self.bank_update_task.add_done_callback(error_callback)
         self.status_task.add_done_callback(error_callback)
+        self.shop_and_st_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -325,12 +350,13 @@ class Brawlcord(commands.Cog):
 
         try:
             first_player, second_player = await g.initialize(ctx)
+            winner, loser = await g.play(ctx)
         except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
             return
         except Exception as exc:
             traceback.print_tb(exc.__traceback__)
             return await ctx.send(
-                f"Error: \"{exc}\" with initialising brawl."
+                f"Error: \"{exc}\" with brawl."
                 " Please notify bot owner by using `-report` command."
             )
         finally:
@@ -340,35 +366,18 @@ class Brawlcord(commands.Cog):
             except (ValueError, AttributeError):
                 pass
 
-        try:
-            winner, loser = await g.play(ctx)
-        except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
-            return
-        except Exception as exc:
-            traceback.print_tb(exc.__traceback__)
-            return await ctx.send(
-                f"Error: \"{exc}\" with brawl. Please notify bot owner"
-                " by using `-report` command."
-            )
-
         players = [first_player, second_player]
 
-        starplayer = random.choice(players)
-
         if winner:
-            # starplayer = winner
             await ctx.send(
                 f"{first_player.mention} {second_player.mention}"
                 f" Match ended. Winner: {winner.name}!"
             )
         else:
-            # starplayer = random.choice(players)
             await ctx.send(
                 f"{first_player.mention} {second_player.mention}"
                 " The match ended in a draw!"
             )
-
-        starplayer = None
 
         count = 0
         for player in players:
@@ -381,28 +390,20 @@ class Brawlcord(commands.Cog):
             else:
                 points = 0
 
-            if player == starplayer:
-                is_starplayer = True
-            else:
-                is_starplayer = False
-
-            (
-                brawl_rewards,
-                rank_up_rewards,
-                trophy_road_reward
-            ) = await self.brawl_rewards(player, points, is_starplayer)
+            # brawl rewards, rank up rewards and trophy road rewards
+            br, rur, trr = await self.brawl_rewards(player, points, gm)
 
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
             level_up = await self.xp_handler(player)
-            await player.send(embed=brawl_rewards)
+            await player.send(embed=br)
             if level_up:
                 await player.send(f"{level_up[0]}\n{level_up[1]}")
-            if rank_up_rewards:
-                await player.send(embed=rank_up_rewards)
-            if trophy_road_reward:
-                await player.send(embed=trophy_road_reward)
+            if rur:
+                await player.send(embed=rur)
+            if trr:
+                await player.send(embed=trr)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -427,7 +428,7 @@ class Brawlcord(commands.Cog):
         embed = discord.Embed(
             color=EMBED_COLOR, title="Tutorial", description=desc)
         # embed.set_author(name=author, icon_url=author_avatar)
-        embed.set_thumbnail(url=imgur_links["shelly_tut"])
+        embed.set_thumbnail(url=shelly_tut)
 
         tut_str = (
             f"This {emojis['gem']} is a Gem. All the gems are mine!"
@@ -925,14 +926,9 @@ class Brawlcord(commands.Cog):
 
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
-    @_select.command(name="gamemode")
+    @_select.command(name="gamemode", aliases=["gm"])
     async def select_gamemode(self, ctx: Context, *, gamemode: str):
         """Change selected game mode"""
-
-        return await ctx.send(
-            "The game only supports **Gem Grab** at the moment."
-            " More game modes will be added soon!"
-        )
 
         # for users who input 'gem-grab' or 'gem_grab'
         gamemode = gamemode.replace("-", " ")
@@ -971,6 +967,12 @@ class Brawlcord(commands.Cog):
                 break
         else:
             return await ctx.send("Unable to identify game mode.")
+
+        if gamemode not in ["Gem Grab", "Solo Showdown"]:
+            return await ctx.send(
+                "The game only supports **Gem Grab** and **Solo Showdown**"
+                " at the moment. More game modes will be added soon!"
+            )
 
         user_owned = await self.get_player_stat(
             ctx.author, 'gamemodes', is_iter=True)
@@ -1477,7 +1479,8 @@ class Brawlcord(commands.Cog):
 
         embed_str = ""
 
-        for idx, brawler in enumerate(user_owned):
+        idx = 1
+        for brawler in user_owned:
             brawler_data = await self.get_player_stat(
                 user, 'brawlers', is_iter=True, substat=brawler)
 
@@ -1493,32 +1496,46 @@ class Brawlcord(commands.Cog):
 
             if powerpoints >= required_powerpoints:
                 embed_str += (
-                    f"\n{idx+1}. {brawler} {brawler_emojis[brawler]} ({level}"
+                    f"\n{idx}. {brawler} {brawler_emojis[brawler]} ({level}"
                     f" -> {level+1}) - {emojis['gold']} {required_gold}"
                 )
+                idx += 1
 
+        embeds = []
         if embed_str:
+            gold = await self.get_player_stat(user, 'gold')
             desc = (
                 "The following Brawlers can be upgraded by using the"
                 " `-upgrade <brawler_name>` command."
+                f"\n\nAvailable Gold: {emojis['gold']} {gold}"
             )
-            embed = discord.Embed(color=EMBED_COLOR, description=desc)
-            embed.add_field(name="Upgradable Brawlers", value=embed_str)
-            gold = await self.get_player_stat(user, 'gold')
-            embed.add_field(name="Available Gold",
-                            value=f"{emojis['gold']} {gold}")
+            pages = list(pagify(text=embed_str))
+            total = len(pages)
+            for i, page in enumerate(pages, start=1):
+                embed = discord.Embed(
+                    color=EMBED_COLOR,
+                    description=desc,
+                    timestamp=ctx.message.created_at
+                )
+                embed.set_author(
+                    name=f"{user.name}'s Upgradable Brawlers",
+                    icon_url=user.avatar_url
+                )
+                embed.set_footer(text=f"Page {i}/{total}")
+                embed.add_field(name="Upgradable Brawlers", value=page)
+                embeds.append(embed)
         else:
             embed = discord.Embed(
                 color=EMBED_COLOR,
                 description="You can't upgrade any Brawler at the moment."
             )
+            embed.set_author(
+                name=f"{user.name}'s Upgradable Brawlers",
+                icon_url=user.avatar_url
+            )
+            embeds.append(embed)
 
-        embed.set_author(
-            name=f"{user.name}'s Upgradable Brawlers",
-            icon_url=user.avatar_url
-        )
-
-        await ctx.send(embed=embed)
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
 
     @commands.command(name="powerpoints", aliases=['pps'])
     @maintenance()
@@ -1567,14 +1584,27 @@ class Brawlcord(commands.Cog):
                     f" - {sp1_icon} {sp2_icon}"
                 )
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.add_field(name="Brawlers", value=embed_str)
+        embeds = []
+        # embed.add_field(name="Brawlers", value=embed_str)
 
-        embed.set_author(
-            name=f"{user.name}'s Power Points Info", icon_url=user.avatar_url)
+        pages = list(pagify(text=embed_str))
+        total = len(pages)
+        for i, page in enumerate(pages, start=1):
+            embed = discord.Embed(
+                color=EMBED_COLOR,
+                description=page,
+                timestamp=ctx.message.created_at
+            )
+
+            embed.set_author(
+                name=f"{user.name}'s Power Points Info",
+                icon_url=user.avatar_url
+            )
+            embed.set_footer(text=f"Page {i}/{total}")
+            embeds.append(embed)
 
         try:
-            await ctx.send(embed=embed)
+            await menu(ctx, embeds, DEFAULT_CONTROLS)
         except discord.Forbidden:
             return await ctx.send(
                 "I do not have the permission to embed a link."
@@ -1686,7 +1716,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="setprefix")
     @commands.admin_or_permissions(manage_guild=True)
     async def _set_prefix(self, ctx: Context, *prefixes: str):
-        """Set Brawlcord's server prefix(es).
+        """Set Brawlcord's server prefix(es)
 
         Enter prefixes as a comma separated list.
         """
@@ -1706,6 +1736,110 @@ class Brawlcord(commands.Cog):
             f"Set {', '.join(inline_prefixes)} as server"
             f" {'prefix' if len(prefixes) == 1 else 'prefixes'}."
         )
+
+    @commands.group(name="shop")
+    @maintenance()
+    async def _shop(self, ctx: Context):
+        """View your daily shop and buy items"""
+
+        if not ctx.invoked_subcommand:
+            await self._view_shop(ctx)
+
+    @_shop.command(name="buy")
+    @maintenance()
+    async def _shop_buy(self, ctx: Context, item_number: Union[str, int]):
+        """Buy items from the daily shop"""
+
+        data = await self.config.user(ctx.author).shop()
+
+        shop = Shop.from_json(data)
+
+        if isinstance(item_number, int):
+            new_data = await shop.buy_item(
+                ctx, ctx.author, self.config, self.BRAWLERS, item_number
+            )
+        else:
+            new_data = await shop.buy_skin(
+                ctx, ctx.author, self.config,
+                self.BRAWLERS, item_number.upper()
+            )
+
+        if new_data:
+            await self.config.user(ctx.author).shop.set(new_data)
+
+    @_shop.command(name="view")
+    @maintenance()
+    async def _shop_view(self, ctx: Context):
+        """View your daily shop"""
+
+        await self._view_shop(ctx)
+
+    @commands.command(name="skins")
+    @maintenance()
+    async def _skins(self, ctx: Context):
+        """View all skins you own"""
+
+        brawler_data = await self.get_player_stat(
+            ctx.author, 'brawlers', is_iter=True
+        )
+
+        embed = discord.Embed(
+            colour=EMBED_COLOR
+        )
+        embed.set_author(
+            name=f"{ctx.author.name}'s Skins", icon_url=ctx.author.avatar_url
+        )
+
+        total = 0
+        for brawler in brawler_data:
+            skins = brawler_data[brawler]["skins"]
+            if len(skins) < 2:
+                continue
+            brawler_skins = ""
+            for skin in skins:
+                if skin == "Default":
+                    continue
+                brawler_skins += f"\n- {skin} {brawler}"
+                total += 1
+            embed.add_field(
+                name=f"{brawler_emojis[brawler]} {brawler} ({len(skins)-1})",
+                value=brawler_skins,
+                inline=False
+            )
+
+        embed.set_footer(text=f"Total Skins: {total}")
+
+        await ctx.send(embed=embed)
+
+    @commands.command(name="startokens")
+    @maintenance()
+    async def _star_tokens(self, ctx: Context):
+        """Show details of today's star tokens"""
+
+        todays_st = await self.config.user(ctx.author).todays_st()
+
+        user_gamemodes = await self.config.user(ctx.author).gamemodes()
+
+        collected = ""
+        not_collected = ""
+
+        for gamemode in user_gamemodes:
+            if gamemode not in gamemodes_map:
+                continue
+            if gamemode in todays_st:
+                collected += f"\n{gamemode_emotes[gamemode]} {gamemode}"
+            else:
+                not_collected += f"\n{gamemode_emotes[gamemode]} {gamemode}"
+
+        embed = discord.Embed(
+            colour=EMBED_COLOR
+        )
+        if collected:
+            embed.add_field(name="Collected", value=collected)
+        if not_collected:
+            embed.add_field(name="Not Collected", value=not_collected)
+
+        await ctx.send(embed=embed)
 
     async def get_player_stat(
         self, user: discord.User, stat: str,
@@ -1767,15 +1901,23 @@ class Brawlcord(commands.Cog):
             return brawlers[brawler_name][stat]
 
     async def brawl_rewards(
-        self, user: discord.User,
-        points: int, is_starplayer=False
+        self,
+        user: discord.User,
+        points: int,
+        gm: str,
+        is_starplayer=False,
     ):
-        """Adjust user variables and return embed containing reward."""
+        """Adjust user variables and return embeds containing reward."""
 
+        star_token = 0
         if points > 0:
             reward_tokens = 20
             reward_xp = 8
             position = 1
+            async with self.config.user(user).todays_st() as todays_st:
+                if gm not in todays_st:
+                    star_token = 1
+                    todays_st.append(gm)
         elif points < 0:
             reward_tokens = 10
             reward_xp = 4
@@ -1827,6 +1969,9 @@ class Brawlcord(commands.Cog):
             substat=selected_brawler, sub_index='trophies'
         )
         await self.update_player_stat(user, 'token_doubler', upd_td)
+        await self.update_player_stat(
+            user, 'startokens', star_token, add_self=True
+        )
         await self.handle_pb(user, selected_brawler)
 
         user_avatar = user.avatar_url
@@ -1836,9 +1981,8 @@ class Brawlcord(commands.Cog):
 
         reward_xp_str = (
             "{}".format(
-                (
                     f'{reward_xp} (Star Player)' if is_starplayer
-                    else f'{reward_xp}')
+                    else f'{reward_xp}'
             )
         )
 
@@ -1853,6 +1997,13 @@ class Brawlcord(commands.Cog):
             embed.add_field(
                 name="Token Doubler",
                 value=f"{emojis['tokendoubler']} x{upd_td} remaining!"
+            )
+
+        if star_token:
+            embed.add_field(
+                name="Star Token",
+                value=f"{emojis['startoken']} 1",
+                inline=False
             )
 
         rank_up = await self.handle_rank_ups(user, selected_brawler)
@@ -2433,7 +2584,7 @@ class Brawlcord(commands.Cog):
     @commands.command()
     @checks.is_owner()
     async def add_mega(self, ctx: Context, quantity=1):
-        """Add a mega box to each"""
+        """Add a mega box to each user who has used the bot at least once."""
 
         users_data = await self.config.all_users()
         user_ids = users_data.keys()
@@ -2520,9 +2671,93 @@ class Brawlcord(commands.Cog):
 
             await asyncio.sleep(120)
 
+    async def create_shop(self, user: discord.User, update=True) -> Shop:
+
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True
+        )
+
+        shop = Shop(self.BRAWLERS, brawler_data)
+        shop.generate_shop_items()
+        data = shop.to_json()
+
+        await self.config.user(user).shop.set(data)
+
+        if update:
+            time_now = datetime.utcnow()
+            epoch = datetime(1970, 1, 1)
+            # get timestamp in UTC
+            timestamp = (time_now - epoch).total_seconds()
+            await self.config.shop_reset_ts.set(timestamp)
+
+        return shop
+
+    async def update_shop_and_st(self):
+        """Task to update daily shop and star tokens."""
+
+        while True:
+            for user in self.bot.users:
+                s_reset = await self.config.shop_reset_ts()
+                if not s_reset:
+                    # first reset
+                    await self.create_shop(user)
+                    continue
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
+                if diff.days > 0:
+                    await self.create_shop(user)
+
+                st_reset = await self.config.st_reset_ts()
+                if not st_reset:
+                    # first reset
+                    await self.reset_st(user)
+                    continue
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
+                if diff.days > 0:
+                    await self.reset_st(user)
+
+            await asyncio.sleep(300)
+
+    async def _view_shop(self, ctx: Context):
+        """Sends shop embeds."""
+
+        user = ctx.author
+
+        shop_data = await self.config.user(user).shop()
+        if not shop_data:
+            shop = await self.create_shop(user, update=False)
+        else:
+            shop = Shop.from_json(shop_data)
+
+        last_reset = datetime.utcfromtimestamp(
+            await self.config.shop_reset_ts()
+        )
+
+        next_reset = last_reset + timedelta(days=1)
+
+        next_reset_str = humanize_timedelta(
+            timedelta=next_reset - datetime.utcnow()
+        )
+
+        em = shop.create_items_embeds(user, next_reset_str)
+
+        await menu(ctx, em, DEFAULT_CONTROLS)
+
+    async def reset_st(self, user: discord.User):
+        """Reset user star tokens list and update timestamp."""
+
+        async with self.config.user(user).todays_st() as todays_st:
+            todays_st.clear()
+
+        time_now = datetime.utcnow()
+        epoch = datetime(1970, 1, 1)
+        # get timestamp in UTC
+        timestamp = (time_now - epoch).total_seconds()
+        await self.config.st_reset_ts.set(timestamp)
+
     def cog_unload(self):
         self.bank_update_task.cancel()
         self.status_task.cancel()
+        self.shop_and_st_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
