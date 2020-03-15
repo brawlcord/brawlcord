@@ -6,7 +6,7 @@
   <br>
 </h1>
 
-<h4 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot">Invite to your server! </a></i></h4>
+<h4 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot"> Invite to your server! </a></i></h4>
 
 <p align="center">
   <a href="#overview">Overview</a>
