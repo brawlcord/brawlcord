@@ -20,7 +20,7 @@
 
 ## Overview
 
-Brawlcord is a Discord bot, an intance of [Red](https://github.com/Cog-Creators/Red-DiscordBot), which allows users to play a simplified version of the game [Brawl Stars](https://brawlstars.com) (developed by Supercell) on Discord.  
+Brawlcord is a Discord bot which allows users to play a simplified version of the game [Brawl Stars](https://brawlstars.com) (developed by Supercell) on Discord. It is an instance of [Red](https://github.com/Cog-Creators/Red-DiscordBot).
 
 > Fast-paced multiplayer battles from the makers of Clash of Clans, Clash Royale and Boom Beach.
 
@@ -32,7 +32,7 @@ You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3P
 
 **Note:** By using the link above, Brawlcord will be able to read messages, send messages, manage messages, embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
 
-[Click here](commands) for a list of all commands!
+[Click here](commands) for a list of all commands.
 
 ## Features
 
