@@ -1341,7 +1341,7 @@ class Brawlcord(commands.Cog):
     @commands.group(name="claim")
     @maintenance()
     async def _claim(self, ctx: Context):
-        """Claim daily/weekly/monthly rewards"""
+        """Claim daily/weekly rewards"""
         pass
 
     @_claim.command(name="daily")
