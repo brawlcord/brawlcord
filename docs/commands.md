@@ -75,7 +75,7 @@
   - `-select brawler`: Change selected Brawler!
   - `-select skin`: Change selected skin!
   - `-select gamemode`: Change selected game mode!
-  - `-select sp`: Change select star power!
+  - `-select starpower`: Change select star power!
 
 - `-tutorial`: Begin the tutorial!
 
