@@ -49,7 +49,9 @@ class Player:
 
         self.can_super = False
 
-        self.last_attack = -1  # round number when last attacked
+        # round number when last attacked opponent
+        # or got attacked by the opponent
+        self.last_attack = -1
 
         self.stunned = False
 
@@ -320,6 +322,7 @@ class GameMode:
         damage = first.brawler._attack(first.brawler_level)
         if not second.invincibility:
             second.health -= damage
+            second.last_attack = round_num
             first.attacks += 1
         else:
             second.invincibility = False
@@ -352,6 +355,8 @@ class GameMode:
             second.health -= (vals * 0.5)
             second.invincibility = False
 
+        second.last_attack = round_num
+
         # hardcoding for Frank's stun
         if first.brawler_name == "Frank":
             second.stunned = True
@@ -359,7 +364,9 @@ class GameMode:
     def _move_attack_spawn(self, first: Player, second: Player):
         second.spawn -= first.brawler._attack(first.brawler_level)
 
-    def _move_spawn_attack(self, first: Player, second: Player):
+    def _move_spawn_attack(
+        self, first: Player, second: Player, round_num: int
+    ):
         if first.spawn:
             vals = first.brawler._spawn(first.brawler_level)
             if isinstance(vals, list):
@@ -370,6 +377,7 @@ class GameMode:
             else:
                 if not second.invincibility:
                     second.health -= vals
+                    second.last_attack = round_num
                     first.attacks += 1
                 else:
                     second.invincibility = False
@@ -720,7 +728,7 @@ class GemGrab(GameMode):
                 self._move_attack_spawn(first, second)
 
             # spawn's attack
-            self._move_spawn_attack(first, second)
+            self._move_spawn_attack(first, second, round_num)
 
         else:
             second.is_respawning = False
@@ -738,7 +746,7 @@ class GemGrab(GameMode):
                 self._move_attack_spawn(first, second)
 
             # spawn's attack
-            self._move_spawn_attack(first, second)
+            self._move_spawn_attack(first, second, round_num)
 
     def _move_gem(self, first: Player, second: Player):
         # 0.75 of collecting one gem
@@ -953,29 +961,28 @@ class Showdown(GameMode):
     def move_handler(
         self, choice: int, first: Player, second: Player, round_num: int
     ):
-        if not second.is_respawning:
-            if choice == 1:
-                # attack
-                self._move_attack(first, second, round_num)
-            elif choice == 2:
-                # collect powerup
-                self._move_powerup(first, second, round_num)
-            elif choice == 3:
-                # invincibility
-                self._move_invinc(first, second)
-            elif choice == 4:
-                if first.can_super:
-                    # super
-                    self._move_super(first, second, round_num)
-                else:
-                    # attack spawn
-                    self._move_attack_spawn(first, second)
-            elif choice == 5:
+        if choice == 1:
+            # attack
+            self._move_attack(first, second, round_num)
+        elif choice == 2:
+            # collect powerup
+            self._move_powerup(first, second, round_num)
+        elif choice == 3:
+            # invincibility
+            self._move_invinc(first, second)
+        elif choice == 4:
+            if first.can_super:
+                # super
+                self._move_super(first, second, round_num)
+            else:
                 # attack spawn
                 self._move_attack_spawn(first, second)
+        elif choice == 5:
+            # attack spawn
+            self._move_attack_spawn(first, second)
 
-            # spawn's attack
-            self._move_spawn_attack(first, second)
+        # spawn's attack
+        self._move_spawn_attack(first, second, round_num)
 
     def _move_powerup(self, first: Player, second: Player, round_num: int):
         first.last_attack = round_num
@@ -1000,6 +1007,7 @@ class Showdown(GameMode):
         )
         if not second.invincibility:
             second.health -= damage
+            second.last_attack = round_num
             first.attacks += 1
         else:
             second.invincibility = False
@@ -1027,6 +1035,8 @@ class Showdown(GameMode):
             second.health -= (self.apply_powerups(first, vals) * 0.5)
             second.invincibility = False
 
+        second.last_attack = round_num
+
         # hardcoding for Frank's stun
         if first.brawler_name == "Frank":
             second.stunned = True
@@ -1036,7 +1046,9 @@ class Showdown(GameMode):
             first, first.brawler._attack(first.brawler_level)
         )
 
-    def _move_spawn_attack(self, first: Player, second: Player):
+    def _move_spawn_attack(
+        self, first: Player, second: Player, round_num: int
+    ):
         if first.spawn:
             vals = first.brawler._spawn(first.brawler_level)
             if isinstance(vals, list):
@@ -1047,6 +1059,7 @@ class Showdown(GameMode):
             else:
                 if not second.invincibility:
                     second.health -= self.apply_powerups(first, vals)
+                    second.last_attack = round_num
                     first.attacks += 1
                 else:
                     second.invincibility = False
