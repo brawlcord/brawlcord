@@ -192,13 +192,13 @@ class Brawlcord(commands.Cog):
         # self.bank_update_task = self.bot.loop.create_task(
         #     self.update_token_bank()
         # )
-        # self.status_task = self.bot.loop.create_task(self.update_status())
-        # self.shop_and_st_task = self.bot.loop.create_task(
-        #     self.update_shop_and_st()
-        # )
+        self.status_task = self.bot.loop.create_task(self.update_status())
+        self.shop_and_st_task = self.bot.loop.create_task(
+            self.update_shop_and_st()
+        )
         # self.bank_update_task.add_done_callback(error_callback)
-        # self.shop_and_st_task.add_done_callback(error_callback)
-        # self.status_task.add_done_callback(error_callback)
+        self.shop_and_st_task.add_done_callback(error_callback)
+        self.status_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -2773,8 +2773,8 @@ class Brawlcord(commands.Cog):
 
     def cog_unload(self):
         # self.bank_update_task.cancel()
-        # self.status_task.cancel()
-        # self.shop_and_st_task.cancel()
+        self.status_task.cancel()
+        self.shop_and_st_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
