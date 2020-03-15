@@ -1,11 +1,3 @@
-<h1 align="center">
-  <br>
-  <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
-  <br>
-  <a href="https://snowsee.github.io/brawlcord/">Brawlcord Discord Bot</a>
-  <br>
-</h1>
-
 <h4 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot"> Invite to your server! </a></i></h4>
 
 <p align="center">
@@ -56,10 +48,10 @@ The cog replicates the real game in a number of ways while adapting to the text-
 
 The following features are likely to be added in near future:
 
-- [ ] More Brawlers  
-- [ ] More Game Modes  
-- [ ] Clubs  
-- [ ] Improved battle system  
+- More Brawlers  
+- More Game Modes  
+- Clubs  
+- Improved battle system  
 
 You can suggest more features in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ).  
 
