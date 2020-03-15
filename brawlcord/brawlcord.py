@@ -11,7 +11,6 @@ from math import ceil
 
 # Discord
 import discord
-from discord.ext import tasks
 from redbot.core import Config, checks, commands
 from redbot.core.bot import Red
 from redbot.core.commands.context import Context
@@ -47,7 +46,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.2"
+__version__ = "2.0.1"
 __author__ = "Snowsee"
 
 default = {
@@ -190,9 +189,16 @@ class Brawlcord(commands.Cog):
                 logging.exception("Error in task", exc_info=exc)
                 print("Error in task:", exc)
 
-        self.update_token_bank.start()
-        self.update_status.start()
-        self.update_shop_and_st.start()
+        self.bank_update_task = self.bot.loop.create_task(
+            self.update_token_bank()
+        )
+        self.status_task = self.bot.loop.create_task(self.update_status())
+        self.shop_and_st_task = self.bot.loop.create_task(
+            self.update_shop_and_st()
+        )
+        self.bank_update_task.add_done_callback(error_callback)
+        self.shop_and_st_task.add_done_callback(error_callback)
+        self.status_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -2097,40 +2103,42 @@ class Brawlcord(commands.Cog):
             await self.update_player_stat(
                 user, 'brawlers', trophies, substat=brawler, sub_index='pb')
 
-    @tasks.loop(minutes=1)
     async def update_token_bank(self):
         """Task to update token banks."""
 
-        for user in self.bot.users:
-            tokens_in_bank = await self.get_player_stat(
-                user, 'tokens_in_bank')
-            if tokens_in_bank == 200:
-                continue
-            tokens_in_bank += 20
-            if tokens_in_bank > 200:
-                tokens_in_bank = 200
+        while True:
+            for user in self.bot.users:
+                tokens_in_bank = await self.get_player_stat(
+                    user, 'tokens_in_bank')
+                if tokens_in_bank == 200:
+                    continue
+                tokens_in_bank += 20
+                if tokens_in_bank > 200:
+                    tokens_in_bank = 200
 
-            bank_update_timestamp = await self.get_player_stat(
-                user, 'bank_update_ts')
+                bank_update_timestamp = await self.get_player_stat(
+                    user, 'bank_update_ts')
 
-            if not bank_update_timestamp:
-                continue
+                if not bank_update_timestamp:
+                    continue
 
-            bank_update_ts = datetime.utcfromtimestamp(
-                ceil(bank_update_timestamp))
-            time_now = datetime.utcnow()
-            delta = time_now - bank_update_ts
-            delta_min = delta.total_seconds() / 60
+                bank_update_ts = datetime.utcfromtimestamp(
+                    ceil(bank_update_timestamp))
+                time_now = datetime.utcnow()
+                delta = time_now - bank_update_ts
+                delta_min = delta.total_seconds() / 60
 
-            if delta_min >= 80:
-                await self.update_player_stat(
-                    user, 'tokens_in_bank', tokens_in_bank)
-                epoch = datetime(1970, 1, 1)
+                if delta_min >= 80:
+                    await self.update_player_stat(
+                        user, 'tokens_in_bank', tokens_in_bank)
+                    epoch = datetime(1970, 1, 1)
 
-                # get timestamp in UTC
-                timestamp = (time_now - epoch).total_seconds()
-                await self.update_player_stat(
-                    user, 'bank_update_ts', timestamp)
+                    # get timestamp in UTC
+                    timestamp = (time_now - epoch).total_seconds()
+                    await self.update_player_stat(
+                        user, 'bank_update_ts', timestamp)
+
+            await asyncio.sleep(60)
 
     def get_rank(self, pb):
         """Return rank of the Brawler based on its personal best."""
@@ -2647,24 +2655,26 @@ class Brawlcord(commands.Cog):
             ctx, getattr(error, "original", error), unhandled_by_cog=True
         )
 
-    @tasks.loop(minutes=2)
     async def update_status(self):
         """Task to update bot's status with total guilds.
 
         Runs every 2 minutes.
         """
 
-        prefix = (await self.bot.get_valid_prefixes())[0]
+        await self.bot.wait_until_ready()
+        while True:
 
-        guilds = len(self.bot.guilds)
+            prefix = (await self.bot.get_valid_prefixes())[0]
 
-        await self.bot.change_presence(
-            activity=discord.Game(
-                name=f'{prefix}help | {guilds} Servers'
+            guilds = len(self.bot.guilds)
+
+            await self.bot.change_presence(
+                activity=discord.Game(
+                    name=f'{prefix}help | {guilds} Servers'
+                )
             )
-        )
 
-        # await asyncio.sleep(120)
+            await asyncio.sleep(120)
 
     async def create_shop(self, user: discord.User, update=True) -> Shop:
 
@@ -2687,28 +2697,32 @@ class Brawlcord(commands.Cog):
 
         return shop
 
-    @tasks.loop(minutes=2)
     async def update_shop_and_st(self):
         """Task to update daily shop and star tokens."""
 
-        for user in self.bot.users:
-            s_reset = await self.config.shop_reset_ts()
-            if not s_reset:
-                # first reset
-                await self.create_shop(user)
-                continue
-            diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
-            if diff.days > 0:
-                await self.create_shop(user)
+        await self.bot.wait_until_ready()
 
-            st_reset = await self.config.st_reset_ts()
-            if not st_reset:
-                # first reset
-                await self.reset_st(user)
-                continue
-            diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
-            if diff.days > 0:
-                await self.reset_st(user)
+        while not self.bot.is_closed():
+            for user in self.bot.users:
+                s_reset = await self.config.shop_reset_ts()
+                if not s_reset:
+                    # first reset
+                    await self.create_shop(user)
+                    continue
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
+                if diff.days > 0:
+                    await self.create_shop(user)
+
+                st_reset = await self.config.st_reset_ts()
+                if not st_reset:
+                    # first reset
+                    await self.reset_st(user)
+                    continue
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
+                if diff.days > 0:
+                    await self.reset_st(user)
+
+            await asyncio.sleep(300)
 
     async def _view_shop(self, ctx: Context):
         """Sends shop embeds."""
@@ -2748,9 +2762,9 @@ class Brawlcord(commands.Cog):
         await self.config.st_reset_ts.set(timestamp)
 
     def cog_unload(self):
-        self.update_token_bank.cancel()
-        self.update_status.cancel()
-        self.update_shop_and_st.cancel()
+        self.bank_update_task.cancel()
+        self.status_task.cancel()
+        self.shop_and_st_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
