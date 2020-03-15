@@ -1,12 +1,4 @@
-<h1 align="center">
-  <br>
-  <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
-  <br>
-  <a href="https://snowsee.github.io/brawlcord/">Brawlcord Discord Bot</a>
-  <br>
-</h1>
-
-<h4 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot">Invite to your server! </a></i></h4>
+<h1 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot">Invite to your server! </a></i></h1>
 
 <p align="center">
   <a href="#general">General</a>
