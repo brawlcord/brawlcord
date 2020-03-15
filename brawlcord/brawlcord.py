@@ -57,7 +57,8 @@ default = {
         "duration": None,
         "setting": False
     },
-    "shop_reset_ts": None  # shop reset timestamp
+    "shop_reset_ts": None,  # shop reset timestamp
+    "st_reset_ts": None  # star tokens reset timestamp
 }
 
 default_user = {
@@ -107,12 +108,13 @@ default_user = {
         "bigbox": 0,
         "megabox": 0
     },
-    "shop": {}
+    "shop": {},
+    # list of gamemodes where the user
+    # already received daily star tokens
+    "todays_st": []
 }
 
-imgur_links = {
-    "shelly_tut": "https://i.imgur.com/QfKYzso.png"
-}
+shelly_tut = "https://i.imgur.com/QfKYzso.png"
 
 reward_types = {
     1: ["Gold", emojis["gold"]],
@@ -194,12 +196,12 @@ class Brawlcord(commands.Cog):
         self.status_task = self.bot.loop.create_task(
             self.update_status()
         )
-        self.shop_task = self.bot.loop.create_task(
-            self.update_shop()
+        self.shop_and_st_task = self.bot.loop.create_task(
+            self.update_shop_and_st()
         )
         self.bank_update_task.add_done_callback(error_callback)
         self.status_task.add_done_callback(error_callback)
-        self.shop_task.add_done_callback(error_callback)
+        self.shop_and_st_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -348,12 +350,13 @@ class Brawlcord(commands.Cog):
 
         try:
             first_player, second_player = await g.initialize(ctx)
+            winner, loser = await g.play(ctx)
         except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
             return
         except Exception as exc:
             traceback.print_tb(exc.__traceback__)
             return await ctx.send(
-                f"Error: \"{exc}\" with initialising brawl."
+                f"Error: \"{exc}\" with brawl."
                 " Please notify bot owner by using `-report` command."
             )
         finally:
@@ -363,35 +366,18 @@ class Brawlcord(commands.Cog):
             except (ValueError, AttributeError):
                 pass
 
-        try:
-            winner, loser = await g.play(ctx)
-        except (asyncio.TimeoutError, UserRejected, discord.Forbidden):
-            return
-        except Exception as exc:
-            traceback.print_tb(exc.__traceback__)
-            return await ctx.send(
-                f"Error: \"{exc}\" with brawl. Please notify bot owner"
-                " by using `-report` command."
-            )
-
         players = [first_player, second_player]
 
-        starplayer = random.choice(players)
-
         if winner:
-            # starplayer = winner
             await ctx.send(
                 f"{first_player.mention} {second_player.mention}"
                 f" Match ended. Winner: {winner.name}!"
             )
         else:
-            # starplayer = random.choice(players)
             await ctx.send(
                 f"{first_player.mention} {second_player.mention}"
                 " The match ended in a draw!"
             )
-
-        starplayer = None
 
         count = 0
         for player in players:
@@ -404,28 +390,20 @@ class Brawlcord(commands.Cog):
             else:
                 points = 0
 
-            if player == starplayer:
-                is_starplayer = True
-            else:
-                is_starplayer = False
-
-            (
-                brawl_rewards,
-                rank_up_rewards,
-                trophy_road_reward
-            ) = await self.brawl_rewards(player, points, is_starplayer)
+            # brawl rewards, rank up rewards and trophy road rewards
+            br, rur, trr = await self.brawl_rewards(player, points, gm)
 
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
             level_up = await self.xp_handler(player)
-            await player.send(embed=brawl_rewards)
+            await player.send(embed=br)
             if level_up:
                 await player.send(f"{level_up[0]}\n{level_up[1]}")
-            if rank_up_rewards:
-                await player.send(embed=rank_up_rewards)
-            if trophy_road_reward:
-                await player.send(embed=trophy_road_reward)
+            if rur:
+                await player.send(embed=rur)
+            if trr:
+                await player.send(embed=trr)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -450,7 +428,7 @@ class Brawlcord(commands.Cog):
         embed = discord.Embed(
             color=EMBED_COLOR, title="Tutorial", description=desc)
         # embed.set_author(name=author, icon_url=author_avatar)
-        embed.set_thumbnail(url=imgur_links["shelly_tut"])
+        embed.set_thumbnail(url=shelly_tut)
 
         tut_str = (
             f"This {emojis['gem']} is a Gem. All the gems are mine!"
@@ -1893,15 +1871,23 @@ class Brawlcord(commands.Cog):
             return brawlers[brawler_name][stat]
 
     async def brawl_rewards(
-        self, user: discord.User,
-        points: int, is_starplayer=False
+        self,
+        user: discord.User,
+        points: int,
+        gm: str,
+        is_starplayer=False,
     ):
-        """Adjust user variables and return embed containing reward."""
+        """Adjust user variables and return embeds containing reward."""
 
+        star_token = 0
         if points > 0:
             reward_tokens = 20
             reward_xp = 8
             position = 1
+            async with self.config.user(user).todays_st() as todays_st:
+                if gm not in todays_st:
+                    star_token = 1
+                    todays_st.append(gm)
         elif points < 0:
             reward_tokens = 10
             reward_xp = 4
@@ -1953,6 +1939,9 @@ class Brawlcord(commands.Cog):
             substat=selected_brawler, sub_index='trophies'
         )
         await self.update_player_stat(user, 'token_doubler', upd_td)
+        await self.update_player_stat(
+            user, 'startokens', star_token, add_self=True
+        )
         await self.handle_pb(user, selected_brawler)
 
         user_avatar = user.avatar_url
@@ -1962,9 +1951,8 @@ class Brawlcord(commands.Cog):
 
         reward_xp_str = (
             "{}".format(
-                (
                     f'{reward_xp} (Star Player)' if is_starplayer
-                    else f'{reward_xp}')
+                    else f'{reward_xp}'
             )
         )
 
@@ -1979,6 +1967,13 @@ class Brawlcord(commands.Cog):
             embed.add_field(
                 name="Token Doubler",
                 value=f"{emojis['tokendoubler']} x{upd_td} remaining!"
+            )
+
+        if star_token:
+            embed.add_field(
+                name="Star Token",
+                value=f"{emojis['startoken']} 1",
+                inline=False
             )
 
         rank_up = await self.handle_rank_ups(user, selected_brawler)
@@ -2667,15 +2662,28 @@ class Brawlcord(commands.Cog):
 
         return shop
 
-    async def update_shop(self):
-        """Task to update daily shop."""
+    async def update_shop_and_st(self):
+        """Task to update daily shop and star tokens."""
 
         while True:
             for user in self.bot.users:
-                reset = await self.config.shop_reset_ts()
-                diff = datetime.utcnow() - datetime.utcfromtimestamp(reset)
+                s_reset = await self.config.shop_reset_ts()
+                if not s_reset:
+                    # first reset
+                    await self.create_shop(user)
+                    continue
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
                 if diff.days > 0:
                     await self.create_shop(user)
+
+                st_reset = await self.config.st_reset_ts()
+                if not st_reset:
+                    # first reset
+                    await self.reset_st(user)
+                    continue
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
+                if diff.days > 0:
+                    await self.reset_st(user)
 
             await asyncio.sleep(300)
 
@@ -2704,10 +2712,22 @@ class Brawlcord(commands.Cog):
 
         await menu(ctx, em, DEFAULT_CONTROLS)
 
+    async def reset_st(self, user: discord.User):
+        """Reset user star tokens list and update timestamp."""
+
+        async with self.config.user(user).todays_st() as todays_st:
+            todays_st.clear()
+
+        time_now = datetime.utcnow()
+        epoch = datetime(1970, 1, 1)
+        # get timestamp in UTC
+        timestamp = (time_now - epoch).total_seconds()
+        await self.config.st_reset_ts.set(timestamp)
+
     def cog_unload(self):
         self.bank_update_task.cancel()
         self.status_task.cancel()
-        self.shop_task.cancel()
+        self.shop_and_st_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
