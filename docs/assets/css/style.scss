@@ -1,0 +1,29 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+ul {
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+li {
+    padding-left: 1em;
+    text-indent: -1em;
+}
+
+li:before {
+    content: ">|";
+    padding-right: 5px;
+    color: #f4a70b;
+    font-weight: bolder;
+}
+
+blockquote {
+    border-left: 2px solid #f4a70b;
+    margin: 0;
+    padding: 0 0 0 20px;
+    font-style:italic
+}
