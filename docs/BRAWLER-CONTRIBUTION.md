@@ -228,15 +228,15 @@ The best place to find all the data is the [Brawl Stars Wiki](https://brawlstars
 - [ ] 8-Bit
 - [ ] Emz
 - [ ] Rosa
-- [ ] Frank
+- [X] Frank
 - [ ] Bibi
 - [ ] Bea
-- [ ] Mortis
-- [ ] Tara
+- [X] Mortis
+- [X] Tara
 - [ ] Gene
 - [ ] Max
 - [ ] Mr. P
-- [ ] Crow
-- [ ] Spike
+- [X] Crow
+- [X] Spike
 - [ ] Leon
 - [ ] Sandy
