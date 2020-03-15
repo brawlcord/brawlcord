@@ -1811,6 +1811,36 @@ class Brawlcord(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(name="startokens")
+    @maintenance()
+    async def _star_tokens(self, ctx: Context):
+        """Show details of today's star tokens."""
+
+        todays_st = await self.config.user(ctx.author).todays_st()
+
+        user_gamemodes = await self.config.user(ctx.author).gamemodes()
+
+        collected = ""
+        not_collected = ""
+
+        for gamemode in user_gamemodes:
+            if gamemode not in gamemodes_map:
+                continue
+            if gamemode in todays_st:
+                collected += f"\n{gamemode_emotes[gamemode]} {gamemode}"
+            else:
+                not_collected += f"\n{gamemode_emotes[gamemode]} {gamemode}"
+
+        embed = discord.Embed(
+            colour=EMBED_COLOR
+        )
+        if collected:
+            embed.add_field(name="Collected", value=collected)
+        if not_collected:
+            embed.add_field(name="Not Collected", value=not_collected)
+
+        await ctx.send(embed=embed)
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
