@@ -255,7 +255,7 @@ class GameMode:
         self, winner: discord.User, loser: discord.User, game_type="3v3"
     ):
         """Update wins/loss stats of both players."""
-        if not winner and not loser:
+        if winner is None and loser is None:
             # in case of draw, winner and loser are "None"
             return
 
@@ -459,12 +459,12 @@ class GameMode:
     async def handle_stun(self, stunned: Player, other: Player):
         """Send stun messages and set stun to False."""
 
-        if stunned != self.guild.me:
+        if stunned.player != self.guild.me:
             await stunned.player.send(
                 "**You are stunned!**"
             )
 
-        if other != self.guild.me:
+        if other.player != self.guild.me:
             await other.player.send("**Opponent is stunned!**")
 
         stunned.stunned = False
@@ -845,7 +845,7 @@ class Showdown(GameMode):
         # time up
         winner, loser = await self.time_up(winner, loser)
 
-        await self.update_stats(winner, loser)
+        await self.update_stats(winner, loser, game_type='solo')
 
         return winner, loser
 
