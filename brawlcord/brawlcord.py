@@ -8,7 +8,6 @@ import traceback
 import urllib.request
 from datetime import datetime, timedelta
 from math import ceil
-from typing import Union
 
 # Discord
 import discord
@@ -47,7 +46,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 __author__ = "Snowsee"
 
 default = {
@@ -1747,18 +1746,19 @@ class Brawlcord(commands.Cog):
 
     @_shop.command(name="buy")
     @maintenance()
-    async def _shop_buy(self, ctx: Context, item_number: Union[str, int]):
+    async def _shop_buy(self, ctx: Context, item_number: str):
         """Buy items from the daily shop"""
 
         data = await self.config.user(ctx.author).shop()
 
         shop = Shop.from_json(data)
 
-        if isinstance(item_number, int):
+        try:
+            item_number = int(item_number)
             new_data = await shop.buy_item(
                 ctx, ctx.author, self.config, self.BRAWLERS, item_number
             )
-        else:
+        except ValueError:
             new_data = await shop.buy_skin(
                 ctx, ctx.author, self.config,
                 self.BRAWLERS, item_number.upper()

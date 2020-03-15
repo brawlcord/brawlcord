@@ -67,11 +67,11 @@ class Shop:
 
         shop_items = {
             "brawlbox": {
-                "quantity": 0, "cost": 0
+                "quantity": 0, "cost": 0, "number": 0
             },
             "starpowers": [],
             "tickets": {
-                "quantity": 0, "cost": 0
+                "quantity": 0, "cost": 0, "number": 0
             },
             "powerpoints": [],
             "gem_skins": [],
@@ -438,25 +438,27 @@ class Shop:
         found = False
 
         # check for brawl box
-        if item_number == self.shop_items["brawlbox"]["number"]:
-            if await self.can_not_buy(
-                ctx, item_number, self.shop_items["brawlbox"]
-            ):
-                return
-            found = True
-            await self.buy_brawlbox(ctx, user, config, brawlers)
-            self.shop_items["brawlbox"]["cost"] = "Claimed!"
-
-        if not found:
-            # check for tickets
-            if item_number == self.shop_items["tickets"]["number"]:
+        if self.shop_items["brawlbox"]["quantity"]:
+            if item_number == self.shop_items["brawlbox"]["number"]:
                 if await self.can_not_buy(
-                    ctx, item_number, self.shop_items["tickets"]
+                    ctx, item_number, self.shop_items["brawlbox"]
                 ):
                     return
                 found = True
-                await self.buy_ticket(ctx, user, config)
-                self.shop_items["tickets"]["cost"] = "Claimed!"
+                await self.buy_brawlbox(ctx, user, config, brawlers)
+                self.shop_items["brawlbox"]["cost"] = "Claimed!"
+
+        if not found:
+            # check for tickets
+            if self.shop_items["tickets"]["quantity"]:
+                if item_number == self.shop_items["tickets"]["number"]:
+                    if await self.can_not_buy(
+                        ctx, item_number, self.shop_items["tickets"]
+                    ):
+                        return
+                    found = True
+                    await self.buy_ticket(ctx, user, config)
+                    self.shop_items["tickets"]["cost"] = "Claimed!"
 
             # check for power point
             else:
