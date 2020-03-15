@@ -649,9 +649,9 @@
             "desc": "Mortis gains a Dash Bar! His dash range is increased by 75% when the bar is fully charged. It takes 3.5 seconds for the bar to charge when Mortis has all three dashes ready."
         },
         "skins": {
-            "Pink": [-1, 500],
-            "Calavera": [-1, -1],
-            "Cupid": [150, -1]
+            "Top Hat": [0, 0],
+            "Rockabilly": [150, -1],
+            "Night Witch": [150, -1]
         }
     },
     "Frank": {
