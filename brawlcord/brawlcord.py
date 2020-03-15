@@ -189,16 +189,16 @@ class Brawlcord(commands.Cog):
                 logging.exception("Error in task", exc_info=exc)
                 print("Error in task:", exc)
 
-        self.bank_update_task = self.bot.loop.create_task(
-            self.update_token_bank()
-        )
-        self.status_task = self.bot.loop.create_task(self.update_status())
-        self.shop_and_st_task = self.bot.loop.create_task(
-            self.update_shop_and_st()
-        )
-        self.bank_update_task.add_done_callback(error_callback)
-        self.shop_and_st_task.add_done_callback(error_callback)
-        self.status_task.add_done_callback(error_callback)
+        # self.bank_update_task = self.bot.loop.create_task(
+        #     self.update_token_bank()
+        # )
+        # self.status_task = self.bot.loop.create_task(self.update_status())
+        # self.shop_and_st_task = self.bot.loop.create_task(
+        #     self.update_shop_and_st()
+        # )
+        # self.bank_update_task.add_done_callback(error_callback)
+        # self.shop_and_st_task.add_done_callback(error_callback)
+        # self.status_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -2670,7 +2670,7 @@ class Brawlcord(commands.Cog):
 
             await self.bot.change_presence(
                 activity=discord.Game(
-                    name=f'{prefix}help | {guilds} Servers'
+                    name=f'{prefix}help | Brawling in {guilds} servers'
                 )
             )
 
@@ -2703,23 +2703,33 @@ class Brawlcord(commands.Cog):
         await self.bot.wait_until_ready()
 
         while not self.bot.is_closed():
+            s_reset = await self.config.shop_reset_ts()
+            create_shop = False
+            if not s_reset:
+                # first reset
+                create_shop = True
+            shop_diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
+
+            st_reset = await self.config.st_reset_ts()
+            reset = False
+            if not st_reset:
+                # first reset
+                reset = True
+                continue
+            st_diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
+
             for user in self.bot.users:
-                s_reset = await self.config.shop_reset_ts()
-                if not s_reset:
-                    # first reset
+                if create_shop:
                     await self.create_shop(user)
                     continue
-                diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
-                if diff.days > 0:
+                if shop_diff.days > 0:
                     await self.create_shop(user)
 
                 st_reset = await self.config.st_reset_ts()
-                if not st_reset:
-                    # first reset
+                if reset:
                     await self.reset_st(user)
                     continue
-                diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
-                if diff.days > 0:
+                if st_diff.days > 0:
                     await self.reset_st(user)
 
             await asyncio.sleep(300)
@@ -2762,9 +2772,9 @@ class Brawlcord(commands.Cog):
         await self.config.st_reset_ts.set(timestamp)
 
     def cog_unload(self):
-        self.bank_update_task.cancel()
-        self.status_task.cancel()
-        self.shop_and_st_task.cancel()
+        # self.bank_update_task.cancel()
+        # self.status_task.cancel()
+        # self.shop_and_st_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
