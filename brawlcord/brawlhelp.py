@@ -34,11 +34,6 @@ class BrawlcordHelp(RedHelpFormatter):
     async def format_bot_help(self, ctx: Context):
         """Format the default help message"""
 
-        description = (
-            "Play a simple version of Brawl Stars on Discord. Use `-tutorial`"
-            " command to begin."
-        )
-
         tagline = (
             f"Type {ctx.clean_prefix}help <command>"
             " for more info on a command."
@@ -50,12 +45,12 @@ class BrawlcordHelp(RedHelpFormatter):
 
         if await ctx.embed_requested():
             emb = {
-                "embed": {"title": "", "description": description},
+                "embed": {"title": "", "description": ""},
                 "footer": {"text": ""}, "fields": []
             }
 
             # do not change
-            emb["embed"]["title"] = "Brawlcord"
+            # emb["embed"]["title"] = "Brawlcord"
             emb["footer"]["text"] = tagline
 
             general_cmd = [
@@ -65,8 +60,8 @@ class BrawlcordHelp(RedHelpFormatter):
             rewards_cmd = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
 
             utility_cmd = [
-                "leaderboard", "tutorial", "select",
-                "brawlcord", "report", "invite"
+                "leaderboard", "tutorial", "select", "brawlcord",
+                "report", "invite", "skins", "startokens"
             ]
 
             misc_cmd = ["setprefix", "info", "licenseinfo"]
