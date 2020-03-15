@@ -6,8 +6,9 @@ import random
 import re
 import traceback
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta
 from math import ceil
+from typing import Union
 
 # Discord
 import discord
@@ -41,6 +42,7 @@ from .emojis import (
 )
 from .errors import MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
+from .shop import Shop
 from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
@@ -54,7 +56,8 @@ default = {
     "maintenance": {
         "duration": None,
         "setting": False
-    }
+    },
+    "shop_reset_ts": None  # shop reset timestamp
 }
 
 default_user = {
@@ -191,8 +194,12 @@ class Brawlcord(commands.Cog):
         self.status_task = self.bot.loop.create_task(
             self.update_status()
         )
+        self.shop_task = self.bot.loop.create_task(
+            self.update_shop()
+        )
         self.bank_update_task.add_done_callback(error_callback)
         self.status_task.add_done_callback(error_callback)
+        self.shop_task.add_done_callback(error_callback)
 
     async def initialize(self):
         brawlers_fp = bundled_data_path(self) / "brawlers.json"
@@ -1752,6 +1759,43 @@ class Brawlcord(commands.Cog):
             f" {'prefix' if len(prefixes) == 1 else 'prefixes'}."
         )
 
+    @commands.group(name="shop")
+    @maintenance()
+    async def _shop(self, ctx: Context):
+        """View your daily shop and buy items!"""
+
+        if not ctx.invoked_subcommand:
+            await self._view_shop(ctx)
+
+    @_shop.command(name="buy")
+    @maintenance()
+    async def _shop_buy(self, ctx: Context, item_number: Union[str, int]):
+        """Buy items from the daily shop!"""
+
+        data = await self.config.user(ctx.author).shop()
+
+        shop = Shop.from_json(data)
+
+        if isinstance(item_number, int):
+            new_data = await shop.buy_item(
+                ctx, ctx.author, self.config, self.BRAWLERS, item_number
+            )
+        else:
+            new_data = await shop.buy_skin(
+                ctx, ctx.author, self.config,
+                self.BRAWLERS, item_number.upper()
+            )
+
+        if new_data:
+            await self.config.user(ctx.author).shop.set(new_data)
+
+    @_shop.command(name="view")
+    @maintenance()
+    async def _shop_view(self, ctx: Context):
+        """View your daily shop!"""
+
+        await self._view_shop(ctx)
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
@@ -2565,9 +2609,68 @@ class Brawlcord(commands.Cog):
 
             await asyncio.sleep(120)
 
+    async def create_shop(self, user: discord.User, update=True) -> Shop:
+
+        brawler_data = await self.get_player_stat(
+            user, 'brawlers', is_iter=True
+        )
+
+        shop = Shop(self.BRAWLERS, brawler_data)
+        shop.generate_shop_items()
+        data = shop.to_json()
+
+        await self.config.user(user).shop.set(data)
+
+        if update:
+            time_now = datetime.utcnow()
+            epoch = datetime(1970, 1, 1)
+            # get timestamp in UTC
+            timestamp = (time_now - epoch).total_seconds()
+            await self.config.shop_reset_ts.set(timestamp)
+
+        return shop
+
+    async def update_shop(self):
+        """Task to update daily shop."""
+
+        while True:
+            for user in self.bot.users:
+                reset = await self.config.shop_reset_ts()
+                diff = datetime.utcnow() - datetime.utcfromtimestamp(reset)
+                if diff.days > 0:
+                    await self.create_shop(user)
+
+            await asyncio.sleep(300)
+
+    async def _view_shop(self, ctx: Context):
+        """Sends shop embeds."""
+
+        user = ctx.author
+
+        shop_data = await self.config.user(user).shop()
+        if not shop_data:
+            shop = await self.create_shop(user, update=False)
+        else:
+            shop = Shop.from_json(shop_data)
+
+        last_reset = datetime.utcfromtimestamp(
+            await self.config.shop_reset_ts()
+        )
+
+        next_reset = last_reset + timedelta(days=1)
+
+        next_reset_str = humanize_timedelta(
+            timedelta=next_reset - datetime.utcnow()
+        )
+
+        em = shop.create_items_embeds(user, next_reset_str)
+
+        await menu(ctx, em, DEFAULT_CONTROLS)
+
     def cog_unload(self):
         self.bank_update_task.cancel()
         self.status_task.cancel()
+        self.shop_task.cancel()
         if old_invite:
             try:
                 self.bot.remove_command("invite")
