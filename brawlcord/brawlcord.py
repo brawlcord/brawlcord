@@ -158,7 +158,6 @@ class Brawlcord(commands.Cog):
     def __init__(self, bot: Red):
         self.bot = bot
 
-        # self._brawl_countdown = {}
         self.sessions = []
         self.tasks = {}
         self.locks = {}
@@ -189,14 +188,14 @@ class Brawlcord(commands.Cog):
                 logging.exception("Error in task", exc_info=exc)
                 print("Error in task:", exc)
 
-        # self.bank_update_task = self.bot.loop.create_task(
-        #     self.update_token_bank()
-        # )
+        self.bank_update_task = self.bot.loop.create_task(
+            self.update_token_bank()
+        )
         self.status_task = self.bot.loop.create_task(self.update_status())
         self.shop_and_st_task = self.bot.loop.create_task(
             self.update_shop_and_st()
         )
-        # self.bank_update_task.add_done_callback(error_callback)
+        self.bank_update_task.add_done_callback(error_callback)
         self.shop_and_st_task.add_done_callback(error_callback)
         self.status_task.add_done_callback(error_callback)
 
@@ -2107,7 +2106,7 @@ class Brawlcord(commands.Cog):
         """Task to update token banks."""
 
         while True:
-            for user in self.bot.users:
+            for user in await self.config.all_users():
                 tokens_in_bank = await self.get_player_stat(
                     user, 'tokens_in_bank')
                 if tokens_in_bank == 200:
@@ -2718,7 +2717,7 @@ class Brawlcord(commands.Cog):
                 continue
             st_diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
 
-            for user in self.bot.users:
+            for user in await self.config.all_users():
                 if create_shop:
                     await self.create_shop(user)
                     continue
@@ -2772,7 +2771,7 @@ class Brawlcord(commands.Cog):
         await self.config.st_reset_ts.set(timestamp)
 
     def cog_unload(self):
-        # self.bank_update_task.cancel()
+        self.bank_update_task.cancel()
         self.status_task.cancel()
         self.shop_and_st_task.cancel()
         if old_invite:
