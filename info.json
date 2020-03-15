@@ -1,5 +1,5 @@
 {
-    "author" : "snowsee",
+    "author" : ["snowsee"],
     "install_msg" : "Thank you for installing the Brawlcord cog.",
     "name" : "Brawlcord",
     "short" : "A simplified version of the game Brawl Stars, developed by Supercell.",

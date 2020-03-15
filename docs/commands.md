@@ -1,4 +1,4 @@
-<h1 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot">Invite to your server! </a></i></h1>
+<h1 align="center"><i> <a href="."> Main Page </a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot"> Invite Bot </a></i></h1>
 
 <p align="center">
   <a href="#general">General</a>
@@ -75,7 +75,7 @@
   - `-select brawler`: Change selected Brawler!
   - `-select skin`: Change selected skin!
   - `-select gamemode`: Change selected game mode!
-  - `-select sp`: Change select star power!
+  - `-select starpower`: Change select star power!
 
 - `-tutorial`: Begin the tutorial!
 

@@ -448,8 +448,8 @@ class Shop:
                 await self.buy_brawlbox(ctx, user, config, brawlers)
                 self.shop_items["brawlbox"]["cost"] = "Claimed!"
 
+        # check for tickets
         if not found:
-            # check for tickets
             if self.shop_items["tickets"]["quantity"]:
                 if item_number == self.shop_items["tickets"]["number"]:
                     if await self.can_not_buy(
@@ -460,18 +460,18 @@ class Shop:
                     await self.buy_ticket(ctx, user, config)
                     self.shop_items["tickets"]["cost"] = "Claimed!"
 
-            # check for power point
-            else:
-                for item in self.shop_items["powerpoints"]:
-                    if item_number == item["number"]:
-                        if await self.can_not_buy(ctx, item_number, item):
-                            return
-                        found = True
-                        if not await self.buy_powerpoint(
-                            ctx, user, config, item
-                        ):
-                            return
-                        item["cost"] = "Bought!"
+        # check for power point
+        if not found:
+            for item in self.shop_items["powerpoints"]:
+                if item_number == item["number"]:
+                    if await self.can_not_buy(ctx, item_number, item):
+                        return
+                    found = True
+                    if not await self.buy_powerpoint(
+                        ctx, user, config, item
+                    ):
+                        return
+                    item["cost"] = "Bought!"
 
         # check for star power
         if not found:
@@ -763,6 +763,6 @@ class Shop:
 
     async def can_not_buy(self, ctx: Context, num: int, item_data: dict):
         if item_data["cost"] in ["Claimed!", "Bought!"]:
-            cost = item_data['cost'].lower()[:-2]
+            cost = item_data['cost'].lower()[:-1]
             await ctx.send(f"You have already {cost} item #{num}.")
             return True
