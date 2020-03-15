@@ -46,7 +46,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.1"
+__version__ = "2.0.3"
 __author__ = "Snowsee"
 
 default = {
@@ -2107,6 +2107,9 @@ class Brawlcord(commands.Cog):
 
         while True:
             for user in await self.config.all_users():
+                user = self.bot.get_user(user)
+                if not user:
+                    continue
                 tokens_in_bank = await self.get_player_stat(
                     user, 'tokens_in_bank')
                 if tokens_in_bank == 200:
@@ -2718,6 +2721,9 @@ class Brawlcord(commands.Cog):
             st_diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
 
             for user in await self.config.all_users():
+                user = self.bot.get_user(user)
+                if not user:
+                    continue
                 if create_shop:
                     await self.create_shop(user)
                     continue
