@@ -1796,6 +1796,43 @@ class Brawlcord(commands.Cog):
 
         await self._view_shop(ctx)
 
+    @commands.command(name="skins")
+    @maintenance()
+    async def _skins(self, ctx: Context):
+        """View all skins you own."""
+
+        brawler_data = await self.get_player_stat(
+            ctx.author, 'brawlers', is_iter=True
+        )
+
+        embed = discord.Embed(
+            colour=EMBED_COLOR
+        )
+        embed.set_author(
+            name=f"{ctx.author.name}'s Skins", icon_url=ctx.author.avatar_url
+        )
+
+        total = 0
+        for brawler in brawler_data:
+            skins = brawler_data[brawler]["skins"]
+            if len(skins) < 2:
+                continue
+            brawler_skins = ""
+            for skin in skins:
+                if skin == "Default":
+                    continue
+                brawler_skins += f"\n- {skin} {brawler}"
+                total += 1
+            embed.add_field(
+                name=f"{brawler_emojis[brawler]} {brawler} ({len(skins)-1})",
+                value=brawler_skins,
+                inline=False
+            )
+
+        embed.set_footer(text=f"Total Skins: {total}")
+
+        await ctx.send(embed=embed)
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
