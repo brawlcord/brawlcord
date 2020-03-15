@@ -367,6 +367,9 @@ class GameMode:
     def _move_spawn_attack(
         self, first: Player, second: Player, round_num: int
     ):
+        # spawns have 50% chance of attacking/healing
+        if not random.randint(0, 1):
+            return
         if first.spawn:
             vals = first.brawler._spawn(first.brawler_level)
             if isinstance(vals, list):
@@ -1049,6 +1052,9 @@ class Showdown(GameMode):
     def _move_spawn_attack(
         self, first: Player, second: Player, round_num: int
     ):
+        # spawns have 50% chance of attacking/healing
+        if not random.randint(0, 1):
+            return
         if first.spawn:
             vals = first.brawler._spawn(first.brawler_level)
             if isinstance(vals, list):
