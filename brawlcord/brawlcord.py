@@ -1716,7 +1716,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="setprefix")
     @commands.admin_or_permissions(manage_guild=True)
     async def _set_prefix(self, ctx: Context, *prefixes: str):
-        """Set Brawlcord's server prefix(es).
+        """Set Brawlcord's server prefix(es)
 
         Enter prefixes as a comma separated list.
         """
@@ -1740,7 +1740,7 @@ class Brawlcord(commands.Cog):
     @commands.group(name="shop")
     @maintenance()
     async def _shop(self, ctx: Context):
-        """View your daily shop and buy items!"""
+        """View your daily shop and buy items"""
 
         if not ctx.invoked_subcommand:
             await self._view_shop(ctx)
@@ -1748,7 +1748,7 @@ class Brawlcord(commands.Cog):
     @_shop.command(name="buy")
     @maintenance()
     async def _shop_buy(self, ctx: Context, item_number: Union[str, int]):
-        """Buy items from the daily shop!"""
+        """Buy items from the daily shop"""
 
         data = await self.config.user(ctx.author).shop()
 
@@ -1770,14 +1770,14 @@ class Brawlcord(commands.Cog):
     @_shop.command(name="view")
     @maintenance()
     async def _shop_view(self, ctx: Context):
-        """View your daily shop!"""
+        """View your daily shop"""
 
         await self._view_shop(ctx)
 
     @commands.command(name="skins")
     @maintenance()
     async def _skins(self, ctx: Context):
-        """View all skins you own."""
+        """View all skins you own"""
 
         brawler_data = await self.get_player_stat(
             ctx.author, 'brawlers', is_iter=True
@@ -1814,7 +1814,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="startokens")
     @maintenance()
     async def _star_tokens(self, ctx: Context):
-        """Show details of today's star tokens."""
+        """Show details of today's star tokens"""
 
         todays_st = await self.config.user(ctx.author).todays_st()
 
