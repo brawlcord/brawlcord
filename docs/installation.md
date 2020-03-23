@@ -1,4 +1,4 @@
-<h1 align="center"><i> <a href="."> Main Page </a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot"> Invite Bot </a></i></h1>
+<h1 align="center"><i> <a href=".">Main Page</a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot">Invite Bot</a></i></h1>
 
 While you can host an instance of Brawlcord yourself, please use [the public Brawlcord bot](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot) unless you have a good reason to host it yourself.
 
