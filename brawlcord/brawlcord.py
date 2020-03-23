@@ -46,7 +46,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.3"
+__version__ = "2.0.4"
 __author__ = "Snowsee"
 
 default = {
