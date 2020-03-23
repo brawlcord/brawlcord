@@ -2666,13 +2666,11 @@ class Brawlcord(commands.Cog):
         await self.bot.wait_until_ready()
         while True:
 
-            prefix = (await self.bot.get_valid_prefixes())[0]
-
             guilds = len(self.bot.guilds)
 
             await self.bot.change_presence(
                 activity=discord.Game(
-                    name=f'{prefix}help | Brawling in {guilds} servers'
+                    name=f'Brawl Stars in {guilds} servers'
                 )
             )
 
