@@ -9,7 +9,6 @@ from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
 from .brawlers import Brawler, brawlers_map
-from .brawlhelp import EMBED_COLOR
 from .emojis import brawler_emojis, emojis, gamemode_emotes
 from .errors import UserRejected
 
@@ -23,6 +22,10 @@ spawn_text = {
 
 healing_over_time = 100
 healing_time = 3
+
+DEFAULT_COLOR = 0xADFF74
+RESPAWN_COLOR = 0xFF7474
+SUPER_COLOR = 0xFFA232
 
 
 class Player:
@@ -622,8 +625,15 @@ class GemGrab(GameMode):
         else:
             opp_super_emote = emojis['supernotready']
 
+        if second.is_respawning:
+            color = RESPAWN_COLOR
+        elif first.can_super:
+            color = SUPER_COLOR
+        else:
+            color = DEFAULT_COLOR
+
         embed = discord.Embed(
-            color=EMBED_COLOR,
+            color=color,
             title=f"Brawl against {second.player.name}"
         )
         embed.set_author(
@@ -889,8 +899,13 @@ class Showdown(GameMode):
         else:
             opp_super_emote = emojis['supernotready']
 
+        if first.can_super:
+            color = SUPER_COLOR
+        else:
+            color = DEFAULT_COLOR
+
         embed = discord.Embed(
-            color=EMBED_COLOR,
+            color=color,
             title=f"Brawl against {second.player.name}"
         )
         embed.set_author(

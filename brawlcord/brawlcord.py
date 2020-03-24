@@ -17,27 +17,15 @@ from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.chat_formatting import pagify
 from redbot.core.utils.menus import (
-    menu, start_adding_reactions, DEFAULT_CONTROLS
+    DEFAULT_CONTROLS, menu, start_adding_reactions
 )
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
 from .brawlers import Brawler, brawler_thumb, brawlers_map
-from .brawlhelp import (
-    COMMUNITY_LINK,
-    EMBED_COLOR,
-    INVITE_URL,
-    REDDIT_LINK,
-    SOURCE_LINK,
-    BrawlcordHelp
-)
+from .brawlhelp import BrawlcordHelp, COMMUNITY_SERVER, INVITE_URL
 from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
 from .emojis import (
-    brawler_emojis,
-    emojis,
-    gamemode_emotes,
-    level_emotes,
-    rank_emojis,
-    sp_icons
+    brawler_emojis, emojis, gamemode_emotes, level_emotes, rank_emojis, sp_icons
 )
 from .errors import MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
@@ -46,7 +34,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.6"
+__version__ = "2.1.0"
 __author__ = "Snowsee"
 
 default = {
@@ -147,9 +135,13 @@ BRAWLCORD_CODE_URL = (
     "https://raw.githubusercontent.com/snowsee/brawlcord/"
     "release/brawlcord/brawlcord.py"
 )
+REDDIT_LINK = "https://www.reddit.com/user/Snowsee"
+SOURCE_LINK = "https://github.com/snowsee/brawlcord"
 
 DAY = 86400
 WEEK = 604800
+
+EMBED_COLOR = 0x74CFFF
 
 
 class Brawlcord(commands.Cog):
@@ -239,8 +231,8 @@ class Brawlcord(commands.Cog):
             f" a simple version of [Brawl Stars]({BRAWLSTARS}), a mobile"
             f" game developed by Supercell. \n\nBrawlcord has features"
             " such as interactive 1v1 Brawls, diverse Brawlers and"
-            " leaderboards! You can suggest more features in the community"
-            f" server (link below)!\n\n{ctx.me.name} is currently in"
+            " leaderboards! You can suggest more features in [the community"
+            f" server]({COMMUNITY_SERVER})!\n\n{ctx.me.name} is currently in"
             f" **{len(self.bot.guilds)}** servers!"
         )
 
@@ -252,8 +244,6 @@ class Brawlcord(commands.Cog):
         )
 
         embed = discord.Embed(color=EMBED_COLOR)
-
-        # embed.set_author(name=ctx.me.name, icon_url=ctx.me.avatar_url)
 
         embed.add_field(name="About Brawlcord", value=info, inline=False)
 
@@ -280,8 +270,8 @@ class Brawlcord(commands.Cog):
         embed.add_field(
             name="Feedback",
             value=(
-                f"You can give feedback to improve Brawlcord in the "
-                f"[Brawlcord community server]({COMMUNITY_LINK})."
+                f"You can give feedback to improve Brawlcord in"
+                f" [the community server]({COMMUNITY_SERVER})."
             ),
             inline=False
         )
@@ -471,7 +461,7 @@ class Brawlcord(commands.Cog):
             name="\u200b\n__Feedback:__",
             value=(
                 "You can give feedback to improve Brawlcord in the"
-                f" [Brawlcord community server]({COMMUNITY_LINK})."
+                f" [Brawlcord community server]({COMMUNITY_SERVER})."
             ),
             inline=False
         )
@@ -514,36 +504,38 @@ class Brawlcord(commands.Cog):
         embed.add_field(name="Highest Trophies",
                         value=f"{emojis['pb']} {pb:,}")
 
-        xp = await self.get_player_stat(user, 'xp')
-        lvl = await self.get_player_stat(user, 'lvl')
+        user_data = await self.config.user(user).all()
+
+        xp = user_data['xp']
+        lvl = user_data['lvl']
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
         embed.add_field(name="Experience Level",
                         value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
-        gold = await self.get_player_stat(user, 'gold')
+        gold = user_data['gold']
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}")
 
-        tokens = await self.get_player_stat(user, 'tokens')
+        tokens = user_data['tokens']
         embed.add_field(name="Tokens", value=f"{emojis['token']} {tokens}")
 
-        token_bank = await self.get_player_stat(user, 'tokens_in_bank')
+        token_bank = user_data['tokens_in_bank']
         embed.add_field(
             name="Tokens In Bank", value=f"{emojis['token']} {token_bank}"
         )
 
-        startokens = await self.get_player_stat(user, 'startokens')
+        startokens = user_data['startokens']
         embed.add_field(name="Star Tokens",
                         value=f"{emojis['startoken']} {startokens}")
 
-        token_doubler = await self.get_player_stat(user, 'token_doubler')
+        token_doubler = user_data['token_doubler']
         embed.add_field(name="Token Doubler",
                         value=f"{emojis['tokendoubler']} {token_doubler}")
 
-        gems = await self.get_player_stat(user, 'gems')
+        gems = user_data['gems']
         embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
 
-        starpoints = await self.get_player_stat(user, 'starpoints')
+        starpoints = user_data['starpoints']
         embed.add_field(name="Star Points",
                         value=f"{emojis['starpoints']} {starpoints}")
 
@@ -563,6 +555,8 @@ class Brawlcord(commands.Cog):
         if not user:
             user = ctx.author
 
+        user_data = await self.config.user(user).all()
+
         embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=f"{user.name}'s Profile",
                          icon_url=user.avatar_url)
@@ -580,21 +574,20 @@ class Brawlcord(commands.Cog):
         embed.add_field(name="Highest Trophies",
                         value=f"{emojis['pb']} {pb:,}")
 
-        xp = await self.get_player_stat(user, 'xp')
-        lvl = await self.get_player_stat(user, 'lvl')
+        xp = user_data['xp']
+        lvl = user_data['lvl']
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
         embed.add_field(name="Experience Level",
                         value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
-        brawl_stats = await self.get_player_stat(
-            user, 'brawl_stats', is_iter=True)
+        brawl_stats = user_data['brawl_stats']
 
         wins_3v3 = brawl_stats["3v3"][0]
         wins_solo = brawl_stats["solo"][0]
         wins_duo = brawl_stats["duo"][0]
 
-        embed.add_field(name="3 vs 3 Wins", value=f"{wins_3v3}")
+        embed.add_field(name="3 vs 3 Wins", value=f"{emojis['3v3']} {wins_3v3}")
         embed.add_field(
             name="Solo Wins",
             value=f"{gamemode_emotes['Solo Showdown']} {wins_solo}"
@@ -604,7 +597,7 @@ class Brawlcord(commands.Cog):
             value=f"{gamemode_emotes['Duo Showdown']} {wins_duo}"
         )
 
-        selected = await self.get_player_stat(user, 'selected', is_iter=True)
+        selected = user_data['selected']
         brawler = selected['brawler']
         sp = selected['starpower']
         skin = selected['brawler_skin']
@@ -719,8 +712,14 @@ class Brawlcord(commands.Cog):
 
         owned = await self.get_player_stat(user, 'brawlers', is_iter=True)
 
-        embed = discord.Embed(color=EMBED_COLOR)
-        embed.set_author(name=f"{user.name}'s Brawlers")
+        def create_embed(new=False):
+            embed = discord.Embed(color=EMBED_COLOR)
+            if not new:
+                embed.set_author(name=f"{user.name}'s Brawlers")
+
+            return embed
+
+        embeds = [create_embed()]
 
         # below code is to sort brawlers by their trophies
         brawlers = {}
@@ -753,6 +752,13 @@ class Brawlcord(commands.Cog):
             value = (f"{emote}`{trophies:>4}` {rank_emojis['br'+str(rank)]} |"
                      f" {emojis['powerplay']}`{pb:>4}`")
 
+            for i, embed in enumerate(embeds):
+                if len(embed.fields) == 25:
+                    if i == len(embeds) - 1:
+                        embed = create_embed(new=True)
+                        embeds.append(embed)
+                        break
+
             embed.add_field(
                 name=(
                     f"{brawler_emojis[brawler]} {skin.upper()}"
@@ -762,13 +768,14 @@ class Brawlcord(commands.Cog):
                 inline=False
             )
 
-        try:
-            await ctx.send(embed=embed)
-        except discord.Forbidden:
-            return await ctx.send(
-                "I do not have the permission to embed a link."
-                " Please give/ask someone to give me that permission."
-            )
+        for embed in embeds:
+            try:
+                await ctx.send(embed=embed)
+            except discord.Forbidden:
+                return await ctx.send(
+                    "I do not have the permission to embed a link."
+                    " Please give/ask someone to give me that permission."
+                )
 
     @commands.command(name="allbrawlers", aliases=['abrawlers', 'abrls'])
     @maintenance()
@@ -778,7 +785,8 @@ class Brawlcord(commands.Cog):
         owned = await self.get_player_stat(
             ctx.author, 'brawlers', is_iter=True)
 
-        embed = discord.Embed(color=EMBED_COLOR, title="All Brawlers")
+        embed = discord.Embed(color=EMBED_COLOR)
+        embed.set_author(name="All Brawlers")
 
         rarities = ["Trophy Road", "Rare",
                     "Super Rare", "Epic", "Mythic", "Legendary"]
@@ -1102,6 +1110,7 @@ class Brawlcord(commands.Cog):
         user = ctx.author
 
         startokens = await self.get_player_stat(user, 'startokens')
+        startokens = 100
 
         if startokens < 10:
             return await ctx.send(
@@ -1436,7 +1445,7 @@ class Brawlcord(commands.Cog):
             invite_url = discord.utils.oauth_url(data.id, permissions=perms)
             value = (
                 "Add Brawlcord to your server by **[clicking here]"
-                f"({invite_url})**.\n\nNote: By using the link"
+                f"({invite_url})**.\n\n**Note:** By using the link"
                 " above, Brawlcord will be able to"
                 " read messages,"
                 " send messages,"
@@ -1445,8 +1454,8 @@ class Brawlcord(commands.Cog):
                 " attach files,"
                 " add reactions,"
                 " and use external emojis"
-                " wherever allowed. You can remove the permissions manually,"
-                " but that may break the bot."
+                " wherever allowed.\n\n*You can remove the permissions manually,"
+                " but that may break the bot.*"
             )
         except Exception as exc:
             invite_url = None
@@ -1455,10 +1464,10 @@ class Brawlcord(commands.Cog):
                 " Notify bot owner using the `-report` command."
             )
 
-        embed = discord.Embed(color=0xFFA232)
+        embed = discord.Embed(color=0xFFA232, description=value)
         embed.set_author(
             name=f"Invite {ctx.me.name}", icon_url=ctx.me.avatar_url)
-        embed.add_field(name="__**Invite Link:**__", value=value)
+        # embed.add_field(name="__**Invite Link:**__", value=value)
 
         try:
             await ctx.send(embed=embed)

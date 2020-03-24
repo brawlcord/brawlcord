@@ -7,9 +7,10 @@ from redbot.core.commands import Context
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
-from .brawlhelp import EMBED_COLOR
 from .emojis import emojis, brawler_emojis, sp_icons
 from .utils import Box
+
+EMBED_COLOR = 0x74FFBE
 
 
 class Shop:
