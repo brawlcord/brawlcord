@@ -46,7 +46,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.4"
+__version__ = "2.0.5"
 __author__ = "Snowsee"
 
 default = {
@@ -1245,21 +1245,14 @@ class Brawlcord(commands.Cog):
 
         report_str = (
             f"`{datetime.utcnow().replace(microsecond=0)}` {ctx.author}"
-            f" (`{ctx.author.id}`) reported from `{ctx.guild}`: **{msg}**"
+            f" (`{ctx.author.id}`) reported from `{ctx.guild or 'DM'}`: **{msg}**"
         )
 
         channel_id = await self.config.report_channel()
 
         channel = None
         if channel_id:
-            for guild in self.bot.guilds:
-                try:
-                    channel = discord.utils.get(
-                        guild.text_channels, id=channel_id)
-                    if channel:
-                        break
-                except discord.Forbidden:
-                    pass
+            channel = self.bot.get_channel(channel_id)
 
         if channel:
             await channel.send(report_str)
@@ -1716,6 +1709,7 @@ class Brawlcord(commands.Cog):
 
     @commands.command(name="setprefix")
     @commands.admin_or_permissions(manage_guild=True)
+    @commands.guild_only()
     async def _set_prefix(self, ctx: Context, *prefixes: str):
         """Set Brawlcord's server prefix(es)
 
@@ -2498,7 +2492,7 @@ class Brawlcord(commands.Cog):
                 pass
 
         embed = discord.Embed(color=EMBED_COLOR, description=embed_desc)
-        embed.set_author(name=title, icon_url=ctx.guild.me.avatar_url)
+        embed.set_author(name=title, icon_url=ctx.me.avatar_url)
         embed.set_thumbnail(url=thumb_url)
 
         # add rank of user
@@ -2514,11 +2508,6 @@ class Brawlcord(commands.Cog):
                                 user, brawler_name)
                         else:
                             num, emoji = await self.get_league_data(trophies)
-                        # val_str += (
-                        #     f"\n**`{(idx+1):02d}.` {emoji}"
-                        #     f"`{trophies:>{padding}}`"
-                        #     f" {user.mention} - {user}**"
-                        # )
                         val_str += (
                             f"**\n`{(idx+1):02d}.` {user} {emoji}"
                             f"{trophies:>{padding},}**"
