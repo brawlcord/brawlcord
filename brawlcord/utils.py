@@ -4,7 +4,6 @@ import discord
 from redbot.core import commands
 from redbot.core.commands import Context
 
-from .brawlhelp import EMBED_COLOR
 from .emojis import brawler_emojis, emojis, sp_icons
 from .errors import MaintenanceError
 
@@ -20,6 +19,8 @@ default_stats = {
     "sp1": False,
     "sp2": False
 }
+
+EMBED_COLOR = 0xD574FF
 
 
 class Box:
@@ -183,7 +184,6 @@ class Box:
             color=EMBED_COLOR,
             title=f"{emojis['brawlbox']} Brawl Box"
         )
-        # embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(
             name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
 
@@ -298,7 +298,6 @@ class Box:
             color=EMBED_COLOR,
             title=f" {emojis['bigbox']} Big Box"
         )
-        embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(
             name="Gold", value=f"{emojis['gold']} {gold}", inline=False
         )
@@ -413,7 +412,6 @@ class Box:
         embed = discord.Embed(
             color=EMBED_COLOR, title=f" {emojis['megabox']} Mega Box"
         )
-        embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.add_field(
             name="Gold", value=f"{emojis['gold']} {gold}", inline=False)
 

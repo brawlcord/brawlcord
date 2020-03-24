@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+import discord
 from redbot.core.commands.context import Context
 from redbot.core.commands.help import RedHelpFormatter
 from redbot.core.utils.chat_formatting import pagify
@@ -10,18 +11,12 @@ INVITE_URL = (
     "https://discordapp.com/api/oauth2/authorize?client_id="
     "644118957917208576&permissions=321600&scope=bot"
 )
-SELF_EMOTE = "<:Brawlcord:648245740409323600>"
-DISCORD_EMOTE = "<:discord:648246368539901961>"
-GITHUB_LINK = "https://snowsee.github.io/brawlcord/"
-SOURCE_LINK = "https://github.com/snowsee/brawlcord"
-COMMUNITY_LINK = GITHUB_LINK + "#how-to-use"
-REDDIT_LINK = "https://www.reddit.com/user/Snowsee"
-EMBED_COLOR = 0xFFA232
+COMMANDS_PAGE = "https://snowsee.github.io/brawlcord/commands"
+COMMUNITY_SERVER = "https://discord.gg/7zJ3PbJ"
 
 
 class BrawlcordHelp(RedHelpFormatter):
-    """
-    Brawlcord's help implementation.
+    """Brawlcord's help implementation.
 
     Lists all commands and their descriptions in custom categories.
 
@@ -35,90 +30,150 @@ class BrawlcordHelp(RedHelpFormatter):
         """Format the default help message"""
 
         tagline = (
-            f"Type {ctx.clean_prefix}help <command>"
-            " for more info on a command."
+            f"Type {ctx.clean_prefix}help <command> for more info on a command."
         )
 
         coms = await self.get_bot_help_mapping(ctx)
         if not coms:
             return
 
-        if await ctx.embed_requested():
-            emb = {
-                "embed": {"title": "", "description": ""},
-                "footer": {"text": ""}, "fields": []
-            }
-
-            # do not change
-            # emb["embed"]["title"] = "Brawlcord"
-            emb["footer"]["text"] = tagline
-
-            general_cmd = [
-                "brawl", "profile", "brawler", "brawlers", "allbrawlers",
-                "stats", "gamemodes", "upgrade", "upgrades", "powerpoints",
-                "skins", "startokens", "shop"
-            ]
-            rewards_cmd = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
-
-            utility_cmd = [
-                "leaderboard", "tutorial", "select",
-                "brawlcord", "report", "invite"
-            ]
-
-            misc_cmd = ["setprefix", "info", "licenseinfo"]
-
-            # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
-
-            titles = ["General", "Rewards", "Utility", "Misc"]
-
-            for title in titles:
-                cog_text = ""
-                for cog_name, data in coms:
-                    for name, command in sorted(data.items()):
-                        def add_com():
-                            def shorten_line(a_line: str) -> str:
-                                # embed max width needs to be lower than 70
-                                if len(a_line) < 70:
-                                    return a_line
-                                return a_line[:67] + "..."
-
-                            return (
-                                "\n" +
-                                shorten_line(
-                                    f"**{ctx.clean_prefix}{name}:**"
-                                    f" {command.short_doc}"
-                                )
-                            )
-
-                        if title == titles[0]:
-                            if name in general_cmd:
-                                cog_text += add_com()
-                        elif title == titles[1]:
-                            if name in rewards_cmd:
-                                cog_text += add_com()
-                        elif title == titles[2]:
-                            if name in utility_cmd:
-                                cog_text += add_com()
-                        elif title == titles[3]:
-                            if name in misc_cmd:
-                                cog_text += add_com()
-                        else:
-                            continue
-
-                for i, page in enumerate(
-                    pagify(cog_text, page_length=1000, shorten_by=0)
-                ):
-                    title = (
-                        f"__{title}:__" if i < 1 else
-                        f"__{title}:__ (continued)"
-                    )
-                    field = EmbedField(title, page, False)
-                    emb["fields"].append(field)
-
-            await self.make_and_send_embeds(ctx, emb)
-
-        else:
+        if not await ctx.embed_requested():
             return await ctx.send(
-                "Brawlcord requires the use"
-                "of embeds. Please enable them!"
+                "Brawlcord requires the use of embeds. Please enable them!"
             )
+
+        emb = {
+            "embed": {"title": "", "description": ""}, "footer": {"text": ""}, "fields": []
+        }
+
+        emb["embed"]["description"] = (
+            f"You can also view the list of commands [here]({COMMANDS_PAGE})."
+            " Feel free to suggest new features in"
+            f" [the community server]({COMMUNITY_SERVER})."
+        )
+        emb["footer"]["text"] = tagline
+
+        gameplay_cmds = [
+            "brawl", "brawler", "tutorial", "allbrawlers",
+            "gamemodes", "upgrade", "shop", "select"
+        ]
+        stat_cmds = [
+            "profile", "stats", "upgrades", "powerpoints",
+            "skins", "startokens", "brawlers", "leaderboard"
+        ]
+        economy_cmds = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
+        misc_cmds = ["setprefix", "brawlcord", "report", "invite", "info", "licenseinfo"]
+
+        # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
+
+        titles = ["Gameplay", "Statistics", "Economy", "Misc"]
+
+        for title in titles:
+            cog_text = ""
+            for cog_name, data in coms:
+                for name, command in sorted(data.items()):
+                    def add_com():
+                        def shorten_line(a_line: str) -> str:
+                            # embed max width needs to be lower than 70
+                            if len(a_line) < 70:
+                                return a_line
+                            return a_line[:67] + "..."
+
+                        return (
+                            "\n" +
+                            shorten_line(
+                                f"**{ctx.clean_prefix}{name}** -"
+                                f" {command.short_doc}"
+                            )
+                        )
+
+                    if title == titles[0] and name in gameplay_cmds:
+                        cog_text += add_com()
+                    if title == titles[1] and name in stat_cmds:
+                        cog_text += add_com()
+                    elif title == titles[2] and name in economy_cmds:
+                        cog_text += add_com()
+                    elif title == titles[3] and name in misc_cmds:
+                        cog_text += add_com()
+                    else:
+                        continue
+
+            for i, page in enumerate(
+                pagify(cog_text, page_length=1000, shorten_by=0)
+            ):
+                title = (
+                    f"**{title}**" if i < 1 else
+                    f"**{title} (continued)**"
+                )
+                field = EmbedField(title, page, False)
+                emb["fields"].append(field)
+
+        await self.make_and_send_embeds(ctx, emb)
+
+    async def make_and_send_embeds(self, ctx, embed_dict: dict):
+
+        pages = []
+
+        page_char_limit = 750
+
+        author_info = {
+            "name": f"{ctx.me.display_name} Help",
+            "icon_url": ctx.me.avatar_url,
+        }
+
+        # Offset calculation here is for total embed size limit
+        # 20 accounts for# *Page {i} of {page_count}*
+        offset = len(author_info["name"])  # + 20
+        foot_text = embed_dict["footer"]["text"]
+        if foot_text:
+            offset += len(foot_text)
+        offset += len(embed_dict["embed"]["description"])
+        offset += len(embed_dict["embed"]["title"])
+
+        # In order to only change the size of embeds when neccessary for this rather
+        # than change the existing behavior for people uneffected by this
+        # we're only modifying the page char limit should they be impacted.
+        # We could consider changing this to always just subtract the offset,
+        # But based on when this is being handled (very end of 3.2 release)
+        # I'd rather not stick a major visual behavior change in at the last moment.
+        if page_char_limit + offset > 5500:
+            # This is still neccessary with the max interaction above
+            # While we could subtract 100% of the time the offset from page_char_limit
+            # the intent here is to shorten again
+            # *only* when neccessary, by the exact neccessary amount
+            # To retain a visual match with prior behavior.
+            page_char_limit = 5500 - offset
+        elif page_char_limit < 250:
+            # Prevents an edge case where a combination of long cog help and low limit
+            # Could prevent anything from ever showing up.
+            # This lower bound is safe based on parts of embed in use.
+            page_char_limit = 250
+
+        field_groups = self.group_embed_fields(embed_dict["fields"], page_char_limit)
+
+        color = await ctx.embed_color()
+        page_count = len(field_groups)
+
+        if not field_groups:  # This can happen on single command without a docstring
+            embed = discord.Embed(color=color, **embed_dict["embed"])
+            embed.set_author(**author_info)
+            embed.set_footer(**embed_dict["footer"])
+            pages.append(embed)
+
+        for i, group in enumerate(field_groups, 1):
+            embed = discord.Embed(color=color, **embed_dict["embed"])
+
+            embed.set_author(**author_info)
+
+            for field in group:
+                embed.add_field(**field._asdict())
+
+            embed.set_footer(**embed_dict["footer"])
+            if page_count > 1:
+                footer_text = f"Page {i} of {page_count} ◆ {embed.footer.text}"
+                footer_icon_url = embed.footer.icon_url
+                embed.set_footer(text=footer_text, icon_url=footer_icon_url)
+
+            pages.append(embed)
+
+        await self.send_pages(ctx, pages, embed=True)
