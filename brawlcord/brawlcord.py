@@ -514,36 +514,38 @@ class Brawlcord(commands.Cog):
         embed.add_field(name="Highest Trophies",
                         value=f"{emojis['pb']} {pb:,}")
 
-        xp = await self.get_player_stat(user, 'xp')
-        lvl = await self.get_player_stat(user, 'lvl')
+        user_data = await self.config.user(user).all()
+
+        xp = user_data['xp']
+        lvl = user_data['lvl']
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
         embed.add_field(name="Experience Level",
                         value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
-        gold = await self.get_player_stat(user, 'gold')
+        gold = user_data['gold']
         embed.add_field(name="Gold", value=f"{emojis['gold']} {gold}")
 
-        tokens = await self.get_player_stat(user, 'tokens')
+        tokens = user_data['tokens']
         embed.add_field(name="Tokens", value=f"{emojis['token']} {tokens}")
 
-        token_bank = await self.get_player_stat(user, 'tokens_in_bank')
+        token_bank = user_data['tokens_in_bank']
         embed.add_field(
             name="Tokens In Bank", value=f"{emojis['token']} {token_bank}"
         )
 
-        startokens = await self.get_player_stat(user, 'startokens')
+        startokens = user_data['startokens']
         embed.add_field(name="Star Tokens",
                         value=f"{emojis['startoken']} {startokens}")
 
-        token_doubler = await self.get_player_stat(user, 'token_doubler')
+        token_doubler = user_data['token_doubler']
         embed.add_field(name="Token Doubler",
                         value=f"{emojis['tokendoubler']} {token_doubler}")
 
-        gems = await self.get_player_stat(user, 'gems')
+        gems = user_data['gems']
         embed.add_field(name="Gems", value=f"{emojis['gem']} {gems}")
 
-        starpoints = await self.get_player_stat(user, 'starpoints')
+        starpoints = user_data['starpoints']
         embed.add_field(name="Star Points",
                         value=f"{emojis['starpoints']} {starpoints}")
 
@@ -563,6 +565,8 @@ class Brawlcord(commands.Cog):
         if not user:
             user = ctx.author
 
+        user_data = await self.config.user(user).all()
+
         embed = discord.Embed(color=EMBED_COLOR)
         embed.set_author(name=f"{user.name}'s Profile",
                          icon_url=user.avatar_url)
@@ -580,21 +584,20 @@ class Brawlcord(commands.Cog):
         embed.add_field(name="Highest Trophies",
                         value=f"{emojis['pb']} {pb:,}")
 
-        xp = await self.get_player_stat(user, 'xp')
-        lvl = await self.get_player_stat(user, 'lvl')
+        xp = user_data['xp']
+        lvl = user_data['lvl']
         next_xp = self.XP_LEVELS[str(lvl)]["Progress"]
 
         embed.add_field(name="Experience Level",
                         value=f"{emojis['xp']} {lvl} `{xp}/{next_xp}`")
 
-        brawl_stats = await self.get_player_stat(
-            user, 'brawl_stats', is_iter=True)
+        brawl_stats = user_data['brawl_stats']
 
         wins_3v3 = brawl_stats["3v3"][0]
         wins_solo = brawl_stats["solo"][0]
         wins_duo = brawl_stats["duo"][0]
 
-        embed.add_field(name="3 vs 3 Wins", value=f"{wins_3v3}")
+        embed.add_field(name="3 vs 3 Wins", value=f"{emojis['3v3']} {wins_3v3}")
         embed.add_field(
             name="Solo Wins",
             value=f"{gamemode_emotes['Solo Showdown']} {wins_solo}"
@@ -604,7 +607,7 @@ class Brawlcord(commands.Cog):
             value=f"{gamemode_emotes['Duo Showdown']} {wins_duo}"
         )
 
-        selected = await self.get_player_stat(user, 'selected', is_iter=True)
+        selected = user_data['selected']
         brawler = selected['brawler']
         sp = selected['starpower']
         skin = selected['brawler_skin']
