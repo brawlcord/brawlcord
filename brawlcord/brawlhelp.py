@@ -29,10 +29,6 @@ class BrawlcordHelp(RedHelpFormatter):
     async def format_bot_help(self, ctx: Context):
         """Format the default help message"""
 
-        tagline = (
-            f"Type {ctx.clean_prefix}help <command> for more info on a command."
-        )
-
         coms = await self.get_bot_help_mapping(ctx)
         if not coms:
             return
@@ -41,6 +37,8 @@ class BrawlcordHelp(RedHelpFormatter):
             return await ctx.send(
                 "Brawlcord requires the use of embeds. Please enable them!"
             )
+
+        tagline = self.get_default_tagline(ctx)
 
         emb = {
             "embed": {"title": "", "description": ""}, "footer": {"text": ""}, "fields": []
@@ -177,3 +175,8 @@ class BrawlcordHelp(RedHelpFormatter):
             pages.append(embed)
 
         await self.send_pages(ctx, pages, embed=True)
+
+    def get_default_tagline(self, ctx):
+        return (
+            f"Type {ctx.clean_prefix}help <command> for more info on a command."
+        )
