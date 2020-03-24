@@ -1476,10 +1476,7 @@ class Brawlcord(commands.Cog):
         total_guilds = len(self.bot.guilds)
         total_users = len(await self.config.all_users())
 
-        await ctx.send(f"{total_guilds}, {total_users}")
-
-        # for user in self.config.all_users():
-        #     print(user)
+        await ctx.send(f"Total Guilds: {total_guilds}\nTotal Users: {total_users}")
 
     @commands.command(name="upgrades")
     @maintenance()
