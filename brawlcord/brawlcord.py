@@ -46,7 +46,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.0.5"
+__version__ = "2.0.6"
 __author__ = "Snowsee"
 
 default = {
@@ -1292,12 +1292,31 @@ class Brawlcord(commands.Cog):
         await self.config.report_channel.set(channel.id)
         await ctx.send(f"Report channel set to {channel.mention}.")
 
-    @commands.group(name="leaderboard", aliases=['lb'], autohelp=False)
+    @commands.group(
+        name="leaderboard",
+        aliases=['lb'], autohelp=False,
+        usage='[brawler or pb] [brawler_name]'
+    )
     @maintenance()
-    async def _leaderboard(self, ctx: Context):
+    async def _leaderboard(self, ctx: Context, arg: str = None, extra: str = None):
         """Display the leaderboard"""
 
         if not ctx.invoked_subcommand:
+            if arg:
+                if arg.lower() == 'pb':
+                    pb = self.bot.get_command('leaderboard pb')
+                    return await ctx.invoke(pb)
+                elif arg.lower() == 'brawler':
+                    lb_brawler = self.bot.get_command('leaderboard brawler')
+                    if not extra:
+                        return await ctx.send_help(lb_brawler)
+                    else:
+                        return await ctx.invoke(lb_brawler, brawler_name=extra)
+                else:
+                    brawler = self.parse_brawler_name(arg)
+                    if brawler:
+                        lb_brawler = self.bot.get_command('leaderboard brawler')
+                        return await ctx.invoke(lb_brawler, brawler_name=brawler)
 
             title = "Brawlcord Leaderboard"
 
@@ -1319,17 +1338,17 @@ class Brawlcord(commands.Cog):
     async def brawler_leaderboard(self, ctx: Context, *, brawler_name: str):
         """Display the specified brawler's leaderboard"""
 
-        brawler_name = self.parse_brawler_name(brawler_name)
+        brawler = self.parse_brawler_name(brawler_name)
 
-        if not brawler_name:
+        if not brawler:
             return await ctx.send(f"{brawler_name} does not exist!")
 
-        title = f"Brawlcord {brawler_name} Leaderboard"
+        title = f"Brawlcord {brawler} Leaderboard"
 
-        url = f"{brawler_thumb.format(brawler_name)}"
+        url = f"{brawler_thumb.format(brawler)}"
 
         await self.leaderboard_handler(
-            ctx, title, url, 4, brawler_name=brawler_name
+            ctx, title, url, 4, brawler_name=brawler
         )
 
     @commands.group(name="claim")
@@ -2446,15 +2465,16 @@ class Brawlcord(commands.Cog):
 
         all_users = await self.config.all_users()
         users = []
-        for guild in self.bot.guilds:
-            for user_id in all_users:
-                try:
-                    user = guild.get_member(user_id)
-                    trophies = await self.get_trophies(
-                        user, pb=pb, brawler_name=brawler_name)
-                    users.append((user, trophies))
-                except Exception:
-                    pass
+        for user_id in all_users:
+            try:
+                user = self.bot.get_user(user_id)
+                if not user:
+                    continue
+                trophies = await self.get_trophies(
+                    user, pb=pb, brawler_name=brawler_name)
+                users.append((user, trophies))
+            except Exception:
+                pass
 
         # remove duplicates
         users = list(set(users))
@@ -2472,18 +2492,14 @@ class Brawlcord(commands.Cog):
                 if brawler_name:
                     emoji = await self.get_rank_emoji(user, brawler_name)
                 else:
-                    num, emoji = await self.get_league_data(trophies)
-                if user == ctx.author:
+                    _, emoji = await self.get_league_data(trophies)
+                if user.id == ctx.author.id:
                     embed_desc += (
                         f"**\n`{(i+1):02d}.` {user} {emoji}"
                         f"{trophies:>{padding},}**"
                     )
                     add_user = False
                 else:
-                    # embed_desc += (
-                    #     f"\n`{(i+1):02d}.`{emoji}`{trophies:>{padding}}`"
-                    #     f" {user.mention} - {user}"
-                    # )
                     embed_desc += (
                         f"\n`{(i+1):02d}.` {user} {emoji}"
                         f"{trophies:>{padding},}"
@@ -2498,7 +2514,7 @@ class Brawlcord(commands.Cog):
         # add rank of user
         if add_user:
             for idx, user in enumerate(users):
-                if ctx.author == user:
+                if ctx.author == user[0]:
                     val_str = ""
                     try:
                         trophies = users[idx][1]
@@ -2507,9 +2523,9 @@ class Brawlcord(commands.Cog):
                             emoji = await self.get_rank_emoji(
                                 user, brawler_name)
                         else:
-                            num, emoji = await self.get_league_data(trophies)
+                            _, emoji = await self.get_league_data(trophies)
                         val_str += (
-                            f"**\n`{(idx+1):02d}.` {user} {emoji}"
+                            f"\n**`{(idx+1):02d}.` {user} {emoji}"
                             f"{trophies:>{padding},}**"
                         )
                     except Exception:
