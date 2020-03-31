@@ -1,9 +1,10 @@
 <h1 align="center">
   <br>
-  <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
+  <a href="https://snowsee.github.io/brawlcord/">
+    <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
+  </a>
   <br>
-  Brawlcord Discord Bot
-  <br>
+  <i> <a href="https://snowsee.github.io/brawlcord/">Brawlcord</a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot">Invite</a></i>
 </h1>
 
 <h4 align="center"><i>1v1 Brawls On Discord!</i></h4>
@@ -13,11 +14,13 @@
   •
   <a href="#how-to-use">How To Use</a>
   •
-  <a href="#features">Features</a>
+  <a href="https://snowsee.github.io/brawlcord/#features">Features</a>
   •
-  <a href="#installation">Installation</a>
+  <a href="https://snowsee.github.io/brawlcord/#installation">Installation</a>
   •
-  <a href="#whats-coming-next">What's Coming Next</a>
+  <a href="https://snowsee.github.io/brawlcord/#commands">Commands</a>
+  •
+  <a href="https://snowsee.github.io/brawlcord/#whats-coming-next">What's Coming Next</a>
   •
   <a href="#credits">Credits</a>
   •
