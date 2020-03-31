@@ -34,7 +34,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __author__ = "Snowsee"
 
 default = {
@@ -1464,7 +1464,7 @@ class Brawlcord(commands.Cog):
                 " Notify bot owner using the `-report` command."
             )
 
-        embed = discord.Embed(color=0xFFA232, description=value)
+        embed = discord.Embed(color=EMBED_COLOR, description=value)
         embed.set_author(
             name=f"Invite {ctx.me.name}", icon_url=ctx.me.avatar_url)
         # embed.add_field(name="__**Invite Link:**__", value=value)
