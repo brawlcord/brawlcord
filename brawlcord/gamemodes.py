@@ -26,6 +26,7 @@ healing_time = 3
 DEFAULT_COLOR = 0xADFF74
 RESPAWN_COLOR = 0xFF7474
 SUPER_COLOR = 0xFFA232
+POISON_COLOR = 0x659146
 
 
 class Player:
@@ -785,8 +786,20 @@ class Showdown(GameMode):
     def __init__(self, ctx, user, opponent, conf, brawlers):
         super().__init__(ctx, user, opponent, conf, brawlers)
 
-        self.poison_starting = 15
-        self.poison_damage = 300
+        # Poison effect starts at the 20th round.
+        # We set this variable to 40 so we can directly compare
+        # it with `i` (the loop variable using in Showdown.play).
+        self.poison_starting = 40
+
+        # The poison damage actually appears as 200 to the user.
+        # This is because the poison_effect method is called twice
+        # before a user sees his stats again.
+        self.poison_damage = 100
+
+        # This is useful when checking for poison in the embed setup method.
+        # Currently, it gets set to `True` each time the condition in `poison_effect`
+        # method evaluates to `True`.
+        self.poison_started = False
 
     async def initialize(self, ctx):
         first, second = await super().initialize(ctx)
@@ -800,8 +813,8 @@ class Showdown(GameMode):
         """Function to run the game"""
 
         i = 0
+        # Game ends after 50th round.
         while i < 100:
-            # game ends after 50th round
             if i % 2 == 0:
                 first = self.first
                 second = self.second
@@ -889,8 +902,17 @@ class Showdown(GameMode):
         return winner, loser
 
     async def set_embed(self, ctx: Context, first: Player, second: Player):
+        """Sets embed for brawl messages."""
+
+        color = DEFAULT_COLOR
+
+        # Change embed color to a slightly darker shade of default when poison effect begins.
+        if self.poison_started:
+            color = POISON_COLOR
+
         if first.can_super:
             self_super_emote = emojis['superready']
+            color = SUPER_COLOR
         else:
             self_super_emote = emojis['supernotready']
 
@@ -898,11 +920,6 @@ class Showdown(GameMode):
             opp_super_emote = emojis['superready']
         else:
             opp_super_emote = emojis['supernotready']
-
-        if first.can_super:
-            color = SUPER_COLOR
-        else:
-            color = DEFAULT_COLOR
 
         embed = discord.Embed(
             color=color,
@@ -1093,7 +1110,8 @@ class Showdown(GameMode):
         return value
 
     def poison_effect(self, round_num: int):
-        if round_num > self.poison_starting:
+        if round_num >= self.poison_starting:
+            self.poison_started = True
             self.first.health -= self.poison_damage
             self.second.health -= self.poison_damage
 
