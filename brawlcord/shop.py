@@ -25,7 +25,7 @@ class Shop:
         self.items = {
             "powerpoints": (2, 100),
             "starpowers": (2000, 10),
-            "brawlbox": (0, 10),
+            "brawlbox": (0, 20),
             "tickets": (0, 10)
         }
 
