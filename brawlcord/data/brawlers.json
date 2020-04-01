@@ -53,7 +53,7 @@
         "ult": {
             "name": "Overbearing",
             "desc": "Nita summons the spirit of Big Baby Bear to hunt down her enemies.",
-            "bear": {
+            "spawn": {
                 "health": 4000,
                 "damage": 400,
                 "range": 1.33,
@@ -164,7 +164,7 @@
         "ult": {
             "name": "Scrappy!",
             "desc": "Jessie deploys a gun turret that automatically shoots at enemies. It's made of 100% recycled materials!",
-            "scrappy": {
+            "spawn": {
                 "health": 2800,
                 "damage": 260,
                 "range": 4.67,
@@ -385,10 +385,12 @@
         "unlockTrp": -1,
         "ult": {
             "name": "Encore",
+            "damage": null,
             "heal": 2100,
             "desc": "Poco heals himself and all friends he can reach with his uplifting melody. Does not affect enemies.",
             "range": 10.33,
-            "projectiles": 1
+            "projectiles": 1,
+            "extra": "Heal"
         },
         "sp1": {
             "name": "Da Capo",
@@ -488,7 +490,7 @@
         "ult": {
             "name": "Old Lobber",
             "desc": "Penny sets up her cannon! It can shoot at enemies at a long range, even if they are behind cover.",
-            "cannon": {
+            "spawn": {
                 "health": 2800,
                 "damage": 1200,
                 "range": 14.33,
@@ -602,8 +604,9 @@
             "name": "Mama's Kiss'",
             "desc": "Pam's healing turret will fix up her and teammates who stay in its area of effect.",
             "extra": "Heal per second",
-            "turret": {
+            "spawn": {
                 "health": 2800,
+                "damage": null,
                 "heal": 320,
                 "range": 5,
                 "name": "Healing Turret"
