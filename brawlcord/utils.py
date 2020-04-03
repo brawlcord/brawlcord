@@ -467,8 +467,10 @@ class Box:
         free_skins = [
             skin for skin in self.BRAWLERS[brawler]["skins"] if skin[0] == 0
         ]
+
         async with conf.brawlers() as brawlers:
-            default_stats["skins"].append(free_skins)
+            if free_skins:
+                default_stats["skins"].extend(free_skins)
             brawlers[brawler] = default_stats
         embed.add_field(
             name=f"New {rarity} Brawler :tada:",
