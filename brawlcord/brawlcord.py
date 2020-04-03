@@ -34,7 +34,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 __author__ = "Snowsee"
 
 default = {
@@ -2651,6 +2651,29 @@ class Brawlcord(commands.Cog):
             duration = maint["duration"]
 
         await ctx.send(f"**Setting:** {setting}\n**Duration:** {duration}")
+
+    @commands.command()
+    @checks.is_owner()
+    async def fixskins(self, ctx: Context):
+        """Removes empty lists from the skins list."""
+
+        data = await self.config.all_users()
+
+        await ctx.trigger_typing()
+        for user in data:
+            for brawler in data[user]["brawlers"]:
+                skins = data[user]["brawlers"][brawler]["skins"]
+
+                skins = [skin for skin in skins if skin]
+                user_obj = discord.Object(user)
+                try:
+                    await self.config.user(user_obj).set_raw(
+                        "brawlers", brawler, "skins", value=skins
+                    )
+                except Exception:
+                    log.error(f"Error fixing skins for user with ID: {user}")
+
+        await ctx.send("Done! Please check logs for errors.")
 
     async def cog_command_error(self, ctx: Context, error: Exception):
         if not isinstance(
