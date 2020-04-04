@@ -59,7 +59,8 @@
                 "range": 1.33,
                 "speed": 620,
                 "name": "Bear"
-            }
+            },
+            "projectiles": 1
         },
         "sp1": {
             "name": "Bear with Me",
@@ -131,7 +132,8 @@
             "name": "Bulldozer",
             "damage": 800,
             "desc": "Bull puts his head down and bulldozes through opponents and obstacles. He's always been headstrong!",
-            "range": 11.67
+            "range": 11.67,
+            "projectiles": 1
         },
         "sp1": {
             "name": "Berserker",
@@ -170,7 +172,8 @@
                 "range": 4.67,
                 "speed": 0,
                 "name": "Scrappy"
-            }
+            },
+            "projectiles": 1
         },
         "sp1": {
             "name": "Energize",
@@ -315,7 +318,8 @@
             "name": "Flying Elbow Drop",
             "damage": 800,
             "desc": "Leaping high, El Primo drops an Intergalactic Elbow that knocks around enemies and destroys cover!",
-            "range": 8.67
+            "range": 8.67,
+            "projectiles": 1
         },
         "sp1": {
             "name": "El Fuego",
@@ -459,7 +463,8 @@
             "name": "Barrel Roll",
             "damage": 400,
             "desc": "Darryl rolls forward inside his barrel, knocking back enemies and bouncing off walls. His Super recharges over time!",
-            "range": 7
+            "range": 7,
+            "projectiles": 1
         },
         "sp1": {
             "name": "Steel Hoops",
@@ -496,7 +501,8 @@
                 "range": 14.33,
                 "reload": 2.5,
                 "name": "Cannon"
-            }
+            },
+            "projectiles": 1
         },
         "sp1": {
             "name": "Last Blast",
@@ -531,7 +537,8 @@
             "damage": 400,
             "desc": "Carl goes into a crazy spin for a few seconds, flailing around and damaging nearby opponents.",
             "duration": 5,
-            "extra": "Damage per swing"
+            "extra": "Damage per swing",
+            "projectiles": 1
         },
         "sp1": {
             "name": "Power Throw",
@@ -610,7 +617,8 @@
                 "heal": 320,
                 "range": 5,
                 "name": "Healing Turret"
-            }
+            },
+            "projectiles": 1
         },
         "sp1": {
             "name": "Mama's Hug",
