@@ -61,8 +61,8 @@ class BrawlcordHelp(RedHelpFormatter):
         ]
         economy_cmds = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
         misc_cmds = [
-            "setprefix", "brawlcord", "report", "invite",
-            "info", "licenseinfo", "redinfo", "support", "discord"
+            "setprefix", "report", "invite", "info",
+            "licenseinfo", "redinfo", "support", "discord"
         ]
 
         # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
