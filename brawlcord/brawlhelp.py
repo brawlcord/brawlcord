@@ -60,7 +60,10 @@ class BrawlcordHelp(RedHelpFormatter):
             "skins", "startokens", "brawlers", "leaderboard"
         ]
         economy_cmds = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
-        misc_cmds = ["setprefix", "brawlcord", "report", "invite", "info", "licenseinfo"]
+        misc_cmds = [
+            "setprefix", "brawlcord", "report", "invite",
+            "info", "licenseinfo", "redinfo", "support", "discord"
+        ]
 
         # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
 
@@ -78,8 +81,7 @@ class BrawlcordHelp(RedHelpFormatter):
                             return a_line[:67] + "..."
 
                         return (
-                            "\n" +
-                            shorten_line(
+                            "\n" + shorten_line(
                                 f"**{ctx.clean_prefix}{name}** -"
                                 f" {command.short_doc}"
                             )
