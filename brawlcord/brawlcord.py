@@ -223,7 +223,7 @@ class Brawlcord(commands.Cog):
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
 
-    @commands.command(name="info")
+    @commands.command(name="info", aliases=["brawlcord"])
     async def _brawlcord(self, ctx: Context):
         """Show info about Brawlcord"""
 
