@@ -34,7 +34,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.3"
+__version__ = "2.1.4"
 __author__ = "Snowsee"
 
 default = {
@@ -869,8 +869,10 @@ class Brawlcord(commands.Cog):
 
         tpstored = await self.get_player_stat(user, 'tpstored')
         tppassed = await self.get_player_stat(user, 'tppassed')
+        trophies = await self.get_trophies(user)
 
         tr_str = ""
+        desc = f"You have {trophies} {emojis['trophies']} at the moment."
 
         embeds = []
 
@@ -903,13 +905,14 @@ class Brawlcord(commands.Cog):
                 start_at = num - 1
 
             embed = discord.Embed(
-                color=EMBED_COLOR, description=page
+                color=EMBED_COLOR, description=desc
             )
+
+            embed.add_field(name="\u200b", value=page)
+
             embed.set_author(
                 name=f"{user.name}'s Trophy Road Progress", icon_url=user.avatar_url
             )
-
-            # embed.add_field(name="Rewards", value=page)
 
             embed.set_footer(text=f"Page {num} of {total_pages}")
 
