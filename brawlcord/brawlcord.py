@@ -34,7 +34,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.3"
+__version__ = "2.1.4"
 __author__ = "Snowsee"
 
 default = {
@@ -128,6 +128,7 @@ league_emojis = {
 }
 
 old_invite = None
+old_info = None
 
 BRAWLSTARS = "https://blog.brawlstars.com/index.html"
 FAN_CONTENT_POLICY = "https://www.supercell.com/fan-content-policy"
@@ -222,7 +223,7 @@ class Brawlcord(commands.Cog):
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
 
-    @commands.command(name="brawlcord")
+    @commands.command(name="info", aliases=["brawlcord"])
     async def _brawlcord(self, ctx: Context):
         """Show info about Brawlcord"""
 
@@ -747,7 +748,7 @@ class Brawlcord(commands.Cog):
             else:
                 _brawler = brawler
 
-            emote = level_emotes["level_"+str(level)]
+            emote = level_emotes["level_" + str(level)]
 
             value = (f"{emote}`{trophies:>4}` {rank_emojis['br'+str(rank)]} |"
                      f" {emojis['powerplay']}`{pb:>4}`")
@@ -813,7 +814,7 @@ class Brawlcord(commands.Cog):
                 " Please give/ask someone to give me that permission."
             )
 
-    @commands.group(name="rewards")
+    @commands.group(name="rewards", aliases=["trophyroad", "tr"])
     @maintenance()
     async def _rewards(self, ctx: Context):
         """View and claim collected trophy road rewards"""
@@ -854,6 +855,71 @@ class Brawlcord(commands.Cog):
 
         try:
             await ctx.send(embed=embed)
+        except discord.Forbidden:
+            return await ctx.send(
+                "I do not have the permission to embed a link."
+                " Please give/ask someone to give me that permission."
+            )
+
+    @_rewards.command(name="all")
+    async def rewards_all(self, ctx: Context):
+        """View all trophy road rewards."""
+
+        user = ctx.author
+
+        tpstored = await self.get_player_stat(user, 'tpstored')
+        tppassed = await self.get_player_stat(user, 'tppassed')
+        trophies = await self.get_trophies(user)
+
+        tr_str = ""
+        desc = f"You have {trophies} {emojis['trophies']} at the moment."
+
+        embeds = []
+
+        max_tier = max(tppassed, key=lambda m: int(m))
+        max_trophies = self.TROPHY_ROAD[max_tier]['Trophies']
+
+        for tier in self.TROPHY_ROAD:
+            reward_data = self.TROPHY_ROAD[tier]
+            reward_name, reward_emoji, reward_str = self.tp_reward_strings(reward_data, tier)
+
+            if tier in tpstored:
+                extra = " **(Can Claim!)**"
+            elif tier in tppassed:
+                extra = " **(Claimed!)**"
+            else:
+                extra = ""
+
+            tr_str += (
+                f"\n\n{emojis['trophies']} **{reward_data['Trophies']}** -"
+                f" {reward_name}: {reward_emoji} {reward_str}{extra}"
+            )
+
+        pages = list(pagify(tr_str, page_length=1000))
+        total_pages = len(pages)
+
+        start_at = 0
+
+        for num, page in enumerate(pages, start=1):
+            if f"**{max_trophies}**" in page:
+                start_at = num - 1
+
+            embed = discord.Embed(
+                color=EMBED_COLOR, description=desc
+            )
+
+            embed.add_field(name="\u200b", value=page)
+
+            embed.set_author(
+                name=f"{user.name}'s Trophy Road Progress", icon_url=user.avatar_url
+            )
+
+            embed.set_footer(text=f"Page {num} of {total_pages}")
+
+            embeds.append(embed)
+
+        try:
+            await menu(ctx, embeds, DEFAULT_CONTROLS, page=start_at)
         except discord.Forbidden:
             return await ctx.send(
                 "I do not have the permission to embed a link."
@@ -922,16 +988,16 @@ class Brawlcord(commands.Cog):
 
         if sps:
             await self.update_player_stat(
-                ctx.author, 'selected',  random.choice(sps),
+                ctx.author, 'selected', random.choice(sps),
                 substat='starpower'
             )
         else:
             await self.update_player_stat(
-                ctx.author, 'selected',  None, substat='starpower')
+                ctx.author, 'selected', None, substat='starpower')
 
         skin = brawler_data["selected_skin"]
         await self.update_player_stat(
-            ctx.author, 'selected',  skin, substat='brawler_skin')
+            ctx.author, 'selected', skin, substat='brawler_skin')
 
         await ctx.send(f"Changed selected Brawler to {brawler_name}!")
 
@@ -1127,7 +1193,7 @@ class Brawlcord(commands.Cog):
             return await ctx.send(
                 f"Error {exc} while opening a Big Box."
                 " Please notify bot creator using `-report` command."
-                )
+            )
 
         try:
             await ctx.send(embed=embed)
@@ -1203,12 +1269,12 @@ class Brawlcord(commands.Cog):
             return await ctx.send("Upgrade cancelled.")
 
         await self.update_player_stat(
-            user, 'brawlers', level+1, substat=brawler, sub_index='level')
+            user, 'brawlers', level + 1, substat=brawler, sub_index='level')
         await self.update_player_stat(
-            user, 'brawlers', powerpoints-required_powerpoints,
+            user, 'brawlers', powerpoints - required_powerpoints,
             substat=brawler, sub_index='powerpoints'
         )
-        await self.update_player_stat(user, 'gold', gold-required_gold)
+        await self.update_player_stat(user, 'gold', gold - required_gold)
 
         await ctx.send(f"Upgraded {brawler} to power {level+1}!")
 
@@ -1236,7 +1302,7 @@ class Brawlcord(commands.Cog):
                 if gamemode not in user_owned:
                     embed_str += f" [Locked]"
 
-            embed.add_field(name=event_type+"s", value=embed_str, inline=False)
+            embed.add_field(name=event_type + "s", value=embed_str, inline=False)
 
         try:
             await ctx.send(embed=embed)
@@ -1572,7 +1638,7 @@ class Brawlcord(commands.Cog):
                 user, 'brawlers', is_iter=True, substat=brawler)
 
             level = brawler_data['level']
-            level_emote = level_emotes["level_"+str(level)]
+            level_emote = level_emotes["level_" + str(level)]
 
             if level < 9:
                 powerpoints = brawler_data['powerpoints']
@@ -1862,6 +1928,33 @@ class Brawlcord(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(name="redinfo")
+    async def red_info(self, ctx: Context):
+        """Show info about Red"""
+
+        global old_info
+        if old_info:
+            await ctx.invoke(old_info)
+
+    @commands.command()
+    async def support(self, ctx: Context):
+        """Show bot support information."""
+
+        txt = (
+            "You can get support for the bot in the Brawlcord"
+            f" community server: {COMMUNITY_SERVER}"
+        )
+
+        await ctx.send(txt)
+
+    @commands.command(name="discord")
+    async def _discord(self, ctx: Context):
+        """Show a link to the community Brawlcord server"""
+
+        await ctx.send(
+            f"You can join the Brawlcord community server by using this link: {COMMUNITY_SERVER}"
+        )
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
@@ -1901,7 +1994,7 @@ class Brawlcord(commands.Cog):
                 old_val = 0
             else:
                 old_val = await self.get_player_stat(user, stat)
-            await stat_attr.set(value+old_val)
+            await stat_attr.set(value + old_val)
 
     async def get_trophies(
         self, user: discord.User,
@@ -2002,8 +2095,8 @@ class Brawlcord(commands.Cog):
 
         reward_xp_str = (
             "{}".format(
-                    f'{reward_xp} (Star Player)' if is_starplayer
-                    else f'{reward_xp}'
+                f'{reward_xp} (Star Player)' if is_starplayer
+                else f'{reward_xp}'
             )
         )
 
@@ -2083,7 +2176,7 @@ class Brawlcord(commands.Cog):
             return False
 
         await self.update_player_stat(user, 'xp', carry)
-        await self.update_player_stat(user, 'lvl', lvl+1)
+        await self.update_player_stat(user, 'lvl', lvl + 1)
 
         level_up_msg = f"Level up! You have reached level {lvl+1}."
 
@@ -2370,9 +2463,9 @@ class Brawlcord(commands.Cog):
             if brawler not in user_brawlers:
                 return await ctx.send(f"You do not own {brawler}!")
 
-            total_powerpoints = (await self.get_player_stat(
-                        user, 'brawlers', is_iter=True, substat=brawler)
-                    )['total_powerpoints']
+            total_powerpoints = (
+                await self.get_player_stat(user, 'brawlers', is_iter=True, substat=brawler)
+            )['total_powerpoints']
 
             if total_powerpoints == 1410:
                 return await ctx.send(
@@ -2562,7 +2655,7 @@ class Brawlcord(commands.Cog):
 
             # end = 14000 for Star V
             if end != 14000:
-                if trophies in range(start, end+1):
+                if trophies in range(start, end + 1):
                     break
             else:
                 if trophies >= 14000:
@@ -2582,7 +2675,7 @@ class Brawlcord(commands.Cog):
             user, 'brawlers', is_iter=True, substat=brawler)
         rank = self.get_rank(data['pb'])
 
-        return rank_emojis['br'+str(rank)]
+        return rank_emojis['br' + str(rank)]
 
     def _box_name(self, box: str):
         """Return box name"""
@@ -2806,9 +2899,13 @@ class Brawlcord(commands.Cog):
         await self.config.st_reset_ts.set(timestamp)
 
     def cog_unload(self):
+        # Cancel various tasks.
         self.bank_update_task.cancel()
         self.status_task.cancel()
         self.shop_and_st_task.cancel()
+
+        # Restore old invite command.
+        global old_invite
         if old_invite:
             try:
                 self.bot.remove_command("invite")
@@ -2816,4 +2913,29 @@ class Brawlcord(commands.Cog):
                 pass
             self.bot.add_command(old_invite)
 
-    __unload = cog_unload
+        # Restore old invite command.
+        global old_info
+        if old_info:
+            try:
+                self.bot.remove_command("info")
+            except Exception:
+                pass
+            self.bot.add_command(old_info)
+
+
+async def setup(bot):
+    # Replace invite command.
+    global old_invite
+    old_invite = bot.get_command("invite")
+    if old_invite:
+        bot.remove_command(old_invite.name)
+
+    # Replace info command.
+    global old_info
+    old_info = bot.get_command("info")
+    if old_info:
+        bot.remove_command(old_info.name)
+
+    brawlcord = Brawlcord(bot)
+    await brawlcord.initialize()
+    bot.add_cog(brawlcord)
