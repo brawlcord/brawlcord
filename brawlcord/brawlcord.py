@@ -32,7 +32,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.5"
+__version__ = "2.1.6"
 __author__ = "Snowsee"
 
 default = {
@@ -288,7 +288,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     @maintenance()
-    async def _brawl(self, ctx: Context, opponent: discord.User = None):
+    async def _brawl(self, ctx: Context, opponent: discord.Member = None):
         """Brawl against other players"""
 
         guild = ctx.guild
