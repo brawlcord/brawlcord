@@ -34,7 +34,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.4"
+__version__ = "2.1.5"
 __author__ = "Snowsee"
 
 default = {
@@ -1176,7 +1176,6 @@ class Brawlcord(commands.Cog):
         user = ctx.author
 
         startokens = await self.get_player_stat(user, 'startokens')
-        startokens = 100
 
         if startokens < 10:
             return await ctx.send(
