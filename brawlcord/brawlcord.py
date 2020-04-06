@@ -32,7 +32,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.6"
+__version__ = "2.1.7"
 __author__ = "Snowsee"
 
 default = {
@@ -1590,7 +1590,7 @@ class Brawlcord(commands.Cog):
                 " `-upgrade <brawler_name>` command."
                 f"\n\nAvailable Gold: {emojis['gold']} {gold}"
             )
-            pages = list(pagify(text=embed_str))
+            pages = list(pagify(text=embed_str, page_length=1000))
             total = len(pages)
             for i, page in enumerate(pages, start=1):
                 embed = discord.Embed(
