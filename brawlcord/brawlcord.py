@@ -1,4 +1,3 @@
-# Standard Library
 import asyncio
 import json
 import logging
@@ -9,7 +8,6 @@ import urllib.request
 from datetime import datetime, timedelta
 from math import ceil
 
-# Discord
 import discord
 from redbot.core import Config, checks, commands
 from redbot.core.bot import Red
@@ -34,7 +32,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.5"
+__version__ = "2.1.6"
 __author__ = "Snowsee"
 
 default = {
@@ -290,7 +288,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     @maintenance()
-    async def _brawl(self, ctx: Context, opponent: discord.User = None):
+    async def _brawl(self, ctx: Context, opponent: discord.Member = None):
         """Brawl against other players"""
 
         guild = ctx.guild
@@ -1343,7 +1341,6 @@ class Brawlcord(commands.Cog):
     async def report_error(self, ctx: Context, error):
         if isinstance(error, commands.MissingRequiredArgument):
             ctx.command.reset_cooldown(ctx)
-            await ctx.send_help(command=self._report)
         elif isinstance(error, commands.CommandOnCooldown):
             await ctx.send(
                 "This command is on cooldown. Try again in {}.".format(
