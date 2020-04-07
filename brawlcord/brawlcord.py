@@ -1500,7 +1500,7 @@ class Brawlcord(commands.Cog):
         # attach_files=True,
         # external_emojis=True,
         # add_reactions=True
-        perms = discord.Permissions(321600)
+        perms = discord.Permissions(322624)
 
         try:
             data = await self.bot.application_info()
