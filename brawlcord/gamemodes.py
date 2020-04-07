@@ -177,7 +177,7 @@ class GameMode:
                 await ctx.send(
                     f"{user.mention} {opponent.mention} Brawl cancelled."
                     f" Reason: {opponent.name} did not accept the challenge."
-                    )
+                )
                 raise asyncio.TimeoutError
 
             if pred.result is True:
@@ -323,7 +323,7 @@ class GameMode:
     def _move_attack(self, first: Player, second: Player, round_num: int):
         first.last_attack = round_num
 
-        damage = first.brawler._attack(first.brawler_level)
+        damage = self.apply_powerups(first, first.brawler._attack(first.brawler_level))
         if not second.invincibility:
             second.health -= damage
             second.last_attack = round_num
@@ -343,7 +343,7 @@ class GameMode:
         first.attacks = 0
         if isinstance(vals, list):
             # heal
-            first.health += vals[0]
+            first.health += self.apply_powerups(first, vals[0])
             if first.health > first.static_health:
                 first.health = first.static_health
 
@@ -354,9 +354,9 @@ class GameMode:
                 return
 
         if not second.invincibility:
-            second.health -= vals
+            second.health -= self.apply_powerups(first, vals)
         else:
-            second.health -= (vals * 0.5)
+            second.health -= (self.apply_powerups(first, vals) * 0.5)
             second.invincibility = False
 
         second.last_attack = round_num
@@ -366,7 +366,7 @@ class GameMode:
             second.stunned = True
 
     def _move_attack_spawn(self, first: Player, second: Player):
-        second.spawn -= first.brawler._attack(first.brawler_level)
+        second.spawn -= self.apply_powerups(first, first.brawler._attack(first.brawler_level))
 
     def _move_spawn_attack(
         self, first: Player, second: Player, round_num: int
@@ -378,12 +378,12 @@ class GameMode:
             vals = first.brawler._spawn(first.brawler_level)
             if isinstance(vals, list):
                 # heal
-                first.health += vals[0]
+                first.health += self.apply_powerups(first, vals[0])
                 if first.health > first.static_health:
                     first.health = first.static_health
             else:
                 if not second.invincibility:
-                    second.health -= vals
+                    second.health -= self.apply_powerups(first, vals)
                     second.last_attack = round_num
                     first.attacks += 1
                 else:
@@ -483,6 +483,9 @@ class GameMode:
             await other.player.send("**Opponent is stunned!**")
 
         stunned.stunned = False
+
+    def apply_powerups(self, player: Player, value: int):
+        return value
 
 
 class GemGrab(GameMode):
@@ -698,7 +701,7 @@ class GemGrab(GameMode):
         embed.add_field(
             name=f"{iden} Gems",
             value=f"{gamemode_emotes['Gem Grab']} {player.gems}"
-            )
+        )
 
         return embed
 
@@ -976,7 +979,7 @@ class Showdown(GameMode):
         embed.add_field(
             name=f"{iden} Powerups",
             value=f"{emojis['powercube']} {player.powerups}"
-            )
+        )
 
         return embed
 
@@ -1033,74 +1036,6 @@ class Showdown(GameMode):
     def buff_health(self, player: Player):
         player.static_health += 400
         player.health += 400
-
-    def _move_attack(self, first: Player, second: Player, round_num: int):
-        first.last_attack = round_num
-
-        damage = self.apply_powerups(
-            first, first.brawler._attack(first.brawler_level)
-        )
-        if not second.invincibility:
-            second.health -= damage
-            second.last_attack = round_num
-            first.attacks += 1
-        else:
-            second.invincibility = False
-
-    def _move_super(self, first: Player, second: Player, round_num: int):
-        first.last_attack = round_num
-
-        vals, first.spawn = first.brawler._ult(first.brawler_level)
-        first.attacks = 0
-        if isinstance(vals, list):
-            # heal
-            first.health += self.apply_powerups(first, vals[0])
-            if first.health > first.static_health:
-                first.health = first.static_health
-
-            # hardcoding for Mortis to both
-            # deal damage and heal
-            vals = vals[0]
-            if first.brawler_name != "Mortis":
-                return
-
-        if not second.invincibility:
-            second.health -= self.apply_powerups(first, vals)
-        else:
-            second.health -= (self.apply_powerups(first, vals) * 0.5)
-            second.invincibility = False
-
-        second.last_attack = round_num
-
-        # hardcoding for Frank's stun
-        if first.brawler_name == "Frank":
-            second.stunned = True
-
-    def _move_attack_spawn(self, first: Player, second: Player):
-        second.spawn -= self.apply_powerups(
-            first, first.brawler._attack(first.brawler_level)
-        )
-
-    def _move_spawn_attack(
-        self, first: Player, second: Player, round_num: int
-    ):
-        # spawns have 50% chance of attacking/healing
-        if not random.randint(0, 1):
-            return
-        if first.spawn:
-            vals = first.brawler._spawn(first.brawler_level)
-            if isinstance(vals, list):
-                # heal
-                first.health += self.apply_powerups(first, vals[0])
-                if first.health > first.static_health:
-                    first.health = first.static_health
-            else:
-                if not second.invincibility:
-                    second.health -= self.apply_powerups(first, vals)
-                    second.last_attack = round_num
-                    first.attacks += 1
-                else:
-                    second.invincibility = False
 
     def apply_powerups(self, player: Player, value: int):
         # 10% increase per powerup
