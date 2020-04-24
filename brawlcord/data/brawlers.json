@@ -809,5 +809,43 @@
             "Night Mecha": [-1, 10000],
             "Gold Mecha": [-1, 50000]
         }
+    },
+    "Leon": {
+        "desc": "Leon shoots a quick salvo of blades at his target. His Super trick is a smoke bomb that makes him invisible for a little while!",
+        "health": 3200,
+        "attack": {
+            "name": "Spinner Blades",
+            "damage": 309,
+            "desc": "Leon flicks his wrist and fires four Spinner Blades. The blades deal less damage the farther they travel.",
+            "range": 9.67,
+            "reload": 1.9,
+            "projectiles": 4,
+            "extra": "Damage per blade"
+        },
+        "speed": 820,
+        "rarity": "Legendary",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Smoke Bomb",
+            "damage": 0,
+            "desc": "Leon becomes invisible for 6 seconds. If he attacks, he will be revealed. Enemies close to Leon will be able to spot him.",
+            "range": 0,
+            "duration": 6,
+            "projectiles": 1,
+            "extra": "Duration"
+        },
+        "sp1": {
+            "name": "Smoke Trails",
+            "desc": "When Leon uses his Super, he gains a 24% boost to his movement speed for the duration of his invisibility."
+        },
+        "sp2": {
+            "name": "Invisiheal",
+            "desc": "Leon recovers 1000 health per second while his Super is active."
+        },
+        "skins": {
+            "Shark": [80, -1],
+            "Sally": [80, -1],
+            "Werewolf": [-1, -1]
+        }
     }
 }

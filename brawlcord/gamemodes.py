@@ -339,6 +339,11 @@ class GameMode:
     def _move_super(self, first: Player, second: Player, round_num: int):
         first.last_attack = round_num
 
+        # Hardcoding for Leon's invisibility.
+        if first.brawler.name == "Leon":
+            first.invincibility = True
+            return
+
         vals, first.spawn = first.brawler._ult(first.brawler_level)
         first.attacks = 0
         if isinstance(vals, list):
