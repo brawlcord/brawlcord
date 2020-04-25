@@ -74,18 +74,11 @@ class BrawlcordHelp(RedHelpFormatter):
             for cog_name, data in coms:
                 for name, command in sorted(data.items()):
                     def add_com():
-                        def shorten_line(a_line: str) -> str:
-                            # embed max width needs to be lower than 70
-                            if len(a_line) < 70:
-                                return a_line
-                            return a_line[:67] + "..."
+                        command_info = f"**{ctx.clean_prefix}{name}** - {command.short_doc}"
 
-                        return (
-                            "\n" + shorten_line(
-                                f"**{ctx.clean_prefix}{name}** -"
-                                f" {command.short_doc}"
-                            )
-                        )
+                        if len(command_info) < 70:
+                            return "\n" + command_info
+                        return "\n" + command_info[:67] + "..."
 
                     if title == titles[0] and name in gameplay_cmds:
                         cog_text += add_com()
