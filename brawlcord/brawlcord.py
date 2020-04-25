@@ -23,7 +23,8 @@ from .brawlers import Brawler, brawler_thumb, brawlers_map
 from .brawlhelp import BrawlcordHelp, COMMUNITY_SERVER, INVITE_URL
 from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
 from .emojis import (
-    brawler_emojis, emojis, gamemode_emotes, level_emotes, rank_emojis, sp_icons
+    brawler_emojis, emojis, gamemode_emotes,
+    league_emojis, level_emotes, rank_emojis, sp_icons
 )
 from .errors import MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
@@ -111,18 +112,6 @@ reward_types = {
     12: ["Power Points", emojis["powerpoint"]],
     13: ["Game Mode", gamemode_emotes],
     14: ["Big Box", emojis["bigbox"]]
-}
-
-league_emojis = {
-    "No League": "<:l0:645337383537082418>",
-    "Wood": "<:l1:645337384782921801>",
-    "Bronze": "<:l2:645337384447377409>",
-    "Silver": "<:l3:645337384657092638>",
-    "Gold": "<:l4:645337384174616577>",
-    "Crystal": "<:l5:645337385500016640>",
-    "Diamond": "<:l6:645337387152441375>",
-    "Master": "<:l7:645337387089657889>",
-    "Star": "<:l8:645337387349835779>"
 }
 
 old_invite = None
@@ -1951,6 +1940,35 @@ class Brawlcord(commands.Cog):
             f"You can join the Brawlcord community server by using this link: {COMMUNITY_SERVER}"
         )
 
+    @commands.command()
+    async def drops(self, ctx: Context):
+        """Show Brawl Box drop rates"""
+
+        brawler_data = await self.get_player_stat(
+            ctx.author, "brawlers", is_iter=True
+        )
+
+        box = Box(self.BRAWLERS, brawler_data)
+
+        embed = discord.Embed(color=EMBED_COLOR)
+        embed.set_author(name="Drop Rates", icon_url=ctx.author.avatar_url)
+
+        def get_value_str(value: int):
+            return f"{value}%"
+
+        # TODO: Add emojis in front of values before release
+        embed.add_field(name="Power Points", value=get_value_str(box.powerpoint))
+        embed.add_field(name="Rare Brawler", value=get_value_str(box.rare))
+        embed.add_field(name="Super Rare Brawler", value=get_value_str(box.superrare))
+        embed.add_field(name="Epic Brawler", value=get_value_str(box.epic))
+        embed.add_field(name="Mythic Brawler", value=get_value_str(box.mythic))
+        embed.add_field(name="Legendary Brawler", value=get_value_str(box.legendary))
+        embed.add_field(name="Gems", value=get_value_str(box.gems))
+        embed.add_field(name="Tickets", value=get_value_str(box.tickets))
+        embed.add_field(name="Token Doubler", value=get_value_str(box.td))
+
+        await ctx.send(embed=embed)
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
@@ -2919,7 +2937,7 @@ class Brawlcord(commands.Cog):
             self.bot.add_command(old_info)
 
 
-async def setup(bot):
+async def setup(bot: Red):
     # Replace invite command.
     global old_invite
     old_invite = bot.get_command("invite")
