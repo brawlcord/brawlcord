@@ -283,7 +283,7 @@ class Healer(Brawler):
 
         stats = self.buff_stats(level)
 
-        heal = stats['utl_heal']
+        heal = stats['ult_heal']
 
         raw = heal * 0.8
 
