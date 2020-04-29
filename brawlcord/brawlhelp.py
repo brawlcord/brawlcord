@@ -2,14 +2,14 @@ from collections import namedtuple
 
 import discord
 from redbot.core.commands.context import Context
-from redbot.core.commands.help import RedHelpFormatter
+from redbot.core.commands.help import HelpSettings, RedHelpFormatter
 from redbot.core.utils.chat_formatting import pagify
 
 EmbedField = namedtuple("EmbedField", "name value inline")
 EMPTY_STRING = "\N{ZERO WIDTH SPACE}"
 INVITE_URL = (
     "https://discordapp.com/api/oauth2/authorize?client_id="
-    "644118957917208576&permissions=321600&scope=bot"
+    "644118957917208576&permissions=322624&scope=bot"
 )
 COMMANDS_PAGE = "https://snowsee.github.io/brawlcord/commands"
 COMMUNITY_SERVER = "https://discord.gg/7zJ3PbJ"
@@ -26,10 +26,10 @@ class BrawlcordHelp(RedHelpFormatter):
     def __init__(self, bot):
         self.bot = bot
 
-    async def format_bot_help(self, ctx: Context):
+    async def format_bot_help(self, ctx: Context, help_settings: HelpSettings):
         """Format the default help message"""
 
-        coms = await self.get_bot_help_mapping(ctx)
+        coms = await self.get_bot_help_mapping(ctx, help_settings)
         if not coms:
             return
 
@@ -74,18 +74,11 @@ class BrawlcordHelp(RedHelpFormatter):
             for cog_name, data in coms:
                 for name, command in sorted(data.items()):
                     def add_com():
-                        def shorten_line(a_line: str) -> str:
-                            # embed max width needs to be lower than 70
-                            if len(a_line) < 70:
-                                return a_line
-                            return a_line[:67] + "..."
+                        command_info = f"**{ctx.clean_prefix}{name}** - {command.short_doc}"
 
-                        return (
-                            "\n" + shorten_line(
-                                f"**{ctx.clean_prefix}{name}** -"
-                                f" {command.short_doc}"
-                            )
-                        )
+                        if len(command_info) < 70:
+                            return "\n" + command_info
+                        return "\n" + command_info[:67] + "..."
 
                     if title == titles[0] and name in gameplay_cmds:
                         cog_text += add_com()
@@ -108,9 +101,9 @@ class BrawlcordHelp(RedHelpFormatter):
                 field = EmbedField(title, page, False)
                 emb["fields"].append(field)
 
-        await self.make_and_send_embeds(ctx, emb)
+        await self.make_and_send_embeds(ctx, emb, help_settings)
 
-    async def make_and_send_embeds(self, ctx, embed_dict: dict):
+    async def make_and_send_embeds(self, ctx, embed_dict: dict, help_settings: HelpSettings):
 
         pages = []
 
@@ -176,7 +169,7 @@ class BrawlcordHelp(RedHelpFormatter):
 
             pages.append(embed)
 
-        await self.send_pages(ctx, pages, embed=True)
+        await self.send_pages(ctx, pages, embed=True, help_settings=help_settings)
 
     def get_default_tagline(self, ctx):
         return (
