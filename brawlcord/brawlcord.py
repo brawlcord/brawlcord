@@ -6,6 +6,7 @@ import re
 import traceback
 import urllib.request
 from datetime import datetime, timedelta
+from distutils.version import LooseVersion
 from math import ceil
 
 import discord
@@ -247,7 +248,7 @@ class Brawlcord(commands.Cog):
 
         if match:
             current_ver = match.group(1)
-            if current_ver != __version__:
+            if LooseVersion(current_ver) > LooseVersion(__version__):
                 version_str += f" ({current_ver} is available!)"
 
         embed.add_field(name="Version", value=version_str)
