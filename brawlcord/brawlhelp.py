@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import discord
 from redbot.core.commands.context import Context
-from redbot.core.commands.help import RedHelpFormatter
+from redbot.core.commands.help import HelpSettings, RedHelpFormatter
 from redbot.core.utils.chat_formatting import pagify
 
 EmbedField = namedtuple("EmbedField", "name value inline")
@@ -26,10 +26,10 @@ class BrawlcordHelp(RedHelpFormatter):
     def __init__(self, bot):
         self.bot = bot
 
-    async def format_bot_help(self, ctx: Context):
+    async def format_bot_help(self, ctx: Context, help_settings: HelpSettings):
         """Format the default help message"""
 
-        coms = await self.get_bot_help_mapping(ctx)
+        coms = await self.get_bot_help_mapping(ctx, help_settings)
         if not coms:
             return
 
@@ -101,9 +101,9 @@ class BrawlcordHelp(RedHelpFormatter):
                 field = EmbedField(title, page, False)
                 emb["fields"].append(field)
 
-        await self.make_and_send_embeds(ctx, emb)
+        await self.make_and_send_embeds(ctx, emb, help_settings)
 
-    async def make_and_send_embeds(self, ctx, embed_dict: dict):
+    async def make_and_send_embeds(self, ctx, embed_dict: dict, help_settings: HelpSettings):
 
         pages = []
 
@@ -169,7 +169,7 @@ class BrawlcordHelp(RedHelpFormatter):
 
             pages.append(embed)
 
-        await self.send_pages(ctx, pages, embed=True)
+        await self.send_pages(ctx, pages, embed=True, help_settings=help_settings)
 
     def get_default_tagline(self, ctx):
         return (
