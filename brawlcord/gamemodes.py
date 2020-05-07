@@ -64,12 +64,19 @@ class Player:
         except KeyError:
             self.spawn_str = ""
 
+    # We have these functions here because of type hinting.
+    # There is no other reason for them to exist here instead of
+    # in the game mode classes.
     def gemgrab(self):
         self.gems = 0
         self.dropped = 0
 
     def showdown(self):
         self.powerups = 1
+
+    def brawlball(self):
+        self.goals = 0
+        self.progress = 0
 
     def _to_json(self) -> dict:
         """Return a dict with player data"""
@@ -272,22 +279,49 @@ class GameMode:
             brawl_stats[game_type][1] += 1
 
     def check_if_win(self, first: Player, second: Player):
-        pass
+        """Needs to be implemented in inherited classes.
+
+        `None` is expected in case of draws. `False` if game hasn't ended.
+        """
 
     async def set_embed(self, ctx: Context, first: Player, second: Player):
-        pass
+        if first.can_super:
+            self_super_emote = emojis['superready']
+        else:
+            self_super_emote = emojis['supernotready']
 
-    def set_embed_fields(
-        self,
-        embed: discord.Embed,
-        player: Player,
-        super_emote: str,
-        opponent=False
-    ):
-        pass
+        if second.can_super:
+            opp_super_emote = emojis['superready']
+        else:
+            opp_super_emote = emojis['supernotready']
+
+        if second.is_respawning:
+            color = RESPAWN_COLOR
+        elif first.can_super:
+            color = SUPER_COLOR
+        else:
+            color = DEFAULT_COLOR
+
+        embed = discord.Embed(
+            color=color,
+            title=f"Brawl against {second.player.name}"
+        )
+        embed.set_author(
+            name=first.player.name, icon_url=first.player.avatar_url
+        )
+
+        embed = self.set_embed_fields(embed, first, self_super_emote, False)
+
+        embed = self.set_embed_fields(embed, second, opp_super_emote, True)
+
+        moves = self.moves_str(first, second)
+
+        embed.add_field(name="Available Moves", value=moves, inline=False)
+
+        return embed
 
     def moves_str(self, first: Player, second: Player):
-        pass
+        """Needs to be implemented in inherited classes."""
 
     async def get_user_choice(
         self, ctx: Context, embed, end, first_player, second_player
@@ -317,8 +351,7 @@ class GameMode:
     def move_handler(
         self, choice: int, first: Player, second: Player, round_num: int
     ):
-        """Handle user and spawn actions"""
-        pass
+        """Needs to be implemented in inherited classes."""
 
     def _move_attack(self, first: Player, second: Player, round_num: int):
         first.last_attack = round_num
@@ -622,42 +655,6 @@ class GemGrab(GameMode):
             loser = False
 
         return winner, loser
-
-    async def set_embed(self, ctx: Context, first: Player, second: Player):
-        if first.can_super:
-            self_super_emote = emojis['superready']
-        else:
-            self_super_emote = emojis['supernotready']
-
-        if second.can_super:
-            opp_super_emote = emojis['superready']
-        else:
-            opp_super_emote = emojis['supernotready']
-
-        if second.is_respawning:
-            color = RESPAWN_COLOR
-        elif first.can_super:
-            color = SUPER_COLOR
-        else:
-            color = DEFAULT_COLOR
-
-        embed = discord.Embed(
-            color=color,
-            title=f"Brawl against {second.player.name}"
-        )
-        embed.set_author(
-            name=first.player.name, icon_url=first.player.avatar_url
-        )
-
-        embed = self.set_embed_fields(embed, first, self_super_emote, False)
-
-        embed = self.set_embed_fields(embed, second, opp_super_emote, True)
-
-        moves = self.moves_str(first, second)
-
-        embed.add_field(name="Available Moves", value=moves, inline=False)
-
-        return embed
 
     def moves_str(self, first: Player, second: Player):
         if not second.is_respawning:
@@ -1056,7 +1053,251 @@ class Showdown(GameMode):
             self.second.health -= self.poison_damage
 
 
+class BrawlBall(GameMode):
+    """Class to represent Brawl Ball."""
+
+    def __init__(self, ctx, user, opponent, conf, brawlers):
+        super().__init__(ctx, user, opponent, conf, brawlers)
+
+        self.ball_holder = None
+
+    async def initialize(self, ctx):
+        first, second = await super().initialize(ctx)
+
+        self.first.brawlball()
+        self.second.brawlball()
+
+        return first, second
+
+    async def play(self, ctx):
+        """Function to run the game"""
+
+        i = 0
+        # Game ends after 75th round.
+        while i < 150:
+            if i % 2 == 0:
+                first = self.first
+                second = self.second
+            else:
+                first = self.second
+                second = self.first
+
+            if first.is_respawning:
+                try:
+                    await first.player.send("You are respawning!")
+                except AttributeError:
+                    pass
+            else:
+                self.healing(i, first)
+                if first.stunned:
+                    await self.handle_stun(first, second)
+                    i += 1
+                    continue
+
+                try:
+                    await self.send_waiting_message(
+                        ctx, first.player, second.player
+                    )
+                except discord.Forbidden:
+                    raise
+
+                if not second.is_respawning:
+                    if first.attacks >= 6:
+                        first.can_super = True
+                        end = 4
+                    else:
+                        first.can_super = False
+                        end = 3
+                else:
+                    end = 3
+
+                if second.spawn:
+                    if second.spawn > 0:
+                        end += 1
+                    else:
+                        second.spawn = None
+
+                if first.player != self.guild.me:
+                    embed = await self.set_embed(ctx, first, second)
+                    try:
+                        choice = await self.get_user_choice(
+                            ctx, embed, end, first.player, second.player
+                        )
+                    except asyncio.TimeoutError:
+                        winner, loser = second.player, first.player
+                        break
+                else:
+                    choice = random.randint(1, end)
+
+                self.move_handler(choice, first, second, i)
+
+                if second.health <= 0:
+                    self.respawning(second)
+
+                    try:
+                        await first.player.send(
+                            f"Opponent defeated! Respawning next round."
+                        )
+                    except AttributeError:
+                        pass  # bot user
+                    try:
+                        await second.player.send(
+                            f"You are defeated! Respawning next round."
+                        )
+                    except AttributeError:
+                        pass  # bot user
+
+                    # go to next loop
+                    i += 1
+                    continue
+
+            winner, loser = self.check_if_win(first, second)
+
+            if winner is False:
+                pass
+            else:
+                break
+            # go to next loop
+            i += 1
+
+        # time up
+        winner, loser = await self.time_up(winner, loser)
+
+        await self.update_stats(winner, loser)
+
+        return winner, loser
+
+    def check_if_win(self, first: Player, second: Player):
+        if first.goals == 2:
+            winner = first.player
+            loser = second.player
+        elif second.goals == 2:
+            winner = second.player
+            loser = first.player
+        else:
+            winner = False
+            loser = False
+
+        return winner, loser
+
+    def moves_str(self, first: Player, second: Player):
+        if not second.is_respawning:
+            if first.can_super and not second.spawn:
+                moves = (
+                    "1. Attack\n2. Try to kick ball\n"
+                    "3. Dodge next move\n4. Use Super"
+                )
+            elif first.can_super and second.spawn:
+                moves = (
+                    "1. Attack\n2. Try to kick ball\n3. Dodge next move"
+                    f"\n4. Use Super\n5. Attack {second.spawn_str}"
+                )
+            elif not first.can_super and second.spawn:
+                moves = (
+                    "1. Attack\n2. Try to kick ball\n3. Dodge next move"
+                    f"\n4. Attack enemy {second.spawn_str}"
+                )
+            else:
+                moves = f"1. Attack\n2. Try to kick ball\n3. Dodge next move"
+        else:
+            if not second.spawn:
+                moves = (
+                    "1. Try to kick ball\n2. Dodge next move"
+                )
+            else:
+                moves = (
+                    "1. Try to kick ball\n2. Dodge next move\n3. Attack enemy {second.spawn_str}"
+                )
+
+        return moves
+
+    def goals_field(self, embed: discord.Embed, player: Player, opponent=False):
+        if opponent:
+            iden = "Opponent's"
+        else:
+            iden = "Your"
+
+        embed.add_field(
+            name=f"{iden} Goals",
+            value=f"{gamemode_emotes['Brawl Ball']} {player.goals}"
+        )
+
+        return embed
+
+    def set_embed_fields(
+        self,
+        embed: discord.Embed,
+        player: Player,
+        super_emote: str,
+        opponent=False
+    ):
+
+        embed = self.initial_fields(embed, player, super_emote, opponent)
+        embed = self.goals_field(embed, player, opponent)
+        embed = self.spawn_field(embed, player, opponent)
+
+        return embed
+
+    def move_handler(
+        self, choice: int, first: Player, second: Player, round_num: int
+    ):
+
+        if not second.is_respawning:
+            if choice == 1:
+                # attack
+                self._move_attack(first, second, round_num)
+            elif choice == 2:
+                # kick ball
+                self._move_kick(first, second)
+            elif choice == 3:
+                # invincibility
+                self._move_invinc(first, second)
+            elif choice == 4:
+                if first.can_super:
+                    # super
+                    self._move_super(first, second, round_num)
+                else:
+                    # attack spawn
+                    self._move_attack_spawn(first, second)
+            elif choice == 5:
+                # attack spawn
+                self._move_attack_spawn(first, second)
+
+            # spawn's attack
+            self._move_spawn_attack(first, second, round_num)
+
+        else:
+            second.is_respawning = False
+            if choice == 1:
+                # kick ball
+                self._move_kick(first, second)
+            elif choice == 2:
+                # invincibility
+                self._move_invinc(first, second)
+            elif choice == 3:
+                # attack spawn
+                self._move_attack_spawn(first, second)
+
+            # spawn's attack
+            self._move_spawn_attack(first, second, round_num)
+
+    def _move_kick(self, first: Player, second: Player):
+        if second.is_respawning:
+            # 0.50 chance of scoring a goal
+            goal = random.choice([0, 1])
+        else:
+            # 0.10 chance of scoring a goal
+            goal = random.choices([0, 1], [0.9, 0.1], k=1)[0]
+        if first.can_super and not goal:
+            # 0.40 chance of scoring
+            goal = random.choices([0, 1], [0.6, 0.4], k=1)[0]
+        first.goals += goal
+        if second.invincibility:
+            second.invincibility = False
+
+
 gamemodes_map = {
     "Gem Grab": GemGrab,
-    "Solo Showdown": Showdown
+    "Solo Showdown": Showdown,
+    "Brawl Ball": BrawlBall
 }
