@@ -1031,10 +1031,10 @@ class Brawlcord(commands.Cog):
         else:
             return await ctx.send("Unable to identify game mode.")
 
-        if gamemode not in ["Gem Grab", "Solo Showdown"]:
+        if gamemode not in ["Gem Grab", "Solo Showdown", "Brawl Ball"]:
             return await ctx.send(
-                "The game only supports **Gem Grab** and **Solo Showdown**"
-                " at the moment. More game modes will be added soon!"
+                "The game only supports **Gem Grab**, **Solo Showdown** and"
+                " **Brawl Ball** at the moment. More game modes will be added soon!"
             )
 
         user_owned = await self.get_player_stat(
