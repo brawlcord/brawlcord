@@ -1109,7 +1109,7 @@ class BrawlBall(GameMode):
                         first.can_super = False
                         end = 3
                 else:
-                    end = 3
+                    end = 2
 
                 if second.spawn:
                     if second.spawn > 0:
