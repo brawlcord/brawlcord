@@ -278,7 +278,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     @maintenance()
-    async def _brawl(self, ctx: Context, opponent: discord.Member = None):
+    async def _brawl(self, ctx: Context, *, opponent: discord.Member = None):
         """Brawl against other players"""
 
         guild = ctx.guild
