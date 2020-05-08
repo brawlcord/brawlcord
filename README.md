@@ -1,7 +1,7 @@
 <h1 align="center">
   <br>
   <a href="https://snowsee.github.io/brawlcord/">
-    <img src="https://i.imgur.com/poP3rlo.png" alt="Brawlcord">
+    <img src="https://i.imgur.com/4Rifxpi.png" alt="Brawlcord">
   </a>
   <br>
   <i> <a href="https://snowsee.github.io/brawlcord/">Brawlcord</a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot">Invite</a></i>
