@@ -20,6 +20,7 @@ from redbot.core.utils.menus import (
 )
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
+from .battlelog import BattleLogEntry, PartialBattleLogEntry
 from .brawlers import Brawler, brawler_thumb, brawlers_map
 from .brawlhelp import BrawlcordHelp, COMMUNITY_SERVER, INVITE_URL
 from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
@@ -34,7 +35,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.7"
+__version__ = "2.2.0"
 __author__ = "Snowsee"
 
 default = {
@@ -98,7 +99,9 @@ default_user = {
     "shop": {},
     # list of gamemodes where the user
     # already received daily star tokens
-    "todays_st": []
+    "todays_st": [],
+    "battle_log": [],
+    "partial_battle_log": []
 }
 
 shelly_tut = "https://i.imgur.com/QfKYzso.png"
@@ -131,6 +134,12 @@ DAY = 86400
 WEEK = 604800
 
 EMBED_COLOR = 0x74CFFF
+
+LOG_COLORS = {
+    "Victory": 0x6CFF52,
+    "Loss": 0xFF5B5B,
+    "Draw": EMBED_COLOR
+}
 
 
 class Brawlcord(commands.Cog):
@@ -354,6 +363,7 @@ class Brawlcord(commands.Cog):
                 " The match ended in a draw!"
             )
 
+        log_data = []
         count = 0
         for player in players:
             if player == guild.me:
@@ -368,17 +378,21 @@ class Brawlcord(commands.Cog):
             # brawl rewards, rank up rewards and trophy road rewards
             br, rur, trr = await self.brawl_rewards(player, points, gm)
 
+            log_data.append({"user": player, "trophies": br[1], "reward": br[2]})
+
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
             level_up = await self.xp_handler(player)
-            await player.send(embed=br)
+            await player.send(embed=br[0])
             if level_up:
                 await player.send(f"{level_up[0]}\n{level_up[1]}")
             if rur:
                 await player.send(embed=rur)
             if trr:
                 await player.send(embed=trr)
+
+        await self.save_battle_log(log_data)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -1970,6 +1984,59 @@ class Brawlcord(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command(aliases=["log"])
+    async def battlelog(self, ctx: Context):
+        """Show the battle log with last 10 (or fewer) entries"""
+
+        battle_log = await self.config.user(ctx.author).battle_log()
+        battle_log.reverse()
+
+        # Only show 10 (or fewer) most recent logs.
+        battle_log = battle_log[-10:]
+        total_pages = len(battle_log)
+
+        embeds = []
+
+        for page_num, entry_json in enumerate(battle_log, start=1):
+            entry: BattleLogEntry = await BattleLogEntry.from_json(entry_json, self.bot)
+
+            embed = discord.Embed(
+                color=LOG_COLORS[entry.result],
+                timestamp=datetime.utcfromtimestamp(entry.timestamp)
+            )
+            embed.set_author(
+                name=f"{ctx.author.name}'s Battle Log", icon_url=ctx.author.avatar_url
+            )
+            embed.description = (
+                f"Opponent: **{entry.opponent}**"
+                f"\nResult: **{entry.result}**"
+                f"\nGame Mode: {gamemode_emotes[entry.game_mode]} **{entry.game_mode}**"
+            )
+
+            player_value = (
+                f"Brawler: {brawler_emojis[entry.player_brawler_name]}"
+                f" **{entry.player_brawler_name}**"
+                f"\nBrawler Level: **{level_emotes['level_' + str(entry.player_brawler_level)]}**"
+                f"\nBrawler Trophies: {emojis['trophies']} **{entry.player_brawler_trophies}**"
+                f"\nReward Trophies: {emojis['trophies']} **{entry.player_reward_trophies}**"
+            )
+            embed.add_field(name="Your Stats", value=player_value)
+
+            opponent_value = (
+                f"Brawler: {brawler_emojis[entry.opponent_brawler_name]}"
+                f" **{entry.opponent_brawler_name}**"
+                f"\nBrawler Level: **{level_emotes['level_' + str(entry.opponent_brawler_level)]}**"
+                f"\nBrawler Trophies: {emojis['trophies']} **{entry.opponent_brawler_trophies}**"
+                f"\nReward Trophies: {emojis['trophies']} **{entry.opponent_reward_trophies}**"
+            )
+            embed.add_field(name="Opponent's Stats", value=opponent_value)
+
+            embed.set_footer(text=f"Log {page_num} of {total_pages}")
+
+            embeds.append(embed)
+
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
@@ -2073,8 +2140,7 @@ class Brawlcord(commands.Cog):
             user, 'brawlers', is_iter=True, substat=selected_brawler)
         trophies = brawler_data['trophies']
 
-        reward_trophies = self.trophies_to_reward_mapping(
-            trophies, '3v3', position)
+        reward_trophies = self.trophies_to_reward_mapping(trophies, '3v3', position)
 
         trophies += reward_trophies
 
@@ -2138,7 +2204,7 @@ class Brawlcord(commands.Cog):
         rank_up = await self.handle_rank_ups(user, selected_brawler)
         trophy_road_reward = await self.handle_trophy_road(user)
 
-        return embed, rank_up, trophy_road_reward
+        return (embed, trophies-reward_trophies, reward_trophies), rank_up, trophy_road_reward
 
     def trophies_to_reward_mapping(
         self, trophies: int, game_type="3v3", position=1
@@ -2912,6 +2978,54 @@ class Brawlcord(commands.Cog):
         # get timestamp in UTC
         timestamp = (time_now - epoch).total_seconds()
         await self.config.st_reset_ts.set(timestamp)
+
+    async def save_battle_log(self, log_data: dict):
+        """Save complete log entry."""
+
+        if len(log_data) == 1:
+            # One user is the bot.
+            user = log_data[0]["user"]
+            partial_logs = await self.config.user(user).partial_battle_log()
+            partial_logs: list
+            partial_log_json = partial_logs[-1]
+
+            partial_log = await PartialBattleLogEntry.from_json(partial_log_json, self.bot)
+            player_extras = {
+                "brawler_trophies": log_data[0]["trophies"],
+                "reward_trophies": log_data[0]["reward"]
+            }
+            opponent_extras = {
+                "brawler_trophies": log_data[0]["trophies"] + random.randint(-20, 20),
+                "reward_trophies": 0
+            }
+            log_entry = BattleLogEntry(partial_log, player_extras, opponent_extras).to_json()
+            async with self.config.user(user).battle_log() as battle_log:
+                battle_log.append(log_entry)
+
+        else:
+            for i in [0, 1]:
+                if i == 0:
+                    other = 1
+                else:
+                    other = 0
+
+                user = log_data[i]["user"]
+                partial_logs = await self.config.user(user).partial_battle_log()
+                partial_logs: list
+                partial_log_json = partial_logs[-1]
+
+                partial_log = await PartialBattleLogEntry.from_json(partial_log_json, self.bot)
+                player_extras = {
+                    "brawler_trophies": log_data[i]["trophies"],
+                    "reward_trophies": log_data[i]["reward"]
+                }
+                opponent_extras = {
+                    "brawler_trophies": log_data[other]["trophies"],
+                    "reward_trophies": log_data[other]["reward"]
+                }
+                log_entry = BattleLogEntry(partial_log, player_extras, opponent_extras).to_json()
+                async with self.config.user(user).battle_log() as battle_log:
+                    battle_log.append(log_entry)
 
     def cog_unload(self):
         # Cancel various tasks.

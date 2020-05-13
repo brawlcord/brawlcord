@@ -1,6 +1,7 @@
 import asyncio
 import random
 from math import ceil
+from typing import Union
 
 import discord
 from redbot.core import Config
@@ -8,6 +9,7 @@ from redbot.core.commands.context import Context
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
+from .battlelog import PartialBattleLogEntry
 from .brawlers import Brawler, brawlers_map
 from .emojis import brawler_emojis, emojis, gamemode_emotes
 from .errors import UserRejected
@@ -525,6 +527,48 @@ class GameMode:
     def apply_powerups(self, player: Player, value: int):
         return value
 
+    async def save_partial_log(
+        self, winner: Union[Player, bool], loser: Union[Player, bool], game_mode: str
+    ):
+        """Saves `PartialBattleLog` instances."""
+
+        first = None
+        first_result = None
+        second = None
+        second_result = None
+        if winner:
+            if winner == self.first.player:
+                first = self.first
+                second = self.second
+                first_result = True
+                second_result = False
+            else:
+                first = self.second
+                second = self.first
+                first_result = False
+                second_result = True
+        else:
+            first = self.first
+            second = self.second
+            first_result = None
+            second_result = None
+
+        if self.guild.me.id != first.player.id:
+            partial_log_first = PartialBattleLogEntry(
+                first, second, game_mode, first_result
+            ).to_json()
+
+            async with self.conf(first.player).partial_battle_log() as partial_battle_log:
+                partial_battle_log.append(partial_log_first)
+
+        if self.guild.me.id != second.player.id:
+            partial_log_second = PartialBattleLogEntry(
+                second, first, game_mode, second_result
+            ).to_json()
+
+            async with self.conf(second.player).partial_battle_log() as partial_battle_log:
+                partial_battle_log.append(partial_log_second)
+
 
 class GemGrab(GameMode):
     """Class to represent Gem Grab."""
@@ -637,6 +681,7 @@ class GemGrab(GameMode):
         winner, loser = await self.time_up(winner, loser)
 
         await self.update_stats(winner, loser)
+        await self.save_partial_log(winner, loser, "Gem Grab")
 
         return winner, loser
 
@@ -885,6 +930,7 @@ class Showdown(GameMode):
         winner, loser = await self.time_up(winner, loser)
 
         await self.update_stats(winner, loser, game_type='solo')
+        await self.save_partial_log(winner, loser, "Solo Showdown")
 
         return winner, loser
 
@@ -1164,6 +1210,7 @@ class BrawlBall(GameMode):
         winner, loser = await self.time_up(winner, loser)
 
         await self.update_stats(winner, loser)
+        await self.save_partial_log(winner, loser, "Brawl Ball")
 
         return winner, loser
 
