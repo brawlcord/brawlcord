@@ -2986,7 +2986,6 @@ class Brawlcord(commands.Cog):
             # One user is the bot.
             user = log_data[0]["user"]
             partial_logs = await self.config.user(user).partial_battle_log()
-            partial_logs: list
             partial_log_json = partial_logs[-1]
 
             partial_log = await PartialBattleLogEntry.from_json(partial_log_json, self.bot)
@@ -3001,7 +3000,6 @@ class Brawlcord(commands.Cog):
             log_entry = BattleLogEntry(partial_log, player_extras, opponent_extras).to_json()
             async with self.config.user(user).battle_log() as battle_log:
                 battle_log.append(log_entry)
-
         else:
             for i in [0, 1]:
                 if i == 0:
@@ -3011,7 +3009,6 @@ class Brawlcord(commands.Cog):
 
                 user = log_data[i]["user"]
                 partial_logs = await self.config.user(user).partial_battle_log()
-                partial_logs: list
                 partial_log_json = partial_logs[-1]
 
                 partial_log = await PartialBattleLogEntry.from_json(partial_log_json, self.bot)
