@@ -1369,7 +1369,8 @@ class Brawlcord(commands.Cog):
 
     @commands.group(
         name="leaderboard",
-        aliases=['lb'], autohelp=False,
+        aliases=['lb'],
+        autohelp=False,
         usage='[brawler or pb] [brawler_name]'
     )
     @maintenance()
@@ -2801,7 +2802,10 @@ class Brawlcord(commands.Cog):
     async def maint(
         self, ctx: Context, setting: bool = False, duration: int = None
     ):
-        """Set/remove maintenance. Duration should be in minutes."""
+        """Set/remove maintenance. The duration should be in minutes."""
+
+        if duration:
+            setting = True
 
         async with self.config.maintenance() as maint:
             maint["setting"] = setting
@@ -2815,7 +2819,7 @@ class Brawlcord(commands.Cog):
         else:
             await ctx.send("Disabled maintenance. Commands are enabled now.")
 
-    @commands.command()
+    @commands.command(aliases=["maintinfo"])
     @checks.is_owner()
     async def minfo(self, ctx: Context):
         """Display maintenance info."""
