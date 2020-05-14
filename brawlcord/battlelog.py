@@ -12,7 +12,7 @@ class PartialBattleLogEntry:
     It does not contain information about brawler trophies and rewards. It also
     does not have `timestamp` attribute.
 
-    Paramters
+    Parameters
     -------------
     player: `Player`
         The player the log is saved for.
@@ -107,7 +107,7 @@ class PartialBattleLogEntry:
 class BattleLogEntry:
     """Represents a complete battle log entry.
 
-    Paramters
+    Parameters
     -------------
     partial_log: `Optional[PartialBattleLogEntry]`
         The partial log entry created for this brawl.
