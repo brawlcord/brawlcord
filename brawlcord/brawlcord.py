@@ -33,7 +33,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.2.0"
+__version__ = "2.2.1"
 __author__ = "Snowsee"
 
 default = {
@@ -2070,7 +2070,7 @@ class Brawlcord(commands.Cog):
                     await self.update_player_stat(
                         user, 'bank_update_ts', timestamp)
 
-            asyncio.sleep(60)
+            await asyncio.sleep(60)
 
     async def update_status(self):
         """Task to update bot's status with total guilds.
