@@ -4,6 +4,8 @@ from redbot.core import Config
 from redbot.core.commands.context import Context
 from redbot.core.utils.chat_formatting import humanize_timedelta
 
+from .utils import utc_timestamp
+
 
 async def user_cooldown(rate: int, per: int, config: Config, ctx: Context):
     """Handle user cooldown"""
@@ -66,28 +68,7 @@ async def user_cooldown_msg(ctx: Context, config: Config):
         now = utc_timestamp(datetime.utcnow())
 
         return (
-                "This command is on cooldown. Try again in {}.".format(
-                    humanize_timedelta(seconds=last-now) or "1 second"
-                )
+            "This command is on cooldown. Try again in {}.".format(
+                humanize_timedelta(seconds=last-now) or "1 second"
             )
-
-
-def utc_timestamp(time: datetime) -> float:
-    """Return timestamp in UTC.
-
-    Parameters
-    --------------
-    time : datetime
-        datetime object in UTC
-
-    Returns
-    ---------
-    float
-        Timestamp in UTC
-    """
-
-    epoch = datetime(1970, 1, 1)
-    # get timestamp in UTC
-    timestamp = (time - epoch).total_seconds()
-
-    return timestamp
+        )

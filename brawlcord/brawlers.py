@@ -639,6 +639,11 @@ class Spike(Brawler):
     """Class to represent Spike."""
 
 
+# It doesn't need any overrides. `GameMode` classes are changes to suit Leon's abilities.
+class Leon(Brawler):
+    """Class to represent Leon."""
+
+
 brawlers_map = {
     "Shelly": Shelly,
     "Nita": Nita,

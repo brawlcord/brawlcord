@@ -1,4 +1,5 @@
 import random
+from datetime import datetime
 
 import discord
 from redbot.core import commands
@@ -561,3 +562,24 @@ def maintenance():
         return True
 
     return commands.check(predicate)
+
+
+def utc_timestamp(time: datetime) -> float:
+    """Return timestamp in UTC.
+
+    Parameters
+    --------------
+    time : datetime
+        datetime object in UTC
+
+    Returns
+    ---------
+    float
+        Timestamp in UTC
+    """
+
+    epoch = datetime(1970, 1, 1)
+    # get timestamp in UTC
+    timestamp = (time - epoch).total_seconds()
+
+    return timestamp

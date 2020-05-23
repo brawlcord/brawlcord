@@ -1,4 +1,4 @@
-<h1 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot"> Invite to your server! </a></i></h1>
+<h1 align="center"><i><a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot"> Invite to your server! </a></i></h1>
 
 <p align="center">
   <a href="#overview">Overview</a>
@@ -28,7 +28,7 @@ Battle with friends or solo across a variety of game modes in under three minute
 
 ## How To Use
 
-You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=321600&scope=bot).  
+You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot).  
 
 **Note:** By using the link above, Brawlcord will be able to read messages, send messages, manage messages, embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
 

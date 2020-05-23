@@ -6,6 +6,7 @@ import re
 import traceback
 import urllib.request
 from datetime import datetime, timedelta
+from distutils.version import LooseVersion
 from math import ceil
 
 import discord
@@ -14,16 +15,16 @@ from redbot.core.bot import Red
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.chat_formatting import pagify
-from redbot.core.utils.menus import (
-    DEFAULT_CONTROLS, menu, start_adding_reactions
-)
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
+from .battlelog import BattleLogEntry, PartialBattleLogEntry
 from .brawlers import Brawler, brawler_thumb, brawlers_map
 from .brawlhelp import BrawlcordHelp, COMMUNITY_SERVER, INVITE_URL
 from .cooldown import humanize_timedelta, user_cooldown, user_cooldown_msg
 from .emojis import (
-    brawler_emojis, emojis, gamemode_emotes, level_emotes, rank_emojis, sp_icons
+    brawler_emojis, emojis, gamemode_emotes,
+    league_emojis, level_emotes, rank_emojis, sp_icons
 )
 from .errors import MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
@@ -32,7 +33,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.1.6"
+__version__ = "2.2.0"
 __author__ = "Snowsee"
 
 default = {
@@ -96,7 +97,9 @@ default_user = {
     "shop": {},
     # list of gamemodes where the user
     # already received daily star tokens
-    "todays_st": []
+    "todays_st": [],
+    "battle_log": [],
+    "partial_battle_log": []
 }
 
 shelly_tut = "https://i.imgur.com/QfKYzso.png"
@@ -111,18 +114,6 @@ reward_types = {
     12: ["Power Points", emojis["powerpoint"]],
     13: ["Game Mode", gamemode_emotes],
     14: ["Big Box", emojis["bigbox"]]
-}
-
-league_emojis = {
-    "No League": "<:l0:645337383537082418>",
-    "Wood": "<:l1:645337384782921801>",
-    "Bronze": "<:l2:645337384447377409>",
-    "Silver": "<:l3:645337384657092638>",
-    "Gold": "<:l4:645337384174616577>",
-    "Crystal": "<:l5:645337385500016640>",
-    "Diamond": "<:l6:645337387152441375>",
-    "Master": "<:l7:645337387089657889>",
-    "Star": "<:l8:645337387349835779>"
 }
 
 old_invite = None
@@ -141,6 +132,12 @@ DAY = 86400
 WEEK = 604800
 
 EMBED_COLOR = 0x74CFFF
+
+LOG_COLORS = {
+    "Victory": 0x6CFF52,
+    "Loss": 0xFF5B5B,
+    "Draw": EMBED_COLOR
+}
 
 
 class Brawlcord(commands.Cog):
@@ -179,13 +176,9 @@ class Brawlcord(commands.Cog):
                 logging.exception("Error in task", exc_info=exc)
                 print("Error in task:", exc)
 
-        self.bank_update_task = self.bot.loop.create_task(
-            self.update_token_bank()
-        )
+        self.bank_update_task = self.bot.loop.create_task(self.update_token_bank())
         self.status_task = self.bot.loop.create_task(self.update_status())
-        self.shop_and_st_task = self.bot.loop.create_task(
-            self.update_shop_and_st()
-        )
+        self.shop_and_st_task = self.bot.loop.create_task(self.update_shop_and_st())
         self.bank_update_task.add_done_callback(error_callback)
         self.shop_and_st_task.add_done_callback(error_callback)
         self.status_task.add_done_callback(error_callback)
@@ -258,7 +251,7 @@ class Brawlcord(commands.Cog):
 
         if match:
             current_ver = match.group(1)
-            if current_ver != __version__:
+            if LooseVersion(current_ver) > LooseVersion(__version__):
                 version_str += f" ({current_ver} is available!)"
 
         embed.add_field(name="Version", value=version_str)
@@ -288,7 +281,7 @@ class Brawlcord(commands.Cog):
     @commands.command(name="brawl", aliases=["b"])
     @commands.guild_only()
     @maintenance()
-    async def _brawl(self, ctx: Context, opponent: discord.Member = None):
+    async def _brawl(self, ctx: Context, *, opponent: discord.Member = None):
         """Brawl against other players"""
 
         guild = ctx.guild
@@ -364,6 +357,7 @@ class Brawlcord(commands.Cog):
                 " The match ended in a draw!"
             )
 
+        log_data = []
         count = 0
         for player in players:
             if player == guild.me:
@@ -378,17 +372,21 @@ class Brawlcord(commands.Cog):
             # brawl rewards, rank up rewards and trophy road rewards
             br, rur, trr = await self.brawl_rewards(player, points, gm)
 
+            log_data.append({"user": player, "trophies": br[1], "reward": br[2]})
+
             count += 1
             if count == 1:
                 await ctx.send("Direct messaging rewards!")
             level_up = await self.xp_handler(player)
-            await player.send(embed=br)
+            await player.send(embed=br[0])
             if level_up:
                 await player.send(f"{level_up[0]}\n{level_up[1]}")
             if rur:
                 await player.send(embed=rur)
             if trr:
                 await player.send(embed=trr)
+
+        await self.save_battle_log(log_data)
 
     @commands.command(name="tutorial", aliases=["tut"])
     @commands.guild_only()
@@ -1041,10 +1039,10 @@ class Brawlcord(commands.Cog):
         else:
             return await ctx.send("Unable to identify game mode.")
 
-        if gamemode not in ["Gem Grab", "Solo Showdown"]:
+        if gamemode not in ["Gem Grab", "Solo Showdown", "Brawl Ball"]:
             return await ctx.send(
-                "The game only supports **Gem Grab** and **Solo Showdown**"
-                " at the moment. More game modes will be added soon!"
+                "The game only supports **Gem Grab**, **Solo Showdown** and"
+                " **Brawl Ball** at the moment. More game modes will be added soon!"
             )
 
         user_owned = await self.get_player_stat(
@@ -1365,7 +1363,8 @@ class Brawlcord(commands.Cog):
 
     @commands.group(
         name="leaderboard",
-        aliases=['lb'], autohelp=False,
+        aliases=['lb'],
+        autohelp=False,
         usage='[brawler or pb] [brawler_name]'
     )
     @maintenance()
@@ -1500,7 +1499,7 @@ class Brawlcord(commands.Cog):
         # attach_files=True,
         # external_emojis=True,
         # add_reactions=True
-        perms = discord.Permissions(321600)
+        perms = discord.Permissions(322624)
 
         try:
             data = await self.bot.application_info()
@@ -1590,7 +1589,7 @@ class Brawlcord(commands.Cog):
                 " `-upgrade <brawler_name>` command."
                 f"\n\nAvailable Gold: {emojis['gold']} {gold}"
             )
-            pages = list(pagify(text=embed_str))
+            pages = list(pagify(text=embed_str, page_length=1000))
             total = len(pages)
             for i, page in enumerate(pages, start=1):
                 embed = discord.Embed(
@@ -1951,6 +1950,186 @@ class Brawlcord(commands.Cog):
             f"You can join the Brawlcord community server by using this link: {COMMUNITY_SERVER}"
         )
 
+    @commands.command()
+    async def drops(self, ctx: Context):
+        """Show Brawl Box drop rates"""
+
+        brawler_data = await self.get_player_stat(
+            ctx.author, "brawlers", is_iter=True
+        )
+
+        box = Box(self.BRAWLERS, brawler_data)
+
+        embed = discord.Embed(color=EMBED_COLOR)
+        embed.set_author(name="Drop Rates", icon_url=ctx.author.avatar_url)
+
+        def get_value_str(value: int):
+            return f"{value}%"
+
+        # TODO: Add emojis in front of values before release
+        embed.add_field(name="Power Points", value=get_value_str(box.powerpoint))
+        embed.add_field(name="Rare Brawler", value=get_value_str(box.rare))
+        embed.add_field(name="Super Rare Brawler", value=get_value_str(box.superrare))
+        embed.add_field(name="Epic Brawler", value=get_value_str(box.epic))
+        embed.add_field(name="Mythic Brawler", value=get_value_str(box.mythic))
+        embed.add_field(name="Legendary Brawler", value=get_value_str(box.legendary))
+        embed.add_field(name="Gems", value=get_value_str(box.gems))
+        embed.add_field(name="Tickets", value=get_value_str(box.tickets))
+        embed.add_field(name="Token Doubler", value=get_value_str(box.td))
+
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["log"])
+    async def battlelog(self, ctx: Context):
+        """Show the battle log with last 10 (or fewer) entries"""
+
+        battle_log = await self.config.user(ctx.author).battle_log()
+        battle_log.reverse()
+
+        # Only show 10 (or fewer) most recent logs.
+        battle_log = battle_log[-10:]
+        total_pages = len(battle_log)
+
+        embeds = []
+
+        for page_num, entry_json in enumerate(battle_log, start=1):
+            entry: BattleLogEntry = await BattleLogEntry.from_json(entry_json, self.bot)
+
+            embed = discord.Embed(
+                color=LOG_COLORS[entry.result],
+                timestamp=datetime.utcfromtimestamp(entry.timestamp)
+            )
+            embed.set_author(
+                name=f"{ctx.author.name}'s Battle Log", icon_url=ctx.author.avatar_url
+            )
+            embed.description = (
+                f"Opponent: **{entry.opponent}**"
+                f"\nResult: **{entry.result}**"
+                f"\nGame Mode: {gamemode_emotes[entry.game_mode]} **{entry.game_mode}**"
+            )
+
+            player_value = (
+                f"Brawler: {brawler_emojis[entry.player_brawler_name]}"
+                f" **{entry.player_brawler_name}**"
+                f"\nBrawler Level: **{level_emotes['level_' + str(entry.player_brawler_level)]}**"
+                f"\nBrawler Trophies: {emojis['trophies']} **{entry.player_brawler_trophies}**"
+                f"\nReward Trophies: {emojis['trophies']} **{entry.player_reward_trophies}**"
+            )
+            embed.add_field(name="Your Stats", value=player_value)
+
+            opponent_value = (
+                f"Brawler: {brawler_emojis[entry.opponent_brawler_name]}"
+                f" **{entry.opponent_brawler_name}**"
+                f"\nBrawler Level: **{level_emotes['level_' + str(entry.opponent_brawler_level)]}**"
+                f"\nBrawler Trophies: {emojis['trophies']} **{entry.opponent_brawler_trophies}**"
+                f"\nReward Trophies: {emojis['trophies']} **{entry.opponent_reward_trophies}**"
+            )
+            embed.add_field(name="Opponent's Stats", value=opponent_value)
+
+            embed.set_footer(text=f"Log {page_num} of {total_pages}")
+
+            embeds.append(embed)
+
+        await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    # Start Tasks
+
+    async def update_token_bank(self):
+        """Task to update token banks."""
+
+        while True:
+            for user in await self.config.all_users():
+                user = self.bot.get_user(user)
+                if not user:
+                    continue
+                tokens_in_bank = await self.get_player_stat(
+                    user, 'tokens_in_bank')
+                if tokens_in_bank == 200:
+                    continue
+                tokens_in_bank += 20
+                if tokens_in_bank > 200:
+                    tokens_in_bank = 200
+
+                bank_update_timestamp = await self.get_player_stat(user, 'bank_update_ts')
+
+                if not bank_update_timestamp:
+                    continue
+
+                bank_update_ts = datetime.utcfromtimestamp(ceil(bank_update_timestamp))
+                time_now = datetime.utcnow()
+                delta = time_now - bank_update_ts
+                delta_min = delta.total_seconds() / 60
+
+                if delta_min >= 80:
+                    await self.update_player_stat(
+                        user, 'tokens_in_bank', tokens_in_bank)
+                    epoch = datetime(1970, 1, 1)
+
+                    # get timestamp in UTC
+                    timestamp = (time_now - epoch).total_seconds()
+                    await self.update_player_stat(
+                        user, 'bank_update_ts', timestamp)
+
+            asyncio.sleep(60)
+
+    async def update_status(self):
+        """Task to update bot's status with total guilds.
+
+        Runs every 2 minutes.
+        """
+
+        while True:
+            try:
+                await self.bot.change_presence(
+                    activity=discord.Game(
+                        name=f'Brawl Stars in {len(self.bot.guilds)} servers'
+                    )
+                )
+            except Exception:
+                pass
+
+            await asyncio.sleep(120)
+
+    async def update_shop_and_st(self):
+        """Task to update daily shop and star tokens."""
+
+        while True:
+            s_reset = await self.config.shop_reset_ts()
+            create_shop = False
+            if not s_reset:
+                # first reset
+                create_shop = True
+            shop_diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
+
+            st_reset = await self.config.st_reset_ts()
+            reset = False
+            if not st_reset:
+                # first reset
+                reset = True
+                continue
+            st_diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
+
+            for user in await self.config.all_users():
+                user = self.bot.get_user(user)
+                if not user:
+                    continue
+                if create_shop:
+                    await self.create_shop(user)
+                    continue
+                if shop_diff.days > 0:
+                    await self.create_shop(user)
+
+                st_reset = await self.config.st_reset_ts()
+                if reset:
+                    await self.reset_st(user)
+                    continue
+                if st_diff.days > 0:
+                    await self.reset_st(user)
+
+            await asyncio.sleep(300)
+
+    # End Tasks
+
     async def get_player_stat(
         self, user: discord.User, stat: str,
         is_iter=False, substat: str = None
@@ -2054,8 +2233,7 @@ class Brawlcord(commands.Cog):
             user, 'brawlers', is_iter=True, substat=selected_brawler)
         trophies = brawler_data['trophies']
 
-        reward_trophies = self.trophies_to_reward_mapping(
-            trophies, '3v3', position)
+        reward_trophies = self.trophies_to_reward_mapping(trophies, '3v3', position)
 
         trophies += reward_trophies
 
@@ -2119,7 +2297,7 @@ class Brawlcord(commands.Cog):
         rank_up = await self.handle_rank_ups(user, selected_brawler)
         trophy_road_reward = await self.handle_trophy_road(user)
 
-        return embed, rank_up, trophy_road_reward
+        return (embed, trophies-reward_trophies, reward_trophies), rank_up, trophy_road_reward
 
     def trophies_to_reward_mapping(
         self, trophies: int, game_type="3v3", position=1
@@ -2209,46 +2387,6 @@ class Brawlcord(commands.Cog):
         if trophies > pb:
             await self.update_player_stat(
                 user, 'brawlers', trophies, substat=brawler, sub_index='pb')
-
-    async def update_token_bank(self):
-        """Task to update token banks."""
-
-        while True:
-            for user in await self.config.all_users():
-                user = self.bot.get_user(user)
-                if not user:
-                    continue
-                tokens_in_bank = await self.get_player_stat(
-                    user, 'tokens_in_bank')
-                if tokens_in_bank == 200:
-                    continue
-                tokens_in_bank += 20
-                if tokens_in_bank > 200:
-                    tokens_in_bank = 200
-
-                bank_update_timestamp = await self.get_player_stat(
-                    user, 'bank_update_ts')
-
-                if not bank_update_timestamp:
-                    continue
-
-                bank_update_ts = datetime.utcfromtimestamp(
-                    ceil(bank_update_timestamp))
-                time_now = datetime.utcnow()
-                delta = time_now - bank_update_ts
-                delta_min = delta.total_seconds() / 60
-
-                if delta_min >= 80:
-                    await self.update_player_stat(
-                        user, 'tokens_in_bank', tokens_in_bank)
-                    epoch = datetime(1970, 1, 1)
-
-                    # get timestamp in UTC
-                    timestamp = (time_now - epoch).total_seconds()
-                    await self.update_player_stat(
-                        user, 'bank_update_ts', timestamp)
-
-            await asyncio.sleep(60)
 
     def get_rank(self, pb):
         """Return rank of the Brawler based on its personal best."""
@@ -2678,6 +2816,8 @@ class Brawlcord(commands.Cog):
 
         return box.split("box")[0].title() + " Box"
 
+    # Start owner-only commands
+
     @commands.command()
     @checks.is_owner()
     async def clear_cooldown(self, ctx: Context, user: discord.User = None):
@@ -2716,7 +2856,10 @@ class Brawlcord(commands.Cog):
     async def maint(
         self, ctx: Context, setting: bool = False, duration: int = None
     ):
-        """Set/remove maintenance. Duration should be in minutes."""
+        """Set/remove maintenance. The duration should be in minutes."""
+
+        if duration:
+            setting = True
 
         async with self.config.maintenance() as maint:
             maint["setting"] = setting
@@ -2730,7 +2873,7 @@ class Brawlcord(commands.Cog):
         else:
             await ctx.send("Disabled maintenance. Commands are enabled now.")
 
-    @commands.command()
+    @commands.command(aliases=["maintinfo"])
     @checks.is_owner()
     async def minfo(self, ctx: Context):
         """Display maintenance info."""
@@ -2764,6 +2907,8 @@ class Brawlcord(commands.Cog):
 
         await ctx.send("Done! Please check logs for errors.")
 
+    # End owner-only commands
+
     async def cog_command_error(self, ctx: Context, error: Exception):
         if not isinstance(
             getattr(error, "original", error),
@@ -2779,22 +2924,6 @@ class Brawlcord(commands.Cog):
         await ctx.bot.on_command_error(
             ctx, getattr(error, "original", error), unhandled_by_cog=True
         )
-
-    async def update_status(self):
-        """Task to update bot's status with total guilds.
-
-        Runs every 2 minutes.
-        """
-
-        await self.bot.wait_until_ready()
-        while True:
-            await self.bot.change_presence(
-                activity=discord.Game(
-                    name=f'Brawl Stars in {len(self.bot.guilds)} servers'
-                )
-            )
-
-            await asyncio.sleep(120)
 
     async def create_shop(self, user: discord.User, update=True) -> Shop:
 
@@ -2816,46 +2945,6 @@ class Brawlcord(commands.Cog):
             await self.config.shop_reset_ts.set(timestamp)
 
         return shop
-
-    async def update_shop_and_st(self):
-        """Task to update daily shop and star tokens."""
-
-        await self.bot.wait_until_ready()
-
-        while not self.bot.is_closed():
-            s_reset = await self.config.shop_reset_ts()
-            create_shop = False
-            if not s_reset:
-                # first reset
-                create_shop = True
-            shop_diff = datetime.utcnow() - datetime.utcfromtimestamp(s_reset)
-
-            st_reset = await self.config.st_reset_ts()
-            reset = False
-            if not st_reset:
-                # first reset
-                reset = True
-                continue
-            st_diff = datetime.utcnow() - datetime.utcfromtimestamp(st_reset)
-
-            for user in await self.config.all_users():
-                user = self.bot.get_user(user)
-                if not user:
-                    continue
-                if create_shop:
-                    await self.create_shop(user)
-                    continue
-                if shop_diff.days > 0:
-                    await self.create_shop(user)
-
-                st_reset = await self.config.st_reset_ts()
-                if reset:
-                    await self.reset_st(user)
-                    continue
-                if st_diff.days > 0:
-                    await self.reset_st(user)
-
-            await asyncio.sleep(300)
 
     async def _view_shop(self, ctx: Context):
         """Sends shop embeds."""
@@ -2894,6 +2983,51 @@ class Brawlcord(commands.Cog):
         timestamp = (time_now - epoch).total_seconds()
         await self.config.st_reset_ts.set(timestamp)
 
+    async def save_battle_log(self, log_data: dict):
+        """Save complete log entry."""
+
+        if len(log_data) == 1:
+            # One user is the bot.
+            user = log_data[0]["user"]
+            partial_logs = await self.config.user(user).partial_battle_log()
+            partial_log_json = partial_logs[-1]
+
+            partial_log = await PartialBattleLogEntry.from_json(partial_log_json, self.bot)
+            player_extras = {
+                "brawler_trophies": log_data[0]["trophies"],
+                "reward_trophies": log_data[0]["reward"]
+            }
+            opponent_extras = {
+                "brawler_trophies": log_data[0]["trophies"] + random.randint(-20, 20),
+                "reward_trophies": 0
+            }
+            log_entry = BattleLogEntry(partial_log, player_extras, opponent_extras).to_json()
+            async with self.config.user(user).battle_log() as battle_log:
+                battle_log.append(log_entry)
+        else:
+            for i in [0, 1]:
+                if i == 0:
+                    other = 1
+                else:
+                    other = 0
+
+                user = log_data[i]["user"]
+                partial_logs = await self.config.user(user).partial_battle_log()
+                partial_log_json = partial_logs[-1]
+
+                partial_log = await PartialBattleLogEntry.from_json(partial_log_json, self.bot)
+                player_extras = {
+                    "brawler_trophies": log_data[i]["trophies"],
+                    "reward_trophies": log_data[i]["reward"]
+                }
+                opponent_extras = {
+                    "brawler_trophies": log_data[other]["trophies"],
+                    "reward_trophies": log_data[other]["reward"]
+                }
+                log_entry = BattleLogEntry(partial_log, player_extras, opponent_extras).to_json()
+                async with self.config.user(user).battle_log() as battle_log:
+                    battle_log.append(log_entry)
+
     def cog_unload(self):
         # Cancel various tasks.
         self.bank_update_task.cancel()
@@ -2919,7 +3053,7 @@ class Brawlcord(commands.Cog):
             self.bot.add_command(old_info)
 
 
-async def setup(bot):
+async def setup(bot: Red):
     # Replace invite command.
     global old_invite
     old_invite = bot.get_command("invite")

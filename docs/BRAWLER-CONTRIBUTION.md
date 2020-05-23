@@ -238,5 +238,5 @@ The best place to find all the data is the [Brawl Stars Wiki](https://brawlstars
 - [ ] Mr. P
 - [X] Crow
 - [X] Spike
-- [ ] Leon
+- [X] Leon
 - [ ] Sandy
