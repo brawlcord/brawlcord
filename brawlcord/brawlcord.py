@@ -2070,7 +2070,7 @@ class Brawlcord(commands.Cog):
                     await self.update_player_stat(
                         user, 'bank_update_ts', timestamp)
 
-            asyncio.sleep(60)
+            await asyncio.sleep(60)
 
     async def update_status(self):
         """Task to update bot's status with total guilds.
