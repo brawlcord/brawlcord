@@ -15,9 +15,7 @@ from redbot.core.bot import Red
 from redbot.core.commands.context import Context
 from redbot.core.data_manager import bundled_data_path
 from redbot.core.utils.chat_formatting import pagify
-from redbot.core.utils.menus import (
-    DEFAULT_CONTROLS, menu, start_adding_reactions
-)
+from redbot.core.utils.menus import DEFAULT_CONTROLS, menu, start_adding_reactions
 from redbot.core.utils.predicates import MessagePredicate, ReactionPredicate
 
 from .battlelog import BattleLogEntry, PartialBattleLogEntry
@@ -2818,6 +2816,8 @@ class Brawlcord(commands.Cog):
 
         return box.split("box")[0].title() + " Box"
 
+    # Start owner-only commands
+
     @commands.command()
     @checks.is_owner()
     async def clear_cooldown(self, ctx: Context, user: discord.User = None):
@@ -2906,6 +2906,8 @@ class Brawlcord(commands.Cog):
                     log.error(f"Error fixing skins for user with ID: {user}")
 
         await ctx.send("Done! Please check logs for errors.")
+
+    # End owner-only commands
 
     async def cog_command_error(self, ctx: Context, error: Exception):
         if not isinstance(
