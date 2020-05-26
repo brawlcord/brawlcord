@@ -33,7 +33,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.2.1"
+__version__ = "2.2.2"
 __author__ = "Snowsee"
 
 default = {
@@ -439,20 +439,6 @@ class Brawlcord(commands.Cog):
         )
 
         embed.add_field(name="__Introduction:__", value=tut_str, inline=False)
-
-        # star shelly skin for beta users
-        # remove this code for global release
-        async with self.config.user(author).brawlers() as brawlers:
-            if "Star" not in brawlers["Shelly"]["skins"]:
-                brawlers["Shelly"]["skins"].append("Star")
-
-        embed.add_field(
-            name="\u200b\n__Exclusive Skin!__",
-            value=(
-                "Being one of the first users of Brawlcord,"
-                " you get an exclusive **Star Shelly** skin!"
-            ),
-            inline=False)
 
         embed.add_field(
             name="\u200b\n__Feedback:__",
