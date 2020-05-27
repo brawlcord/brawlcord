@@ -53,7 +53,7 @@ class BrawlcordHelp(RedHelpFormatter):
 
         gameplay_cmds = [
             "brawl", "brawler", "tutorial", "allbrawlers",
-            "gamemodes", "upgrade", "shop", "select"
+            "gamemodes", "upgrade", "shop", "select", "battlelog"
         ]
         stat_cmds = [
             "profile", "stats", "upgrades", "powerpoints",
@@ -64,8 +64,6 @@ class BrawlcordHelp(RedHelpFormatter):
             "setprefix", "report", "invite", "info",
             "licenseinfo", "redinfo", "support", "discord"
         ]
-
-        # commands = sorted(ctx.bot.commands, key=lambda x: x.name)
 
         titles = ["Gameplay", "Statistics", "Economy", "Misc"]
 
