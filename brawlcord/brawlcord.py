@@ -33,7 +33,7 @@ from .utils import Box, default_stats, maintenance
 
 log = logging.getLogger("red.brawlcord")
 
-__version__ = "2.2.3"
+__version__ = "2.2.4"
 __author__ = "Snowsee"
 
 default = {
@@ -1975,6 +1975,11 @@ class Brawlcord(commands.Cog):
         # Only show 10 (or fewer) most recent logs.
         battle_log = battle_log[-10:]
         total_pages = len(battle_log)
+
+        if total_pages < 1:
+            return await ctx.send(
+                "You don't have any battles logged. Use the `-brawl` command to brawl!"
+            )
 
         embeds = []
 

@@ -14,6 +14,8 @@
 
 - `-allbrawlers`: Show list of all the Brawlers!
 
+- `-battlelog`: Show the battle log with last 10 (or fewer) entries!
+
 - `-brawl`: Brawl against other players!
 
 - `-brawler`: Show stats of a particular Brawler!
@@ -81,14 +83,18 @@
 
 ## Misc
 
-- `-brawlcord`: Show info about Brawlcord!
+- `-discord`: Show a link to the community Brawlcord server!
+
+- `-info`: Show info about Brawlcord!
 
 - `-invite`: Show Brawlcord's invite url!
+
+- `-redinfo`: Show info about Red!
 
 - `-report`: Send a report to the bot owner!
 
 - `-setprefix`: Set Brawlcord's server prefix(es)!
 
-- `-info`: Shows info about Red!
+- `-support`: Show bot support information!
 
 - `-licenseinfo`: Get info about Red's licenses!
