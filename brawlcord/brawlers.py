@@ -666,5 +666,6 @@ brawlers_map = {
     "Frank": Frank,
     "Tara": Tara,
     "Spike": Spike,
-    "Crow": Crow
+    "Crow": Crow,
+    "Leon": Leon
 }
