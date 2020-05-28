@@ -1976,6 +1976,11 @@ class Brawlcord(commands.Cog):
         battle_log = battle_log[-10:]
         total_pages = len(battle_log)
 
+        if total_pages < 1:
+            return await ctx.send(
+                "You don't have any battles logged. Use the `-brawl` command to brawl!"
+            )
+
         embeds = []
 
         for page_num, entry_json in enumerate(battle_log, start=1):
