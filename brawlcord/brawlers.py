@@ -129,7 +129,7 @@ class Brawler:
 
         for stat in self.stats:
             val = self.stats[stat]
-            if not val:
+            if val is None or not isinstance(val, (int, float)):
                 continue
             stats[stat] = val + int(val/20 * (level - 1))
 
@@ -562,6 +562,21 @@ class Crow(Brawler):
         return info
 
 
+# Overrides `super_info` method to factor in super duration.
+# `_attack` and `_ult` methods don't need overrides as
+# `GameMode` classes are changed to suit Leon's abilities.
+class Leon(Brawler):
+    """Class to represent Leon."""
+
+    def super_info(self, stats):
+        super_str = self.ult['extra']
+        super_desc = f"```{self.ult['desc']}```"
+
+        info = f"{super_desc}\n{emojis['super']} {super_str}: {self.ult['duration']} seconds"
+
+        return info
+
+
 # GENERAL BRAWLER CLASSES
 # These exist just for the sake of having a class for each Brawler.
 # They simply inherit from appropriate base classes
@@ -637,11 +652,6 @@ class Tara(Brawler):
 
 class Spike(Brawler):
     """Class to represent Spike."""
-
-
-# It doesn't need any overrides. `GameMode` classes are changes to suit Leon's abilities.
-class Leon(Brawler):
-    """Class to represent Leon."""
 
 
 brawlers_map = {
