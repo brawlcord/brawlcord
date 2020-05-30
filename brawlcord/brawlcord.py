@@ -26,7 +26,7 @@ from .emojis import (
     brawler_emojis, emojis, gamemode_emotes,
     league_emojis, level_emotes, rank_emojis, sp_icons
 )
-from .errors import MaintenanceError, UserRejected
+from .errors import AmbiguityError, MaintenanceError, UserRejected
 from .gamemodes import GameMode, gamemodes_map
 from .shop import Shop
 from .utils import Box, default_stats, maintenance
@@ -44,7 +44,8 @@ default = {
         "setting": False
     },
     "shop_reset_ts": None,  # shop reset timestamp
-    "st_reset_ts": None  # star tokens reset timestamp
+    "st_reset_ts": None,  # star tokens reset timestamp
+    "clubs": []
 }
 
 default_user = {
@@ -99,7 +100,8 @@ default_user = {
     # already received daily star tokens
     "todays_st": [],
     "battle_log": [],
-    "partial_battle_log": []
+    "partial_battle_log": [],
+    "club": None,  # club identifier
 }
 
 shelly_tut = "https://i.imgur.com/QfKYzso.png"
@@ -138,6 +140,8 @@ LOG_COLORS = {
     "Loss": 0xFF5B5B,
     "Draw": EMBED_COLOR
 }
+
+gamemode_thumb = "https://www.starlist.pro/assets/gamemode/{}.png"
 
 
 class Brawlcord(commands.Cog):
@@ -987,42 +991,12 @@ class Brawlcord(commands.Cog):
     async def select_gamemode(self, ctx: Context, *, gamemode: str):
         """Change selected game mode"""
 
-        # for users who input 'gem-grab' or 'gem_grab'
-        gamemode = gamemode.replace("-", " ")
-        gamemode = gamemode.replace("_", " ")
+        try:
+            gamemode = self.parse_gamemode(gamemode)
+        except AmbiguityError as e:
+            return await ctx.send(e)
 
-        if gamemode.lower() == "showdown":
-            return await ctx.send(
-                "Please select one between Solo and Duo Showdown."
-            )
-
-        possible_names = {
-            "Gem Grab": ["gem grab", "gemgrab", "gg", "gem"],
-            "Brawl Ball": ["brawl ball", "brawlball", "bb", "bball", "ball"],
-            "Solo Showdown": [
-                "solo showdown", "ssd", "solo sd",
-                "soloshowdown", "solo", "s sd"
-            ],
-            "Duo Showdown": [
-                "duo showdown", "dsd", "duo sd", "duoshowdown", "duo", "d sd"
-            ],
-            "Bounty": ["bounty", "bonty", "bunty"],
-            "Heist": ["heist", "heis"],
-            "Lone Star": ["lone star", "lonestar", "ls", "lone"],
-            "Takedown": ["takedown", "take down", "td"],
-            "Robo Rumble": [
-                "robo rumble", "rr", "roborumble", "robo", "rumble"
-            ],
-            "Big Game": ["big game", "biggame", "bg", "big"],
-            "Boss Fight": ["boss fight", "bossfight", "bf", "boss"]
-        }
-
-        for gmtype in possible_names:
-            modes = possible_names[gmtype]
-            if gamemode.lower() in modes:
-                gamemode = gmtype
-                break
-        else:
+        if gamemode is None:
             return await ctx.send("Unable to identify game mode.")
 
         if gamemode not in ["Gem Grab", "Solo Showdown", "Brawl Ball"]:
@@ -1032,7 +1006,8 @@ class Brawlcord(commands.Cog):
             )
 
         user_owned = await self.get_player_stat(
-            ctx.author, 'gamemodes', is_iter=True)
+            ctx.author, 'gamemodes', is_iter=True
+        )
 
         if gamemode not in user_owned:
             return await ctx.send(f"You do not own {gamemode}!")
@@ -2022,6 +1997,51 @@ class Brawlcord(commands.Cog):
             embeds.append(embed)
 
         await menu(ctx, embeds, DEFAULT_CONTROLS)
+
+    @commands.command(name="license")
+    async def license_(self, ctx: Context):
+        """Shows's Brawlcord's license"""
+
+        await ctx.send(
+            "Brawlcord is an instance of Red-DiscordBot, which is licensed under the GNU GPLv3."
+            " For more information about Red's license, use `licenseinfo` command."
+            "\n\nThe source code of Brawlcord itself is available under the MIT license."
+            " The full text of the license is available at"
+            " <https://github.com/snowsee/brawlcord/blob/release/LICENSE>"
+        )
+
+    @commands.group(name="club")
+    async def club(self, ctx: Context):
+        """Show info about your club"""
+
+    @commands.command(name="gamemode")
+    async def _gamemode(self, ctx: Context, *, gamemode: str):
+        """Show info about a game mode"""
+
+        try:
+            gamemode = self.parse_gamemode(gamemode)
+        except AmbiguityError as e:
+            return await ctx.send(e)
+
+        if gamemode is None:
+            return await ctx.send("Unable to identify game mode.")
+
+        if gamemode not in ["Gem Grab", "Solo Showdown", "Brawl Ball"]:
+            return await ctx.send(
+                "The game only supports **Gem Grab**, **Solo Showdown** and"
+                " **Brawl Ball** at the moment. More game modes will be added soon!"
+            )
+
+        embed = discord.Embed(
+            color=EMBED_COLOR,
+            # title=f"{gamemode_emotes[gamemode]} {gamemode}",
+            description=self.GAMEMODES[gamemode]["desc"]
+        )
+        embed.set_author(
+            name=gamemode, icon_url=gamemode_thumb.format(gamemode.replace(" ", "-"))
+        )
+
+        await ctx.send(embed=embed)
 
     # Start Tasks
 
@@ -3018,6 +3038,54 @@ class Brawlcord(commands.Cog):
                 log_entry = BattleLogEntry(partial_log, player_extras, opponent_extras).to_json()
                 async with self.config.user(user).battle_log() as battle_log:
                     battle_log.append(log_entry)
+
+    def parse_gamemode(self, gamemode: str):
+        """Returns full game mode name from user input.
+
+        Returns `None` if no game mode is found.
+
+        Raises
+        --------
+        AmbiguityError
+            If `gamemode.lower()` is "showdown"
+        """
+
+        gamemode = gamemode.strip()
+
+        # for users who input 'gem-grab' or 'gem_grab'
+        gamemode = gamemode.replace("-", " ")
+        gamemode = gamemode.replace("_", " ")
+
+        if gamemode.lower() == "showdown":
+            raise AmbiguityError("Please select one between Solo and Duo Showdown.")
+
+        possible_names = {
+            "Gem Grab": ["gem grab", "gemgrab", "gg", "gem"],
+            "Brawl Ball": ["brawl ball", "brawlball", "bb", "bball", "ball"],
+            "Solo Showdown": [
+                "solo showdown", "ssd", "solo sd",
+                "soloshowdown", "solo", "s sd"
+            ],
+            "Duo Showdown": [
+                "duo showdown", "dsd", "duo sd", "duoshowdown", "duo", "d sd"
+            ],
+            "Bounty": ["bounty", "bonty", "bunty"],
+            "Heist": ["heist", "heis"],
+            "Lone Star": ["lone star", "lonestar", "ls", "lone"],
+            "Takedown": ["takedown", "take down", "td"],
+            "Robo Rumble": [
+                "robo rumble", "rr", "roborumble", "robo", "rumble"
+            ],
+            "Big Game": ["big game", "biggame", "bg", "big"],
+            "Boss Fight": ["boss fight", "bossfight", "bf", "boss"]
+        }
+
+        for gmtype in possible_names:
+            modes = possible_names[gmtype]
+            if gamemode.lower() in modes:
+                return gmtype
+        else:
+            return None
 
     def cog_unload(self):
         # Cancel various tasks.
