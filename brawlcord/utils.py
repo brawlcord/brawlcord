@@ -1,8 +1,11 @@
+# import copy
 import random
 from datetime import datetime
+from typing import List, Optional
 
 import discord
-from redbot.core import commands
+from redbot.core import commands, Config
+from redbot.core.bot import Red
 from redbot.core.commands import Context
 
 from .emojis import brawler_emojis, emojis, sp_icons
@@ -583,3 +586,87 @@ def utc_timestamp(time: datetime) -> float:
     timestamp = (time - epoch).total_seconds()
 
     return timestamp
+
+
+class Club:
+    """Represents a Brawlcord club."""
+
+    def __init__(self, data: dict):
+        self.name: str = data["name"]
+        self.description: str = data["description"]
+        self.required_trophies: int = data["required_trophies"]
+        self.location: str = data["location"]
+        self.icon_num: str = data["icon_num"]
+        self.president: discord.User = data["president"]
+
+        self.vice_presidents: List[discord.User] = data.get("vice_presidents", [])
+        self.seniors: List[discord.User] = data.get("seniors", [])
+        self.members: List[discord.User] = data.get("members", [])
+
+    async def create_club(self, config: Config):
+        async with config.clubs() as clubs:
+            clubs.append(self.to_json())
+
+    def to_json(self) -> dict:
+        """Returns a dictionary represeting the `Club` object."""
+
+        return {
+            "name": self.name,
+            "description": self.description,
+            "required_trophies": self.required_trophies,
+            "location": self.location,
+            "icon_num": self.icon_num,
+            "president_id": self.president.id,
+            "vice_president_ids": [vp.id for vp in self.vice_presidents],
+            "senior_ids": [s.id for s in self.seniors],
+            "member_ids": [m.id for m in self.members]
+        }
+
+    @classmethod
+    async def from_json(cls, data: dict, bot: Red):
+        """Return a `Club` object from dictionary representation of the club."""
+
+        data["president"] = cls.get_user(data["president_id"], bot)
+
+        vice_presidents = []
+        for vp_id in data["vice_president_ids"]:
+            vp = cls.get_user(vp_id, bot)
+            if vp is not None:
+                vice_presidents.append(vp)
+        data["vice_presidents"] = vice_presidents
+
+        seniors = []
+        for s_id in data["senior_ids"]:
+            sen = cls.get_user(s_id, bot)
+            if sen is not None:
+                seniors.append(sen)
+        data["seniors"] = seniors
+
+        members = []
+        for m_id in data["member_ids"]:
+            mem = cls.get_user(m_id, bot)
+            if mem is not None:
+                members.append(mem)
+        data["members"] = members
+
+        data.pop("president_id")
+        data.pop("vice_president_ids")
+        data.pop("senior_ids")
+        data.pop("member_ids")
+
+        return cls(data)
+
+    @staticmethod
+    async def get_user(user_id: int, bot: Red) -> Optional[discord.User]:
+        """Returns `discord.User` object from the given ID.
+
+        Returns `None` if user can't be found.
+        """
+
+        user = bot.get_user(user_id)
+        if user is None:
+            try:
+                user = await bot.fetch_user(user_id)
+            except Exception:
+                pass
+        return user
