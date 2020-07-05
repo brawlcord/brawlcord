@@ -594,7 +594,7 @@
     },
     "Pam": {
         "desc": "Pam shoots from the hip, peppering targets with shrapnel. Her Super is a healing turret that restores her and teammates' health!",
-        "health": 4800,
+        "health": 4500,
         "attack": {
             "name": "Scrapstorm",
             "damage": 260,
