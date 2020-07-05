@@ -205,7 +205,7 @@
         "unlockTrp": 1000,
         "ult": {
             "name": "Rocket Rain",
-            "damage": 1040,
+            "damage": 290,
             "desc": "Brock fires a rocket barrage that takes out enemies and obstacles. He only wants to see you bathing in the Rocket Rain!",
             "range": 8,
             "projectiles": 9,
@@ -449,11 +449,11 @@
         "health": 4800,
         "attack": {
             "name": "Double Deuce",
-            "damage": 380,
+            "damage": 350,
             "desc": "Darryl's double barrel shotguns fire two staggered blasts of heavy close-range damage.",
             "range": 5.67,
             "reload": 1.8,
-            "projectiles": 8,
+            "projectiles": 5,
             "extra": "Damage per shell"
         },
         "speed": 770,
@@ -594,7 +594,7 @@
     },
     "Pam": {
         "desc": "Pam shoots from the hip, peppering targets with shrapnel. Her Super is a healing turret that restores her and teammates' health!",
-        "health": 4800,
+        "health": 4500,
         "attack": {
             "name": "Scrapstorm",
             "damage": 260,
