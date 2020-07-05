@@ -449,11 +449,11 @@
         "health": 4800,
         "attack": {
             "name": "Double Deuce",
-            "damage": 380,
+            "damage": 350,
             "desc": "Darryl's double barrel shotguns fire two staggered blasts of heavy close-range damage.",
             "range": 5.67,
             "reload": 1.8,
-            "projectiles": 8,
+            "projectiles": 5,
             "extra": "Damage per shell"
         },
         "speed": 770,
