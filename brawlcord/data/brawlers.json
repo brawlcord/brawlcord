@@ -205,7 +205,7 @@
         "unlockTrp": 1000,
         "ult": {
             "name": "Rocket Rain",
-            "damage": 1040,
+            "damage": 290,
             "desc": "Brock fires a rocket barrage that takes out enemies and obstacles. He only wants to see you bathing in the Rocket Rain!",
             "range": 8,
             "projectiles": 9,
