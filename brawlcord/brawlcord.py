@@ -122,11 +122,11 @@ old_info = None
 BRAWLSTARS = "https://blog.brawlstars.com/index.html"
 FAN_CONTENT_POLICY = "https://www.supercell.com/fan-content-policy"
 BRAWLCORD_CODE_URL = (
-    "https://raw.githubusercontent.com/snowsee/brawlcord/"
+    "https://raw.githubusercontent.com/brawlcord/brawlcord/"
     "release/brawlcord/brawlcord.py"
 )
 REDDIT_LINK = "https://www.reddit.com/user/Snowsee"
-SOURCE_LINK = "https://github.com/snowsee/brawlcord"
+SOURCE_LINK = "https://github.com/brawlcord/brawlcord"
 
 DAY = 86400
 WEEK = 604800
