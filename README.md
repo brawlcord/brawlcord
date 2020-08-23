@@ -1,10 +1,10 @@
 <h1 align="center">
   <br>
-  <a href="https://snowsee.github.io/brawlcord/">
+  <a href="https://brawlcord.github.io/">
     <img src="https://i.imgur.com/iB0wEQY.png" alt="Brawlcord">
   </a>
   <br>
-  <i> <a href="https://snowsee.github.io/brawlcord/">Brawlcord</a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot">Invite</a></i>
+  <i> <a href="https://brawlcord.github.io/">Brawlcord</a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot">Invite</a></i>
 </h1>
 
 <h4 align="center"><i>1v1 Brawls On Discord!</i></h4>
@@ -14,13 +14,13 @@
   •
   <a href="#how-to-use">How To Use</a>
   •
-  <a href="https://snowsee.github.io/brawlcord/#features">Features</a>
+  <a href="https://brawlcord.github.io/#features">Features</a>
   •
-  <a href="https://snowsee.github.io/brawlcord/#installation">Installation</a>
+  <a href="https://brawlcord.github.io/#installation">Installation</a>
   •
-  <a href="https://snowsee.github.io/brawlcord/#commands">Commands</a>
+  <a href="https://brawlcord.github.io/#commands">Commands</a>
   •
-  <a href="https://snowsee.github.io/brawlcord/#whats-coming-next">What's Coming Next</a>
+  <a href="https://brawlcord.github.io/#whats-coming-next">What's Coming Next</a>
   •
   <a href="#credits">Credits</a>
   •
@@ -45,7 +45,7 @@ You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3P
 
 **Note:** By using the link above, Brawlcord will be able to read messages, send messages, manage messages, embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
 
-More information about bot commands and hosting can be found [here](https://snowsee.github.io/brawlcord/).
+More information about bot commands and hosting can be found [here](https://brawlcord.github.io/).
 
 ## Credits
 

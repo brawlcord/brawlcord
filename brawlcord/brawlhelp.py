@@ -11,7 +11,7 @@ INVITE_URL = (
     "https://discordapp.com/api/oauth2/authorize?client_id="
     "644118957917208576&permissions=322624&scope=bot"
 )
-COMMANDS_PAGE = "https://snowsee.github.io/brawlcord/commands"
+COMMANDS_PAGE = "https://brawlcord.github.io/commands"
 COMMUNITY_SERVER = "https://discord.gg/7zJ3PbJ"
 
 
