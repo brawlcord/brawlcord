@@ -16,9 +16,9 @@
   •
   <a href="https://brawlcord.github.io/#features">Features</a>
   •
-  <a href="https://brawlcord.github.io/#installation">Installation</a>
+  <a href="https://brawlcord.github.io/installation">Installation</a>
   •
-  <a href="https://brawlcord.github.io/#commands">Commands</a>
+  <a href="https://brawlcord.github.io/commands">Commands</a>
   •
   <a href="https://brawlcord.github.io/#whats-coming-next">What's Coming Next</a>
   •
