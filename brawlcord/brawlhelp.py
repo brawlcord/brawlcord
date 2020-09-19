@@ -58,7 +58,7 @@ class BrawlcordHelp(RedHelpFormatter):
         misc_cmds = [
             "setprefix", "report", "invite", "info",
             "licenseinfo", "redinfo", "support", "discord",
-            "license", "credits"
+            "license", "credits", "deletedata", "getdata"
         ]
 
         titles = ["Gameplay", "Statistics", "Economy", "Misc"]
