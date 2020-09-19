@@ -18,7 +18,7 @@ from .tasks import TasksMixin
 from .utils.constants import default_stats
 from .utils.errors import MaintenanceError
 
-__version__ = "2.3.0"
+__version__ = "2.3.1"
 __author__ = "Snowsee"
 
 old_info = None
