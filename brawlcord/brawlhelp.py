@@ -101,7 +101,7 @@ class BrawlcordHelp(RedHelpFormatter):
 
         pages = []
 
-        page_char_limit = 750
+        page_char_limit = 1000
 
         author_info = {
             "name": f"{ctx.me.display_name} Help",
