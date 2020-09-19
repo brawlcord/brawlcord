@@ -847,5 +847,75 @@
             "Sally": [80, -1],
             "Werewolf": [-1, -1]
         }
+    },
+    "Gene": {
+        "desc": "Gene uses his magic lamp to shoot a splitting projectile. His super is a magical hand that grabs and pulls enemies close!",
+        "health": 3600,
+        "attack": {
+            "name": "Smoke Blast",
+            "damage": 900,
+            "desc": "Gene shoots a solid ball of magical smoke from his lamp. If the ball doesn't hit a target, it splits up and spreads the damage in a cone.",
+            "range": 8.67,
+            "reload": 2,
+            "projectiles": 2,
+            "extra": "Damage"
+        },
+        "speed": 720,
+        "rarity": "Mythic",
+        "unlockTrp": -1,
+        "ult": {
+            "name": "Magic Hand",
+            "damage": 1200,
+            "desc": "Gene launches a magical hand from his lamp. If the hand hits an enemy, they get pulled back to Gene's location!",
+            "range": 7.67,
+            "projectiles": 1,
+            "extra": "Damage"
+        },
+        "sp1": {
+            "name": "Magic Puffs",
+            "desc": "Gene heals all friendly Brawlers around him for 400 health per second."
+        },
+        "sp2": {
+            "name": "Spirit Slap",
+            "desc": "When Gene's Super is fully charged he does +300 damage with his attack."
+        },
+        "skins": {
+            "Pirate": [80, -1],
+            "Evil Gene": [150, -1]
+        }
+    },
+    "Tick": {
+        "desc": "Tick is a metal ball of barely controlled excitement and energy - explosive energy! He throws mines, and his Super makes his head detach, seek a target and explode.",
+        "health": 2200,
+        "attack": {
+            "name": "Minimines",
+            "damage": 680,
+            "desc": "Tick lobs a cluster of mines that separate before landing. The mines explode on contact with a target, or after a few seconds.",
+            "range": 7,
+            "reload": 2.2,
+            "projectiles": 3,
+            "extra": "Damage per mine"
+        },
+        "speed": 720,
+        "rarity": "Trophy Road",
+        "unlockTrp": 4000,
+        "ult": {
+            "name": "Headfirst",
+            "damage": 2000,
+            "desc": "Tick detaches and launches his head. After landing, the head hops toward the nearest target and explodes on contact!",
+            "range": 3.33,
+            "projectiles": 1
+        },
+        "sp1": {
+            "name": "Well Oiled",
+            "desc": "When Tick takes no damage and doesn't attack, he starts recovering health 2.0 seconds faster than normal."
+        },
+        "sp2": {
+            "name": "Automa-Tick Reload",
+            "desc": "Tick's reload time is 10% shorter."
+        },
+        "skins": {
+            "King Crab": [80, -1]
+        }
     }
 }

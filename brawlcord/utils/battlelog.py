@@ -3,7 +3,7 @@ from datetime import datetime
 import discord
 from redbot.core.bot import Red
 
-from .utils import utc_timestamp
+from .core import utc_timestamp
 
 
 class PartialBattleLogEntry:

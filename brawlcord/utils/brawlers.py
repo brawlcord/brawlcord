@@ -654,6 +654,14 @@ class Spike(Brawler):
     """Class to represent Spike."""
 
 
+class Gene(Brawler):
+    """Class to represent Gene."""
+
+
+class Tick(Brawler):
+    """Class to represent Tick."""
+
+
 brawlers_map = {
     "Shelly": Shelly,
     "Nita": Nita,
@@ -677,5 +685,7 @@ brawlers_map = {
     "Tara": Tara,
     "Spike": Spike,
     "Crow": Crow,
-    "Leon": Leon
+    "Leon": Leon,
+    "Gene": Gene,
+    "Tick": Tick,
 }

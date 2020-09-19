@@ -1,25 +1,9 @@
 import random
-from datetime import datetime
 
 import discord
-from redbot.core import commands
-from redbot.core.commands import Context
 
+from .constants import default_stats
 from .emojis import brawler_emojis, emojis, sp_icons
-from .errors import MaintenanceError
-
-default_stats = {
-    "trophies": 0,
-    "pb": 0,
-    "rank": 1,
-    "level": 1,
-    "powerpoints": 0,
-    "total_powerpoints": 0,
-    "skins": ["Default"],
-    "selected_skin": "Default",
-    "sp1": False,
-    "sp2": False
-}
 
 EMBED_COLOR = 0xD574FF
 
@@ -534,52 +518,3 @@ class Box:
         )
 
         return embed
-
-
-def maintenance():
-    """A decorator which checks for maintenance."""
-
-    async def predicate(ctx: Context):
-        if await ctx.bot.is_owner(ctx.author):
-            # True means command should run
-            return True
-
-        cog = ctx.cog
-        if cog:
-            config = cog.config
-
-            async with config.maintenance() as maint:
-                setting = maint["setting"]
-
-                if setting:
-                    raise MaintenanceError(
-                        "The bot is currently under maintenance. It will end"
-                        f" in approx. {maint['duration']} minutes."
-                        " Commands will not work till then."
-                        " Sorry for the inconvenience!"
-                    )
-        # Run command if not maintenance
-        return True
-
-    return commands.check(predicate)
-
-
-def utc_timestamp(time: datetime) -> float:
-    """Return timestamp in UTC.
-
-    Parameters
-    --------------
-    time : datetime
-        datetime object in UTC
-
-    Returns
-    ---------
-    float
-        Timestamp in UTC
-    """
-
-    epoch = datetime(1970, 1, 1)
-    # get timestamp in UTC
-    timestamp = (time - epoch).total_seconds()
-
-    return timestamp

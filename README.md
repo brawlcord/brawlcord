@@ -4,7 +4,7 @@
     <img src="https://i.imgur.com/iB0wEQY.png" alt="Brawlcord">
   </a>
   <br>
-  <i> <a href="https://brawlcord.github.io/">Brawlcord</a> // <a href="https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot">Invite</a></i>
+  <i> <a href="https://brawlcord.github.io/">Brawlcord</a> // <a href="https://discord.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot">Invite</a></i>
 </h1>
 
 <h4 align="center"><i>1v1 Brawls On Discord!</i></h4>
@@ -41,7 +41,7 @@ The cog replicates the real game in a number of ways while adapting to the text-
 
 ## How To Use
 
-You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discordapp.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot).
+You can use the bot in the [Brawlcord Community Server](https://discord.gg/7zJ3PbJ) or invite it to your own server using [this link](https://discord.com/oauth2/authorize?client_id=644118957917208576&scope=bot&permissions=322624&scope=bot).
 
 **Note:** By using the link above, Brawlcord will be able to read messages, send messages, manage messages, embed links, attach files, add reactions, and use external emojis wherever allowed. You can remove the permissions manually, but that may break the bot.  
 

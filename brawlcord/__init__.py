@@ -1,1 +1,1 @@
-from .brawlcord import setup  # noqa: F401
+from .brawlcord import setup  # noqa

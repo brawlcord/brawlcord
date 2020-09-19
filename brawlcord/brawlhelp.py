@@ -5,14 +5,9 @@ from redbot.core.commands.context import Context
 from redbot.core.commands.help import HelpSettings, RedHelpFormatter
 from redbot.core.utils.chat_formatting import pagify
 
+from .utils.constants import COMMANDS_PAGE, COMMUNITY_SERVER
+
 EmbedField = namedtuple("EmbedField", "name value inline")
-EMPTY_STRING = "\N{ZERO WIDTH SPACE}"
-INVITE_URL = (
-    "https://discordapp.com/api/oauth2/authorize?client_id="
-    "644118957917208576&permissions=322624&scope=bot"
-)
-COMMANDS_PAGE = "https://brawlcord.github.io/commands"
-COMMUNITY_SERVER = "https://discord.gg/7zJ3PbJ"
 
 
 class BrawlcordHelp(RedHelpFormatter):
@@ -52,17 +47,18 @@ class BrawlcordHelp(RedHelpFormatter):
         emb["footer"]["text"] = tagline
 
         gameplay_cmds = [
-            "brawl", "brawler", "tutorial", "allbrawlers",
-            "gamemodes", "upgrade", "shop", "select", "battlelog"
+            "brawl", "brawler", "tutorial", "allbrawlers", "gamemode",
+            "gamemodes", "upgrade", "shop", "select", "battlelog", "club"
         ]
         stat_cmds = [
-            "profile", "stats", "upgrades", "powerpoints",
-            "skins", "startokens", "brawlers", "leaderboard"
+            "profile", "stats", "upgrades", "powerpoints", "skins",
+            "startokens", "brawlers", "leaderboard", "drops"
         ]
         economy_cmds = ["brawlbox", "bigbox", "claim", "rewards", "gift"]
         misc_cmds = [
             "setprefix", "report", "invite", "info",
-            "licenseinfo", "redinfo", "support", "discord"
+            "licenseinfo", "redinfo", "support", "discord",
+            "license", "credits"
         ]
 
         titles = ["Gameplay", "Statistics", "Economy", "Misc"]

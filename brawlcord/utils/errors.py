@@ -7,3 +7,11 @@ class UserRejected(Exception):
 
 class MaintenanceError(CheckFailure):
     """Raised when the game is on maintenance."""
+
+
+class AmbiguityError(Exception):
+    """Raised when user input is ambiguous."""
+
+
+class CancellationError(Exception):
+    """Raised when user cancels creation of something."""

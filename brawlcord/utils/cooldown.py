@@ -4,7 +4,7 @@ from redbot.core import Config
 from redbot.core.commands.context import Context
 from redbot.core.utils.chat_formatting import humanize_timedelta
 
-from .utils import utc_timestamp
+from .core import utc_timestamp
 
 
 async def user_cooldown(rate: int, per: int, config: Config, ctx: Context):

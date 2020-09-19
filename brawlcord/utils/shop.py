@@ -7,8 +7,8 @@ from redbot.core.commands import Context
 from redbot.core.utils.menus import start_adding_reactions
 from redbot.core.utils.predicates import ReactionPredicate
 
+from .box import Box
 from .emojis import emojis, brawler_emojis, sp_icons
-from .utils import Box
 
 EMBED_COLOR = 0x74FFBE
 
@@ -40,7 +40,9 @@ class Shop:
 
         if brawlers_data:
             for brawler in brawlers_data:
-                # self.owned.append(brawler)
+                if brawler not in all_brawlers:
+                    continue
+
                 total_powerpoints = brawlers_data[brawler]['total_powerpoints']
                 if total_powerpoints < self.max_pp:
                     self.can_get_pp[brawler] = self.max_pp - total_powerpoints
