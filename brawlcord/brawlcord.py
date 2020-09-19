@@ -35,6 +35,8 @@ default = {
     "st_reset_ts": None,  # star tokens reset timestamp
     "clubs": [],
     "club_id_length": 5,
+    # Whether the bot has informed the bot owners about discontinuation of the Red cog or not.
+    "informed_about_discontinuation": False,
 }
 
 default_user = {
@@ -185,6 +187,17 @@ class Brawlcord(
         custom_help = await self.config.custom_help()
         if custom_help:
             self.bot._help_formatter = BrawlcordHelp(self.bot)
+
+        # Inform about Red discontinuation.
+        if not await self.config.informed_about_discontinuation():
+            await self.bot.send_to_owners(
+                "Brawlcord is getting rewritten as a standalone bot in a different"
+                " programming language. Therefore, the future versions of the bot will not"
+                " be available as Red cogs. Additionally, the repo name of Brawlcord's Red cog"
+                " has changed. Please see the following link to update the repo URL for your bot:"
+                " https://brawlcord.github.io/discontinuing-red"
+            )
+            await self.config.informed_about_discontinuation.set(True)
 
     # This command needs to be in this class because of `old_info` variable.
     @commands.command(name="redinfo")
